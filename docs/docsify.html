@@ -79,14 +79,61 @@
     .icon-btn svg { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 2; }
     .sidebar-toggle { display: none !important; }
 
-    /* 文件夹展开/折叠图标 */
+    /* 侧边栏条目胶囊样式 */
+    .sidebar-nav li {
+      list-style: none;
+      margin: 2px 0;
+    }
+    .sidebar-nav a,
+    .sidebar-nav .folder-item > span:first-child,
+    .sidebar-nav .folder-item > a {
+      display: block;
+      padding: 6px 12px;
+      border-radius: 8px;
+      color: #333;
+      text-decoration: none;
+      transition: background 0.15s;
+      cursor: pointer;
+      background: transparent;
+    }
+    .sidebar-nav a:hover,
+    .sidebar-nav .folder-item:hover > a,
+    .sidebar-nav .folder-item:hover > span:first-child {
+      background: rgba(0,0,0,0.06);
+    }
+    .sidebar-nav .active > a {
+      background: rgba(0,0,0,0.08);
+      font-weight: 500;
+    }
+
+    /* 文件夹条目：flex 布局，文字在左，+/- 在右 */
+    .folder-item {
+      display: flex !important;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .folder-item > a,
+    .folder-item > span:first-child {
+      flex: 1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
     .folder-toggle {
-      display: inline-block; width: 16px; margin-right: 4px; cursor: pointer;
-      text-align: center; font-weight: bold; color: #666; user-select: none;
+      margin-left: 8px;
+      font-size: 14px;
+      font-weight: bold;
+      color: #666;
+      user-select: none;
+      min-width: 16px;
+      text-align: center;
       transition: transform 0.2s;
     }
-    .sidebar-nav li { list-style: none; }
-    .sidebar-nav ul { padding-left: 1.2rem; }
+
+    /* 子列表默认缩进 */
+    .sidebar-nav ul {
+      padding-left: 1.5rem;
+    }
 
     /* ========== 文档区域固定抬头 ========== */
     .doc-header {
@@ -104,7 +151,7 @@
     }
     .markdown-section { padding-top: 56px !important; max-width: 960px; margin: 0 auto; }
 
-    /* 胶囊按钮 */
+    /* 胶囊按钮（侧边栏关闭时） */
     .capsule {
       display: none; align-items: center; background: rgba(255,255,255,0.95);
       backdrop-filter: blur(10px); border: 1px solid #e0e0e0; border-radius: 24px;
@@ -246,7 +293,7 @@
               }, 500);
             }
 
-            // 侧边栏改造（知识库总览、搜索文档名、关闭按钮）
+            // 侧边栏头部
             var sidebar = document.querySelector('.sidebar');
             if (sidebar) {
               var header = document.createElement('div');
@@ -272,7 +319,6 @@
               var searchBtn = document.getElementById('sidebarSearchBtn');
               var closeBtn = document.getElementById('sidebarCloseBtn');
 
-              // 文档名过滤函数
               function filterSidebarLinks(keyword) {
                 var links = document.querySelectorAll('.sidebar-nav li');
                 var kw = keyword.toLowerCase();
@@ -294,9 +340,7 @@
                   filterInput.focus();
                 }
               });
-              filterInput.addEventListener('input', function(e) {
-                filterSidebarLinks(e.target.value);
-              });
+              filterInput.addEventListener('input', function(e) { filterSidebarLinks(e.target.value); });
               filterInput.addEventListener('keydown', function(e) {
                 if (e.key === 'Escape') {
                   filterInput.classList.remove('show');
@@ -314,7 +358,6 @@
               });
             }
 
-            // 胶囊按钮事件
             document.getElementById('capsuleSidebarBtn').addEventListener('click', function() {
               document.body.classList.remove('close');
             });
@@ -324,24 +367,20 @@
 
             document.body.classList.remove('close');
             updateDocTitle();
-            initSidebarFolders(); // 初始化文件夹折叠
+            initSidebarFolders(); // 初始化文件夹树
           });
 
-          // 每次页面切换后
           hook.doneEach(function() {
             updateDocTitle();
             closeSearchModal();
             enhanceCodeBlocks();
-            initSidebarFolders(); // 重新应用文件夹折叠
-            if (window.MathJax && MathJax.typesetPromise) {
-              MathJax.typesetPromise();
-            }
+            initSidebarFolders();
+            if (window.MathJax && MathJax.typesetPromise) MathJax.typesetPromise();
           });
         }
       ]
     };
 
-    // 全局更新文档标题
     function updateDocTitle() {
       var active = document.querySelector('.sidebar-nav .active');
       var title = active ? active.textContent.trim() : '';
@@ -352,24 +391,70 @@
       document.getElementById('docTitle').textContent = title || '文档';
     }
 
-    // ========== 文件夹展开/折叠功能 ==========
+    // ========== 侧边栏文件夹初始化（+/- 右侧、整行点击、排序） ==========
     function initSidebarFolders() {
       var sidebarNav = document.querySelector('.sidebar-nav');
       if (!sidebarNav) return;
+
+      // 递归排序：文件夹优先，再按名称字母顺序
+      function sortList(ul) {
+        var items = Array.from(ul.children).filter(li => li.tagName === 'LI');
+        items.sort(function(a, b) {
+          var aIsFolder = !!a.querySelector('ul');
+          var bIsFolder = !!b.querySelector('ul');
+          if (aIsFolder && !bIsFolder) return -1;
+          if (!aIsFolder && bIsFolder) return 1;
+          var aText = (a.querySelector(':scope > a') || a.firstChild).textContent.trim();
+          var bText = (b.querySelector(':scope > a') || b.firstChild).textContent.trim();
+          return aText.localeCompare(bText, 'zh');
+        });
+        items.forEach(function(li) { ul.appendChild(li); });
+      }
+
+      // 对所有 ul 进行排序
+      var allUls = sidebarNav.querySelectorAll('ul');
+      allUls.forEach(sortList);
+
+      // 处理文件夹条目
       var allLis = sidebarNav.querySelectorAll('li');
       allLis.forEach(function(li) {
         var childUl = li.querySelector('ul');
         if (childUl) {
-          // 避免重复添加图标
-          if (li.querySelector('.folder-toggle')) return;
-          var a = li.querySelector(':scope > a');
-          var folderName = a ? a.textContent.trim() : li.childNodes[0]?.textContent.trim();
-          if (!folderName) return;
+          // 避免重复处理
+          if (li.classList.contains('folder-item')) return;
+          li.classList.add('folder-item');
 
+          // 确保有一个可点击的文字区域（使用 a 或 span）
+          var textElement = li.querySelector(':scope > a');
+          if (!textElement) {
+            // 如果没有 a，则创建一个 span 包裹文字
+            var firstText = li.childNodes[0];
+            if (firstText && firstText.nodeType === 3) {
+              textElement = document.createElement('span');
+              textElement.textContent = firstText.textContent.trim();
+              li.replaceChild(textElement, firstText);
+            } else {
+              textElement = document.createElement('span');
+              textElement.textContent = li.textContent.trim();
+              li.innerHTML = '';
+              li.appendChild(textElement);
+            }
+          } else {
+            // 已有 a 标签，将其变为不可跳转（仅用于展示）
+            textElement.setAttribute('href', 'javascript:void(0)');
+          }
+          textElement.style.flex = '1';
+          textElement.style.cursor = 'pointer';
+
+          // 创建右侧图标
           var icon = document.createElement('span');
           icon.className = 'folder-toggle';
           icon.textContent = '+';
-          icon.addEventListener('click', function(e) {
+          li.appendChild(icon);
+
+          // 整行点击切换展开/折叠
+          li.addEventListener('click', function(e) {
+            // 如果点击的是图标，已经包含在内；防止冒泡导致上层 ul 也被触发
             e.stopPropagation();
             if (childUl.style.display === 'none') {
               childUl.style.display = '';
@@ -380,17 +465,6 @@
             }
           });
 
-          if (a) {
-            a.setAttribute('href', 'javascript:void(0)');
-            a.style.cursor = 'pointer';
-            a.addEventListener('click', function(e) {
-              e.preventDefault();
-              icon.click();
-            });
-            a.parentNode.insertBefore(icon, a);
-          } else {
-            li.insertBefore(icon, li.firstChild);
-          }
           // 默认折叠
           childUl.style.display = 'none';
         }
