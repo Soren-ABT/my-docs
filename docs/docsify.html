@@ -25,7 +25,6 @@
       justify-content: center;
       transition: opacity 0.4s ease;
     }
-
     .loader {
       width: 48px;
       height: 48px;
@@ -35,11 +34,9 @@
       animation: spin 0.8s linear infinite;
       margin-bottom: 1.2rem;
     }
-
     @keyframes spin {
       to { transform: rotate(360deg); }
     }
-
     .loading-text {
       color: #b0b0b0;
       font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
@@ -64,17 +61,8 @@
       repo: '',
       loadSidebar: true,
       relativePath: true,
-      // MathJax 配置
-      mathjax: {
-        tex: {
-          inlineMath: [['$','$'], ['\\(','\\)']],
-          displayMath: [['$$','$$'], ['\\[','\\]']]
-        },
-        options: {
-          skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre']
-        }
-      },
       plugins: [
+        // 1. 加载动画关闭
         function(hook, vm) {
           hook.ready(function() {
             var loadingEl = document.getElementById('loading');
@@ -85,15 +73,37 @@
               }, 400);
             }
           });
+        },
+        // 2. 每次页面渲染后，手动触发 MathJax 排版
+        function(hook, vm) {
+          hook.doneEach(function() {
+            if (window.MathJax && MathJax.typesetPromise) {
+              MathJax.typesetPromise();
+            }
+          });
         }
       ]
-    }
+    };
+
+    // MathJax 配置（必须在加载 MathJax 之前定义）
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$','$'], ['\\(','\\)']],
+        displayMath: [['$$','$$'], ['\\[','\\]']],
+        processEscapes: true
+      },
+      options: {
+        skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+        ignoreHtmlClass: 'tex2jax_ignore',
+        processHtmlClass: 'tex2jax_process'
+      }
+    };
   </script>
 
   <!-- Docsify 核心库 -->
   <script src="//cdn.jsdelivr.net/npm/docsify@4"></script>
   
-  <!-- docsify-mathjax 插件（自动渲染公式） -->
-  <script src="//cdn.jsdelivr.net/npm/docsify-mathjax/dist/docsify-mathjax.min.js"></script>
+  <!-- MathJax 3 核心 -->
+  <script id="MathJax-script" async src="//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 </body>
 </html>
