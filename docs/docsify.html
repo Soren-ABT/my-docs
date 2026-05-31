@@ -97,25 +97,21 @@
       background: rgba(0,0,0,0.08); font-weight: 500;
     }
 
-    /* 文件夹行：flex 布局，允许换行 */
     .folder-item {
       display: flex !important;
-      flex-wrap: wrap;               /* 让子列表换行 */
+      flex-wrap: wrap;
       justify-content: space-between;
       align-items: center;
     }
-    /* 文字部分占满第一行（除去图标宽度） */
     .folder-item > a,
     .folder-item > span:first-child {
       flex: 1 1 auto;
-      max-width: calc(100% - 28px);  /* 留出图标空间 */
+      max-width: calc(100% - 28px);
     }
-    /* 子列表强制换行，占满整行 */
     .folder-item > ul {
       flex-basis: 100%;
       width: 100%;
     }
-
     .folder-toggle {
       font-size: 14px; font-weight: bold;
       color: #666; user-select: none;
@@ -123,7 +119,6 @@
       flex-shrink: 0;
     }
 
-    /* 嵌套子列表折叠动画 */
     .sidebar-nav ul.sidebar-sub {
       padding-left: 1.5rem;
       max-height: 0;
@@ -131,7 +126,7 @@
       transition: max-height 0.35s ease;
     }
     .sidebar-nav ul.sidebar-sub.expanded {
-      max-height: 600px;             /* 增大以适应更多文件 */
+      max-height: 600px;
     }
     .sidebar-nav > ul {
       padding-left: 0;
@@ -268,7 +263,9 @@
       name: '我的知识库',
       repo: '',
       loadSidebar: true,
-      relativePath: true,
+      // 不再使用 relativePath，而是用 basePath 配合绝对路径侧边栏
+      relativePath: false,
+      basePath: '/my-docs/docs/',    // 文档根目录
       plugins: [
         function(hook, vm) {
           hook.ready(function() {
@@ -384,6 +381,7 @@
       document.getElementById('docTitle').textContent = title || '文档';
     }
 
+    // 编码中文路径（适用于绝对路径）
     function fixChinesePaths() {
       document.querySelectorAll('.sidebar-nav a').forEach(function(a) {
         var original = a.getAttribute('data-original-href');
@@ -393,6 +391,7 @@
             a.setAttribute('data-original-href', href);
             original = href;
           }
+          // 只编码路径中非 ASCII 字符的部分，保留斜杠和冒号等
           var hashIndex = original.indexOf('#');
           var path = hashIndex === -1 ? original : original.substring(0, hashIndex);
           var hash = hashIndex === -1 ? '' : original.substring(hashIndex);
@@ -406,7 +405,6 @@
       var sidebarNav = document.querySelector('.sidebar-nav');
       if (!sidebarNav) return;
 
-      // 重新标记子列表
       var allUls = sidebarNav.querySelectorAll('ul');
       allUls.forEach(function(ul) {
         if (ul.parentNode.classList.contains('sidebar-nav') || ul === sidebarNav.firstElementChild) {
@@ -416,7 +414,6 @@
         }
       });
 
-      // 排序：文件夹优先，再按名称
       function sortList(ul) {
         var items = Array.from(ul.children).filter(li => li.tagName === 'LI');
         items.sort(function(a, b) {
@@ -433,7 +430,6 @@
 
       allUls.forEach(sortList);
 
-      // 处理文件夹条目
       var allLis = sidebarNav.querySelectorAll('li');
       allLis.forEach(function(li) {
         var childUl = li.querySelector('ul');
@@ -663,7 +659,6 @@
       }
     };
 
-    // 加载动画立体交互
     (function() {
       var wrapper = document.getElementById('loaderWrapper');
       var triangle = document.getElementById('loaderTriangle');
