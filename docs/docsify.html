@@ -111,7 +111,7 @@
     /* 隐藏原生切换按钮 */
     .sidebar-toggle { display: none !important; }
 
-    /* ========== 文档区域固定抬头（与正文共进退） ========== */
+    /* ========== 文档区域固定抬头 ========== */
     .doc-header {
       position: fixed;
       top: 0;
@@ -144,20 +144,11 @@
       flex: 1;
     }
 
-    /* 正文区域增加平滑过渡（与抬头同步） */
+    /* ========== 文档正文区域：居中并避开抬头 ========== */
     .markdown-section {
-      padding-top: 56px !important;
-      transition: margin-left 0.4s cubic-bezier(0.45, 0.05, 0.55, 0.95);
-      margin-left: 0;
-    }
-    body.close .markdown-section {
-      margin-left: 0;
-    }
-    /* 当侧边栏打开时，为正文留出空间（可选） */
-    @media (min-width: 769px) {
-      body:not(.close) .markdown-section {
-        /* 不设置 margin，保持原始布局，因为 Docsify 内容区域自动适配 */
-      }
+      padding-top: 56px !important;   /* 留出抬头高度 */
+      max-width: 960px;
+      margin: 0 auto;                /* 水平居中 */
     }
 
     /* ========== 胶囊按钮组（侧边栏关闭时显示） ========== */
@@ -260,7 +251,7 @@
     }
     .search-result-item:hover { background: #f9f9f9; }
     .search-result-item mark {
-      background: #b9f6ca; /* 绿色高亮 */
+      background: #b9f6ca;
       color: #000;
       border-radius: 2px;
       padding: 0 2px;
@@ -327,7 +318,6 @@
       repo: '',
       loadSidebar: true,
       relativePath: true,
-      // 不再使用原生搜索插件，自定义全文搜索
       plugins: [
         function(hook, vm) {
           hook.ready(function() {
@@ -372,7 +362,6 @@
               var searchBtn = document.getElementById('sidebarSearchBtn');
               var closeBtn = document.getElementById('sidebarCloseBtn');
 
-              // 文档名过滤功能
               function filterSidebarLinks(keyword) {
                 var links = document.querySelectorAll('.sidebar-nav li');
                 var lowerKeyword = keyword.toLowerCase();
@@ -409,7 +398,6 @@
 
               closeBtn.addEventListener('click', function() {
                 document.body.classList.add('close');
-                // 清除侧边栏搜索状态
                 filterInput.classList.remove('show');
                 filterInput.value = '';
                 brand.classList.remove('hidden');
@@ -431,12 +419,10 @@
               });
             }
 
-            // 初始状态
             document.body.classList.remove('close');
             updateDocTitle();
           });
 
-          // 每次内容加载后更新标题，关闭搜索模态
           hook.doneEach(function() {
             updateDocTitle();
             closeSearchModal();
@@ -448,7 +434,6 @@
       ]
     };
 
-    // 更新文档抬头标题
     function updateDocTitle() {
       var activeLink = document.querySelector('.sidebar-nav .active');
       var title = '';
@@ -462,7 +447,7 @@
       if (docTitle) docTitle.textContent = title || '文档';
     }
 
-    // ========== 自定义全文搜索模态框逻辑 ==========
+    // ========== 全文搜索模态逻辑 ==========
     var searchModalOverlay = document.getElementById('searchModalOverlay');
     var searchModalInput = document.getElementById('searchModalInput');
     var searchResults = document.getElementById('searchResults');
@@ -474,7 +459,6 @@
       searchModalInput.value = '';
       searchResults.innerHTML = '';
       searchModalInput.focus();
-      // 清除上次高亮
       clearHighlights();
     }
 
@@ -484,19 +468,17 @@
       clearHighlights();
     }
 
-    // 清除所有搜索高亮，恢复原始文本
     function clearHighlights() {
       currentHighlights.forEach(function(mark) {
         var parent = mark.parentNode;
         if (parent) {
           parent.replaceChild(document.createTextNode(mark.textContent), mark);
-          parent.normalize(); // 合并相邻文本节点
+          parent.normalize();
         }
       });
       currentHighlights = [];
     }
 
-    // 高亮关键词，返回高亮后的mark元素数组
     function highlightInDocument(keyword) {
       clearHighlights();
       if (!keyword.trim()) return;
@@ -504,7 +486,6 @@
       if (!container) return;
       var walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT, {
         acceptNode: function(node) {
-          // 跳过输入框、脚本等
           if (node.parentNode.tagName === 'SCRIPT' || node.parentNode.tagName === 'STYLE' ||
               node.parentNode.tagName === 'INPUT' || node.parentNode.tagName === 'TEXTAREA' ||
               node.parentNode.classList.contains('search-modal-input') ||
@@ -525,11 +506,9 @@
         var lastIndex = 0;
         var fragment = document.createDocumentFragment();
         while ((match = regex.exec(text)) !== null) {
-          // 添加前面的普通文本
           if (match.index > lastIndex) {
             fragment.appendChild(document.createTextNode(text.substring(lastIndex, match.index)));
           }
-          // 创建高亮标记
           var mark = document.createElement('mark');
           mark.className = 'search-highlight';
           mark.textContent = match[0];
@@ -546,79 +525,53 @@
       });
     }
 
-    // 根据关键词生成搜索结果列表
     function generateSearchResults(keyword) {
       searchResults.innerHTML = '';
       if (!keyword.trim()) return;
       var container = document.querySelector('.markdown-section');
       if (!container) return;
-      // 收集所有文本段落块 (p, li, td, h1-h6 等)
       var blocks = container.querySelectorAll('p, li, td, th, h1, h2, h3, h4, h5, h6, div');
       var regex = new RegExp(keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
-      var matches = [];
+      var seenBlocks = new Set();
       blocks.forEach(function(block) {
         var text = block.textContent;
+        regex.lastIndex = 0;
         if (regex.test(text)) {
-          // 重置lastIndex
-          regex.lastIndex = 0;
-          var match;
-          while ((match = regex.exec(text)) !== null) {
-            matches.push({
-              block: block,
-              position: match.index,
-              matchText: match[0]
-            });
-          }
+          if (seenBlocks.has(block)) return;
+          seenBlocks.add(block);
+          var div = document.createElement('div');
+          div.className = 'search-result-item';
+          var match = regex.exec(text) || {};
+          var start = Math.max(0, (match.index || 0) - 40);
+          var end = Math.min(text.length, (match.index || 0) + (match[0] || '').length + 40);
+          var excerpt = text.substring(start, end);
+          if (start > 0) excerpt = '…' + excerpt;
+          if (end < text.length) excerpt = excerpt + '…';
+          var highlightedExcerpt = excerpt.replace(regex, function(matched) {
+            return '<mark>' + matched + '</mark>';
+          });
+          div.innerHTML = highlightedExcerpt;
+          div.addEventListener('click', function() {
+            block.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          });
+          searchResults.appendChild(div);
         }
       });
-      if (matches.length === 0) {
+      if (searchResults.children.length === 0) {
         searchResults.innerHTML = '<div class="search-no-results">未找到匹配内容</div>';
-        return;
       }
-      // 将同一个block的多个匹配合并，但为了简洁，每个block只显示一次，包含上下文
-      var seenBlocks = new Set();
-      matches.forEach(function(item) {
-        var block = item.block;
-        if (seenBlocks.has(block)) return;
-        seenBlocks.add(block);
-        var div = document.createElement('div');
-        div.className = 'search-result-item';
-        // 提取该block的文本，并高亮关键词
-        var blockText = block.textContent;
-        // 限制上下文长度，显示匹配位置周围
-        var start = Math.max(0, item.position - 40);
-        var end = Math.min(blockText.length, item.position + item.matchText.length + 40);
-        var excerpt = blockText.substring(start, end);
-        if (start > 0) excerpt = '…' + excerpt;
-        if (end < blockText.length) excerpt = excerpt + '…';
-        // 高亮关键词
-        var highlightedExcerpt = excerpt.replace(regex, function(matched) {
-          return '<mark>' + matched + '</mark>';
-        });
-        div.innerHTML = highlightedExcerpt;
-        div.addEventListener('click', function() {
-          // 滚动到该block
-          block.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          // 可选：再次高亮关键词（已在文档中高亮）
-        });
-        searchResults.appendChild(div);
-      });
     }
 
-    // 输入事件：实时搜索
     searchModalInput.addEventListener('input', function() {
       var keyword = this.value;
       highlightInDocument(keyword);
       generateSearchResults(keyword);
     });
 
-    // 关闭按钮
     searchModalClose.addEventListener('click', closeSearchModal);
-    // 点击遮罩关闭
     searchModalOverlay.addEventListener('click', function(e) {
       if (e.target === searchModalOverlay) closeSearchModal();
     });
-    // ESC键关闭
     document.addEventListener('keydown', function(e) {
       if (e.key === 'Escape' && searchModalOverlay.classList.contains('active')) {
         closeSearchModal();
