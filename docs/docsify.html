@@ -12,145 +12,131 @@
   <style>
     /* ========== 毛玻璃加载遮罩 ========== */
     #loading {
-      position: fixed;
-      top: 0; left: 0; width: 100%; height: 100%;
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: rgba(255, 255, 255, 0.08);
       backdrop-filter: blur(7px);
       -webkit-backdrop-filter: blur(7px);
       z-index: 9999;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      display: flex; align-items: center; justify-content: center;
       transition: opacity 0.5s ease;
       perspective: 600px;
     }
     .loader-wrapper {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      transform-style: preserve-3d;
-      transition: transform 0.1s ease;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      transform-style: preserve-3d; transition: transform 0.1s ease;
     }
     .loader-triangle {
-      width: 96px; height: 96px;
-      margin-bottom: 1.5rem;
+      width: 96px; height: 96px; margin-bottom: 1.5rem;
       filter: drop-shadow(0 0 8px rgba(255,255,255,0.15)) drop-shadow(0 0 2px rgba(0,0,0,0.2));
       transition: filter 0.1s ease;
     }
     .loader-triangle svg { width: 100%; height: 100%; }
-    .triangle-bg {
-      fill: none; stroke: #666666; stroke-width: 5; stroke-linejoin: round;
-    }
+    .triangle-bg { fill: none; stroke: #666; stroke-width: 5; stroke-linejoin: round; }
     .triangle-progress {
       fill: none; stroke: #f1c40f; stroke-width: 6;
       stroke-linecap: round; stroke-linejoin: round;
       stroke-dasharray: 10 110; stroke-dashoffset: 0;
       animation: dashRhythm 2s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
     }
-    @keyframes dashRhythm {
-      0% { stroke-dashoffset: 0; } 100% { stroke-dashoffset: -120; }
-    }
+    @keyframes dashRhythm { 0% { stroke-dashoffset: 0; } 100% { stroke-dashoffset: -120; } }
     .loading-text {
-      color: #4a4a4a;
-      font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+      color: #4a4a4a; font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
       font-size: 0.95rem; letter-spacing: 1px;
     }
 
-    /* ========== 侧边栏 – 淡灰底色 + 更强的景深 ========== */
+    /* ========== 全局布局 ========== */
+    body { background: #fff; }
+
+    /* ========== 侧边栏（淡灰 + 轻度景深） ========== */
     .sidebar {
-      background: #f7f7f8;              /* 仿 DeepSeek 淡灰 */
-      border-right: 1px solid #e5e5e5;
-      /* 景深强化 */
-      box-shadow: 4px 0 28px rgba(0, 0, 0, 0.18);
-      transition: transform 0.45s cubic-bezier(0.45, 0.05, 0.55, 0.95),
-                  box-shadow 0.45s cubic-bezier(0.45, 0.05, 0.55, 0.95) !important;
+      background: #f5f5f5;
+      border-right: 1px solid #e0e0e0;
+      box-shadow: 4px 0 16px rgba(0,0,0,0.06);   /* 更柔和景深 */
+      transition: transform 0.4s cubic-bezier(0.45, 0.05, 0.55, 0.95),
+                  box-shadow 0.4s cubic-bezier(0.45, 0.05, 0.55, 0.95) !important;
     }
     .sidebar.close {
       transform: translateX(-100%);
-      box-shadow: 0 0 0 rgba(0, 0, 0, 0);
+      box-shadow: none;
     }
 
-    /* 侧边栏顶部导航（搜索 + 切换） */
-    .sidebar-header {
-      display: flex;
-      align-items: center;
-      justify-content: flex-end;
-      padding: 8px 12px;
+    /* 侧边栏顶部：知识库标题（居中，加粗，不拥挤） */
+    .sidebar-title {
+      padding: 20px 16px 12px;
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: #333;
+      text-align: center;
+      border-bottom: 1px solid #e0e0e0;
+      line-height: 1.4;
+    }
+
+    /* 搜索与切换按钮行 */
+    .sidebar-toolbar {
+      display: flex; align-items: center; padding: 8px 12px;
       border-bottom: 1px solid #eee;
-      height: 48px;
     }
-    .sidebar-header .icon-btn {
-      background: none;
-      border: none;
-      cursor: pointer;
-      width: 32px; height: 32px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-left: 4px;
-      border-radius: 6px;
-      transition: background 0.2s;
-      color: #555;
-    }
-    .sidebar-header .icon-btn:hover {
-      background: rgba(0,0,0,0.05);
-    }
-    .sidebar-header .icon-btn svg {
-      width: 20px; height: 20px;
-      stroke: currentColor;
-      fill: none;
-      stroke-width: 2;
-    }
-
-    /* Docsify 默认搜索框位置调整，由我们自定义触发 */
-    .sidebar .search {
-      margin: 8px 12px;
-      display: none;           /* 默认隐藏，点击搜索图标后显示 */
-    }
-    .sidebar .search.show {
-      display: block;
-    }
-    .sidebar .search input {
-      width: 100%;
+    .sidebar-toolbar .filter-input {
+      flex: 1;
       padding: 6px 10px;
       border: 1px solid #ddd;
       border-radius: 6px;
       background: #fff;
+      font-size: 0.9rem;
       outline: none;
+      margin-right: 8px;
+      display: none;        /* 默认隐藏，点击搜索图标显示 */
+    }
+    .sidebar-toolbar .filter-input.show { display: block; }
+    .sidebar-toolbar .icon-btn {
+      background: none; border: none; cursor: pointer;
+      width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;
+      border-radius: 6px; transition: background 0.2s; color: #555;
+    }
+    .sidebar-toolbar .icon-btn:hover { background: rgba(0,0,0,0.06); }
+    .icon-btn svg {
+      width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 2;
     }
 
-    /* 隐藏 Docsify 原生的侧边栏切换按钮，用我们自己的 */
-    .sidebar-toggle {
-      display: none !important;
-    }
+    /* 隐藏原生侧边栏切换按钮 */
+    .sidebar-toggle { display: none !important; }
 
-    /* 文档区域左上角标题 */
-    .page-title {
+    /* ========== 文档区域固定抬头 ========== */
+    .doc-header {
       position: fixed;
-      top: 12px;
-      left: 280px;            /* 侧边栏宽度 + 间距 */
-      font-size: 14px;
-      color: #888;
+      top: 0;
+      left: 260px;                /* 侧边栏宽度 */
+      right: 0;
+      height: 56px;
+      background: #ffffff;
+      border-bottom: 1px solid #eee;
+      display: flex;
+      align-items: center;
+      padding: 0 24px;
+      z-index: 999;
+      transition: left 0.4s cubic-bezier(0.45, 0.05, 0.55, 0.95);
+      box-shadow: 0 1px 4px rgba(0,0,0,0.02); /* 极轻微的抬头阴影 */
+    }
+    body.close .doc-header { left: 0; }
+
+    .doc-header .doc-title {
+      font-size: 15px;
       font-weight: 500;
-      z-index: 100;
-      pointer-events: none;
+      color: #555;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      max-width: calc(100% - 300px);
-      transition: left 0.45s cubic-bezier(0.45, 0.05, 0.55, 0.95);
     }
-    body.close .page-title {
-      left: 20px;             /* 侧边栏关闭后靠近左边缘 */
+
+    /* 为 Docsify 内容区域增加上边距，避免被固定抬头遮挡 */
+    .markdown-section {
+      padding-top: 56px !important;
     }
 
     /* 移动端适配 */
     @media screen and (max-width: 768px) {
-      .page-title {
-        left: 20px;
-        font-size: 13px;
-      }
+      .doc-header { left: 0; }
+      .sidebar { box-shadow: 2px 0 12px rgba(0,0,0,0.08); }
     }
   </style>
 </head>
@@ -168,8 +154,10 @@
     </div>
   </div>
 
-  <!-- 文档区域标题（动态插入） -->
-  <div class="page-title" id="pageTitle"></div>
+  <!-- 文档区域固定抬头 -->
+  <div class="doc-header">
+    <span class="doc-title" id="docTitle">文档加载中…</span>
+  </div>
 
   <!-- Docsify 渲染容器 -->
   <div id="app"></div>
@@ -183,88 +171,105 @@
       relativePath: true,
       search: {
         maxAge: 86400000,
-        placeholder: '搜索文档...',
+        placeholder: '搜索文档内容...',
         noData: '无结果'
       },
       plugins: [
-        // 1. 加载动画关闭 & 侧边栏自定义头部 & 搜索/切换图标绑定
+        // 核心插件：加载完毕、侧边栏装饰、标题更新
         function(hook, vm) {
           hook.ready(function() {
+            // 隐藏加载层
             var loadingEl = document.getElementById('loading');
             if (loadingEl) {
               loadingEl.style.opacity = '0';
               setTimeout(function() {
                 loadingEl.style.display = 'none';
-                document.removeEventListener('mousemove', onMouseMove);
+                if (window._loaderMouseHandler) {
+                  document.removeEventListener('mousemove', window._loaderMouseHandler);
+                }
               }, 500);
             }
 
-            // 创建侧边栏顶部栏
+            // 侧边栏内部改造
             var sidebar = document.querySelector('.sidebar');
-            if (sidebar && !document.querySelector('.sidebar-header')) {
-              var header = document.createElement('div');
-              header.className = 'sidebar-header';
-              header.innerHTML = `
-                <button class="icon-btn search-btn" title="搜索">
+            if (sidebar) {
+              // 插入知识库标题
+              var titleDiv = document.createElement('div');
+              titleDiv.className = 'sidebar-title';
+              titleDiv.textContent = '我的知识库';
+              sidebar.insertBefore(titleDiv, sidebar.firstChild);
+
+              // 插入工具栏（搜索图标 + 切换图标）
+              var toolbar = document.createElement('div');
+              toolbar.className = 'sidebar-toolbar';
+              toolbar.innerHTML = `
+                <input type="text" class="filter-input" placeholder="过滤文档名称…" id="filterInput">
+                <button class="icon-btn search-btn" title="搜索/过滤文档">
                   <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg>
                 </button>
-                <button class="icon-btn toggle-btn" title="收起侧边栏">
+                <button class="icon-btn toggle-btn" title="收起/展开侧边栏">
                   <svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
                 </button>
               `;
-              // 插入到侧边栏导航之前
               var nav = sidebar.querySelector('.sidebar-nav');
               if (nav) {
-                sidebar.insertBefore(header, nav);
+                sidebar.insertBefore(toolbar, nav);
               } else {
-                sidebar.insertBefore(header, sidebar.firstChild);
+                sidebar.appendChild(toolbar);
               }
 
-              // 搜索按钮行为：显示/隐藏 Docsify 的搜索输入框
-              var searchBtn = header.querySelector('.search-btn');
-              var searchBox = document.querySelector('.sidebar .search');
-              if (searchBtn && searchBox) {
+              // 搜索图标行为：显示/隐藏过滤输入框
+              var searchBtn = toolbar.querySelector('.search-btn');
+              var filterInput = document.getElementById('filterInput');
+              if (searchBtn && filterInput) {
                 searchBtn.addEventListener('click', function() {
-                  searchBox.classList.toggle('show');
-                  if (searchBox.classList.contains('show')) {
-                    var input = searchBox.querySelector('input');
-                    if (input) input.focus();
+                  filterInput.classList.toggle('show');
+                  if (filterInput.classList.contains('show')) {
+                    filterInput.focus();
+                  } else {
+                    filterInput.value = '';
+                    filterSidebarLinks(''); // 清空过滤时恢复全部链接
                   }
                 });
               }
 
-              // 切换侧边栏按钮行为：调用 Docsify 的 toggleSidebar
-              var toggleBtn = header.querySelector('.toggle-btn');
+              // 侧边栏过滤功能（仅按文档名匹配）
+              function filterSidebarLinks(keyword) {
+                var links = document.querySelectorAll('.sidebar-nav li');
+                var lowerKeyword = keyword.toLowerCase();
+                links.forEach(function(li) {
+                  var text = li.textContent.trim().toLowerCase();
+                  if (lowerKeyword === '' || text.includes(lowerKeyword)) {
+                    li.style.display = '';
+                  } else {
+                    li.style.display = 'none';
+                  }
+                });
+              }
+              filterInput.addEventListener('input', function(e) {
+                filterSidebarLinks(e.target.value);
+              });
+
+              // 切换侧边栏按钮
+              var toggleBtn = toolbar.querySelector('.toggle-btn');
               if (toggleBtn) {
                 toggleBtn.addEventListener('click', function() {
-                  if (vm && typeof vm.toggleSidebar === 'function') {
-                    vm.toggleSidebar();
-                  }
+                  document.body.classList.toggle('close');
                 });
               }
+
+              // 确保侧边栏默认打开（移除可能存在的 close 类）
+              document.body.classList.remove('close');
             }
 
-            // 初始化时让搜索框默认隐藏（类已在 CSS 中定义）
-            var searchBox = document.querySelector('.sidebar .search');
-            if (searchBox) searchBox.classList.remove('show');
+            // 首次加载后更新文档标题
+            updateDocTitle();
           });
 
-          // 2. 每次页面渲染后，更新左上角文档标题
+          // 每次内容加载完成后，更新文档标题
           hook.doneEach(function() {
-            // 从侧边栏获取当前激活的链接文本
-            var activeLink = document.querySelector('.sidebar-nav .active');
-            var title = '';
-            if (activeLink) {
-              title = activeLink.textContent.trim();
-            } else {
-              // 回退：获取 Markdown 中的第一个 h1
-              var h1 = document.querySelector('.markdown-section h1');
-              if (h1) title = h1.textContent.trim();
-            }
-            var pageTitle = document.getElementById('pageTitle');
-            if (pageTitle) pageTitle.textContent = title || '';
-
-            // 同时触发 MathJax 排版
+            updateDocTitle();
+            // MathJax 重新排版
             if (window.MathJax && MathJax.typesetPromise) {
               MathJax.typesetPromise();
             }
@@ -272,6 +277,20 @@
         }
       ]
     };
+
+    // ========== 更新文档固定抬头标题 ==========
+    function updateDocTitle() {
+      var activeLink = document.querySelector('.sidebar-nav .active');
+      var title = '';
+      if (activeLink) {
+        title = activeLink.textContent.trim();
+      } else {
+        var h1 = document.querySelector('.markdown-section h1');
+        if (h1) title = h1.textContent.trim();
+      }
+      var docTitle = document.getElementById('docTitle');
+      if (docTitle) docTitle.textContent = title || '文档';
+    }
 
     // ========== MathJax 配置 ==========
     window.MathJax = {
@@ -287,29 +306,29 @@
       }
     };
 
-    // ========== 加载动画的立体交互（三角随鼠标微倾） ==========
+    // ========== 加载动画立体交互 ==========
     (function() {
       var wrapper = document.getElementById('loaderWrapper');
       var triangle = document.getElementById('loaderTriangle');
       if (!wrapper || !triangle) return;
       var maxAngle = 10;
       var baseFilter = 'drop-shadow(0 0 8px rgba(255,255,255,0.15)) drop-shadow(0 0 2px rgba(0,0,0,0.2))';
-
-      function onMouseMove(e) {
-        var halfW = window.innerWidth / 2, halfH = window.innerHeight / 2;
+      function handleMouse(e) {
+        var halfW = window.innerWidth/2, halfH = window.innerHeight/2;
         var dx = (e.clientX - halfW) / halfW, dy = (e.clientY - halfH) / halfH;
         var rotateY = dx * maxAngle, rotateX = -dy * maxAngle;
-        wrapper.style.transform = 'rotateX(' + rotateX + 'deg) rotateY(' + rotateY + 'deg) translateZ(15px)';
-        var shadowX = dx * 8, shadowY = dy * 8;
-        triangle.style.filter = baseFilter + ' drop-shadow(' + shadowX + 'px ' + shadowY + 'px 8px rgba(0,0,0,0.35))';
+        wrapper.style.transform = 'rotateX('+rotateX+'deg) rotateY('+rotateY+'deg) translateZ(15px)';
+        var sx = dx * 8, sy = dy * 8;
+        triangle.style.filter = baseFilter + ' drop-shadow('+sx+'px '+sy+'px 8px rgba(0,0,0,0.35))';
       }
-      document.addEventListener('mousemove', onMouseMove);
+      document.addEventListener('mousemove', handleMouse);
+      window._loaderMouseHandler = handleMouse;
     })();
   </script>
 
   <!-- Docsify 核心 -->
   <script src="//cdn.jsdelivr.net/npm/docsify@4"></script>
-  <!-- 搜索插件 -->
+  <!-- 搜索插件（保留，以备全文搜索使用，但侧边栏已提供文档名过滤） -->
   <script src="//cdn.jsdelivr.net/npm/docsify/lib/plugins/search.min.js"></script>
   <!-- MathJax 3 -->
   <script id="MathJax-script" async src="//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
