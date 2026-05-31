@@ -79,6 +79,7 @@
     .icon-btn svg { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 2; }
     .sidebar-toggle { display: none !important; }
 
+    /* 侧边栏条目胶囊样式 */
     .sidebar-nav li { list-style: none; margin: 2px 0; }
     .sidebar-nav a, .sidebar-nav .folder-item > span:first-child, .sidebar-nav .folder-item > a {
       display: block; padding: 6px 12px; border-radius: 8px;
@@ -248,15 +249,17 @@
   <div id="app"></div>
 
   <script>
+    // ========== Docsify 配置 ==========
     window.$docsify = {
       name: '我的知识库',
       repo: '',
-      loadSidebar: true,           // 自动加载 sidebar.md（已重命名）
-      basePath: '/my-docs/docs/',  // 文档根路径
-      // 不再手动指定 sidebar 和 homepage，使用默认
+      loadSidebar: true,                // 自动加载 sidebar.md（已重命名）
+      basePath: '/my-docs/docs/',       // 文档根目录绝对路径
+      // 不再需要 sidebar 或 homepage 配置，使用默认文件名
       plugins: [
         function(hook, vm) {
           hook.ready(function() {
+            // 隐藏加载层
             var loadingEl = document.getElementById('loading');
             var docHeader = document.getElementById('docHeader');
             if (loadingEl) {
@@ -270,7 +273,7 @@
               }, 500);
             }
 
-            // 侧边栏头部
+            // 侧边栏头部插入
             var sidebar = document.querySelector('.sidebar');
             if (sidebar && sidebar.querySelector('.sidebar-nav')) {
               var header = document.createElement('div');
@@ -287,7 +290,7 @@
               if (nav) sidebar.insertBefore(header, nav);
             }
 
-            // 胶囊按钮
+            // 胶囊按钮事件
             var capsuleSidebarBtn = document.getElementById('capsuleSidebarBtn');
             var capsuleSearchBtn = document.getElementById('capsuleSearchBtn');
             if (capsuleSidebarBtn) capsuleSidebarBtn.addEventListener('click', function() { document.body.classList.remove('close'); });
@@ -296,12 +299,14 @@
             document.body.classList.remove('close');
             updateDocTitle();
 
+            // 延迟执行，确保 Docsify 完全渲染 DOM
             setTimeout(function() {
               initSidebarFolders();
               fixChinesePaths();
             }, 200);
           });
 
+          // 每次页面切换后重新应用
           hook.doneEach(function() {
             updateDocTitle();
             closeSearchModal();
@@ -316,7 +321,7 @@
       ]
     };
 
-    // 更新文档标题
+    // 更新文档抬头标题
     function updateDocTitle() {
       var active = document.querySelector('.sidebar-nav .active');
       var title = active ? active.textContent.trim() : '';
@@ -328,12 +333,12 @@
       if (docTitle) docTitle.textContent = title || '文档';
     }
 
-    // 中文路径编码（不添加前缀，因为 basePath 已处理）
+    // 中文路径编码（相对路径 → 自动加上 basePath 的编码）
     function fixChinesePaths() {
       document.querySelectorAll('.sidebar-nav a').forEach(function(a) {
         var href = a.getAttribute('href');
         if (!href || href === 'javascript:void(0)' || href.startsWith('#') || href.startsWith('http')) return;
-        // 仅处理相对路径
+        // 只处理相对路径，不干扰绝对路径
         if (!href.startsWith('/')) {
           var hashIndex = href.indexOf('#');
           var path = hashIndex === -1 ? href : href.substring(0, hashIndex);
@@ -343,11 +348,12 @@
       });
     }
 
-    // 侧边栏文件夹初始化
+    // 文件夹树初始化（排序、展开折叠）
     function initSidebarFolders() {
       var sidebarNav = document.querySelector('.sidebar-nav');
       if (!sidebarNav) return;
 
+      // 标记子列表，根列表不受影响
       var allUls = sidebarNav.querySelectorAll('ul');
       allUls.forEach(function(ul) {
         if (ul.parentNode.classList.contains('sidebar-nav') || ul === sidebarNav.firstElementChild) {
@@ -357,6 +363,7 @@
         }
       });
 
+      // 排序：文件夹优先，再按名称
       function sortList(ul) {
         var items = Array.from(ul.children).filter(li => li.tagName === 'LI');
         items.sort(function(a, b) {
@@ -373,6 +380,7 @@
 
       allUls.forEach(sortList);
 
+      // 处理文件夹条目
       var allLis = sidebarNav.querySelectorAll('li');
       allLis.forEach(function(li) {
         var childUl = li.querySelector('ul');
@@ -468,7 +476,7 @@
       });
     }
 
-    // 全文搜索
+    // ========== 全文搜索（完整实现） ==========
     var searchModalOverlay = document.getElementById('searchModalOverlay');
     var searchModalInput = document.getElementById('searchModalInput');
     var searchResults = document.getElementById('searchResults');
@@ -482,12 +490,14 @@
       searchModalInput.focus();
       clearHighlights();
     }
+
     function closeSearchModal() {
       if (!searchModalOverlay) return;
       searchModalOverlay.classList.remove('active');
       searchResults.innerHTML = '';
       clearHighlights();
     }
+
     function clearHighlights() {
       currentHighlights.forEach(function(mark) {
         var parent = mark.parentNode;
@@ -577,24 +587,22 @@
       }
     }
 
-    if (searchModalInput) {
-      searchModalInput.addEventListener('input', function() {
-        highlightInDocument(this.value);
-        generateSearchResults(this.value);
-      });
-    }
+    searchModalInput.addEventListener('input', function() {
+      highlightInDocument(this.value);
+      generateSearchResults(this.value);
+    });
     var closeBtn = document.getElementById('searchModalClose');
     if (closeBtn) closeBtn.addEventListener('click', closeSearchModal);
-    if (searchModalOverlay) {
-      searchModalOverlay.addEventListener('click', function(e) {
-        if (e.target === searchModalOverlay) closeSearchModal();
-      });
-    }
+    searchModalOverlay.addEventListener('click', function(e) {
+      if (e.target === searchModalOverlay) closeSearchModal();
+    });
     document.addEventListener('keydown', function(e) {
-      if (e.key === 'Escape' && searchModalOverlay && searchModalOverlay.classList.contains('active')) closeSearchModal();
+      if (e.key === 'Escape' && searchModalOverlay.classList.contains('active')) {
+        closeSearchModal();
+      }
     });
 
-    // MathJax 配置
+    // ========== MathJax ==========
     window.MathJax = {
       tex: {
         inlineMath: [['$','$'], ['\\(','\\)']],
@@ -608,7 +616,7 @@
       }
     };
 
-    // 加载动画立体交互
+    // 加载动画立体交互（保留）
     (function() {
       var wrapper = document.getElementById('loaderWrapper');
       var triangle = document.getElementById('loaderTriangle');
