@@ -81,26 +81,23 @@
 
     /* 侧边栏条目胶囊样式 */
     .sidebar-nav li { list-style: none; margin: 2px 0; }
-    .sidebar-nav a,
-    .sidebar-nav .folder-item > span:first-child,
-    .sidebar-nav .folder-item > a {
+    .sidebar-nav a, .sidebar-nav .folder-item > span:first-child, .sidebar-nav .folder-item > a {
       display: block; padding: 6px 12px; border-radius: 8px;
       color: #333; text-decoration: none; transition: background 0.15s;
       cursor: pointer; background: transparent;
     }
-    .sidebar-nav a:hover,
-    .sidebar-nav .folder-item:hover > a,
-    .sidebar-nav .folder-item:hover > span:first-child {
+    .sidebar-nav a:hover, .sidebar-nav .folder-item:hover > a, .sidebar-nav .folder-item:hover > span:first-child {
       background: rgba(0,0,0,0.06);
     }
     .sidebar-nav .active > a { background: rgba(0,0,0,0.08); font-weight: 500; }
 
     .folder-item { display: flex !important; justify-content: space-between; align-items: center; }
-    .folder-item > a,
-    .folder-item > span:first-child { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .folder-item > a, .folder-item > span:first-child {
+      flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
     .folder-toggle {
-      margin-left: 8px; font-size: 14px; font-weight: bold; color: #666;
-      user-select: none; min-width: 16px; text-align: center; transition: transform 0.2s;
+      margin-left: 8px; font-size: 14px; font-weight: bold;
+      color: #666; user-select: none; min-width: 16px; text-align: center;
     }
 
     .sidebar-nav ul {
@@ -200,6 +197,7 @@
   </style>
 </head>
 <body>
+  <!-- 毛玻璃加载 -->
   <div id="loading">
     <div class="loader-wrapper" id="loaderWrapper">
       <div class="loader-triangle" id="loaderTriangle">
@@ -209,6 +207,7 @@
     </div>
   </div>
 
+  <!-- 文档区域固定抬头 -->
   <div class="doc-header" id="docHeader">
     <div class="capsule" id="capsuleGroup">
       <button class="icon-btn" id="capsuleSidebarBtn"><svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
@@ -217,6 +216,7 @@
     <span class="doc-title" id="docTitle">文档加载中…</span>
   </div>
 
+  <!-- 全文搜索模态 -->
   <div class="search-modal-overlay" id="searchModalOverlay">
     <div class="search-modal">
       <div class="search-modal-header">
@@ -246,10 +246,13 @@
               setTimeout(function() {
                 loadingEl.style.display = 'none';
                 if (docHeader) docHeader.style.display = 'flex';
-                if (window._loaderMouseHandler) document.removeEventListener('mousemove', window._loaderMouseHandler);
+                if (window._loaderMouseHandler) {
+                  document.removeEventListener('mousemove', window._loaderMouseHandler);
+                }
               }, 500);
             }
 
+            // 侧边栏头部
             var sidebar = document.querySelector('.sidebar');
             if (sidebar) {
               var header = document.createElement('div');
@@ -343,6 +346,7 @@
       document.getElementById('docTitle').textContent = title || '文档';
     }
 
+    // 中文路径自动编码
     function fixChinesePaths() {
       document.querySelectorAll('.sidebar-nav a').forEach(function(a) {
         var href = a.getAttribute('href');
@@ -408,7 +412,6 @@
           icon.textContent = '+';
           li.appendChild(icon);
 
-          childUl.style.maxHeight = null;
           li.addEventListener('click', function(e) {
             e.stopPropagation();
             if (childUl.classList.contains('expanded')) {
@@ -471,7 +474,7 @@
       });
     }
 
-    // ========== 全文搜索（完整实现） ==========
+    // ========== 全文搜索（完整版） ==========
     var searchModalOverlay = document.getElementById('searchModalOverlay');
     var searchModalInput = document.getElementById('searchModalInput');
     var searchResults = document.getElementById('searchResults');
@@ -581,9 +584,8 @@
     }
 
     searchModalInput.addEventListener('input', function() {
-      var keyword = this.value;
-      highlightInDocument(keyword);
-      generateSearchResults(keyword);
+      highlightInDocument(this.value);
+      generateSearchResults(this.value);
     });
     document.getElementById('searchModalClose').addEventListener('click', closeSearchModal);
     searchModalOverlay.addEventListener('click', function(e) {
@@ -595,18 +597,30 @@
       }
     });
 
-    // MathJax
+    // MathJax 配置
     window.MathJax = {
-      tex: { inlineMath: [['$','$'], ['\\(','\\)']], displayMath: [['$$','$$'], ['\\[','\\]']], processEscapes: true },
-      options: { skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre'], ignoreHtmlClass: 'tex2jax_ignore', processHtmlClass: 'tex2jax_process' }
+      tex: {
+        inlineMath: [['$','$'], ['\\(','\\)']],
+        displayMath: [['$$','$$'], ['\\[','\\]']],
+        processEscapes: true
+      },
+      options: {
+        skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+        ignoreHtmlClass: 'tex2jax_ignore',
+        processHtmlClass: 'tex2jax_process'
+      }
     };
 
+    // 加载动画立体交互
     (function() {
-      var wrapper = document.getElementById('loaderWrapper'), triangle = document.getElementById('loaderTriangle');
+      var wrapper = document.getElementById('loaderWrapper');
+      var triangle = document.getElementById('loaderTriangle');
       if (!wrapper || !triangle) return;
-      var maxAngle = 10, baseFilter = 'drop-shadow(0 0 8px rgba(255,255,255,0.15)) drop-shadow(0 0 2px rgba(0,0,0,0.2))';
+      var maxAngle = 10;
+      var baseFilter = 'drop-shadow(0 0 8px rgba(255,255,255,0.15)) drop-shadow(0 0 2px rgba(0,0,0,0.2))';
       function handleMouse(e) {
-        var dx = (e.clientX - innerWidth/2) / (innerWidth/2), dy = (e.clientY - innerHeight/2) / (innerHeight/2);
+        var dx = (e.clientX - window.innerWidth/2) / (window.innerWidth/2);
+        var dy = (e.clientY - window.innerHeight/2) / (window.innerHeight/2);
         wrapper.style.transform = 'rotateX('+(-dy*maxAngle)+'deg) rotateY('+(dx*maxAngle)+'deg) translateZ(15px)';
         triangle.style.filter = baseFilter + ' drop-shadow('+(dx*8)+'px '+(dy*8)+'px 8px rgba(0,0,0,0.35))';
       }
@@ -615,8 +629,13 @@
     })();
   </script>
 
+  <!-- PDF 内嵌插件 -->
   <script src="//cdn.jsdelivr.net/npm/docsify-pdf-embed/dist/docsify-pdf-embed.min.js"></script>
+
+  <!-- Docsify 核心 -->
   <script src="//cdn.jsdelivr.net/npm/docsify@4"></script>
+
+  <!-- MathJax 3 -->
   <script id="MathJax-script" async src="//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 </body>
 </html>
