@@ -21,10 +21,8 @@
       background: rgba(255, 255, 255, 0.15);
       backdrop-filter: blur(7px);
       -webkit-backdrop-filter: blur(7px);
-      z-index: 9999;
-      display: flex; align-items: center; justify-content: center;
-      transition: opacity 0.5s ease;
-      perspective: 600px;
+      z-index: 9999; display: flex; align-items: center; justify-content: center;
+      transition: opacity 0.5s ease; perspective: 600px;
     }
     .loader-wrapper {
       display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -33,7 +31,6 @@
     .loader-triangle {
       width: 96px; height: 96px; margin-bottom: 1.5rem;
       filter: drop-shadow(0 0 8px rgba(255,255,255,0.15)) drop-shadow(0 0 2px rgba(0,0,0,0.2));
-      transition: filter 0.1s ease;
     }
     .loader-triangle svg { width: 100%; height: 100%; }
     .triangle-bg { fill: none; stroke: #666; stroke-width: 5; stroke-linejoin: round; }
@@ -49,23 +46,18 @@
       font-size: 0.95rem; letter-spacing: 1px;
     }
 
-    /* ========== 全局布局 ========== */
-    body { background: #fff; }
-
-    /* ========== 侧边栏（淡灰 + 轻度景深） ========== */
+    /* ========== 侧边栏 ========== */
     .sidebar {
-      background: #f5f5f5;
-      border-right: 1px solid #e0e0e0;
+      background: #f5f5f5; border-right: 1px solid #e0e0e0;
       box-shadow: 4px 0 16px rgba(0,0,0,0.06);
       transition: transform 0.4s cubic-bezier(0.45, 0.05, 0.55, 0.95),
                   box-shadow 0.4s cubic-bezier(0.45, 0.05, 0.55, 0.95) !important;
       width: 260px;
     }
     .sidebar.close { transform: translateX(-100%); box-shadow: none; }
-
     .sidebar-header {
       display: flex; align-items: center; padding: 16px 12px;
-      border-bottom: 1px solid #e0e0e0; height: 56px; box-sizing: border-box; gap: 8px;
+      border-bottom: 1px solid #e0e0e0; height: 56px; gap: 8px;
     }
     .sidebar-brand {
       font-size: 1.15rem; font-weight: 600; color: #333;
@@ -87,16 +79,23 @@
     .icon-btn svg { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 2; }
     .sidebar-toggle { display: none !important; }
 
-    /* ========== 文档区域固定抬头（加载时隐藏） ========== */
+    /* 文件夹展开/折叠图标 */
+    .folder-toggle {
+      display: inline-block; width: 16px; margin-right: 4px; cursor: pointer;
+      text-align: center; font-weight: bold; color: #666; user-select: none;
+      transition: transform 0.2s;
+    }
+    .sidebar-nav li { list-style: none; }
+    .sidebar-nav ul { padding-left: 1.2rem; }
+
+    /* ========== 文档区域固定抬头 ========== */
     .doc-header {
       position: fixed; top: 0; left: 260px; right: 0; height: 56px;
       background: rgba(255,255,255,0.85); backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid rgba(0,0,0,0.05);
-      display: flex; align-items: center; padding: 0 24px; z-index: 999;
-      transition: left 0.4s cubic-bezier(0.45, 0.05, 0.55, 0.95), background 0.4s;
-      box-shadow: 0 1px 8px rgba(0,0,0,0.04); overflow: visible;
-      /* 初始隐藏，加载完成后用 JS 显示 */
-      display: none;
+      display: none; align-items: center; padding: 0 24px; z-index: 999;
+      transition: left 0.4s cubic-bezier(0.45, 0.05, 0.55, 0.95);
+      box-shadow: 0 1px 8px rgba(0,0,0,0.04);
     }
     body.close .doc-header { left: 0; }
     .doc-title {
@@ -105,7 +104,7 @@
     }
     .markdown-section { padding-top: 56px !important; max-width: 960px; margin: 0 auto; }
 
-    /* ========== 胶囊按钮组 ========== */
+    /* 胶囊按钮 */
     .capsule {
       display: none; align-items: center; background: rgba(255,255,255,0.95);
       backdrop-filter: blur(10px); border: 1px solid #e0e0e0; border-radius: 24px;
@@ -114,15 +113,15 @@
     }
     body.close .capsule { display: flex; }
     body.close .doc-title { padding-left: 80px; }
-    .capsule .icon-btn { width: 28px; height: 28px; border-radius: 50%; color: #555; }
+    .capsule .icon-btn { width: 28px; height: 28px; border-radius: 50%; }
     .capsule .icon-btn:hover { background: rgba(0,0,0,0.1); }
 
-    /* ========== 全文搜索模态框 ========== */
+    /* ========== 全文搜索模态 ========== */
     .search-modal-overlay {
       position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0, 0, 0, 0.3); backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px); z-index: 10000; display: none;
-      align-items: flex-start; justify-content: center; padding-top: 10vh;
+      background: rgba(0,0,0,0.3); backdrop-filter: blur(8px);
+      z-index: 10000; display: none; align-items: flex-start; justify-content: center;
+      padding-top: 10vh;
     }
     .search-modal-overlay.active { display: flex; }
     .search-modal {
@@ -136,7 +135,7 @@
     .search-modal-close { background: none; border: none; cursor: pointer; color: #888; padding: 4px; border-radius: 50%; }
     .search-modal-close:hover { background: #f0f0f0; color: #333; }
     .search-results { overflow-y: auto; flex: 1; padding: 8px 0; }
-    .search-result-item { padding: 10px 18px; cursor: pointer; border-bottom: 1px solid #f5f5f5; font-size: 0.95rem; }
+    .search-result-item { padding: 10px 18px; cursor: pointer; border-bottom: 1px solid #f5f5f5; }
     .search-result-item:hover { background: #f9f9f9; }
     .search-result-item mark { background: #b9f6ca; border-radius: 2px; }
     .search-no-results { padding: 20px; text-align: center; color: #888; }
@@ -144,148 +143,58 @@
     /* ========== 代码块卡片样式 ========== */
     .code-block-wrapper {
       margin: 1.8rem 0; border-radius: 12px; overflow: hidden;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.06), 0 1px 4px rgba(0,0,0,0.04);
-      background: #f8f9fa; border: 1px solid rgba(0,0,0,0.05);
-      transition: box-shadow 0.25s, border-color 0.25s;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.06); background: #f8f9fa;
+      border: 1px solid rgba(0,0,0,0.05);
     }
-    .code-block-wrapper:hover { box-shadow: 0 8px 24px rgba(0,0,0,0.08); }
     .code-toolbar {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 0.6rem 1.2rem; background: rgba(0,0,0,0.04);
-      border-bottom: 1px solid rgba(0,0,0,0.06); font-size: 0.85rem; color: #555;
+      display: flex; justify-content: space-between; padding: 0.6rem 1.2rem;
+      background: rgba(0,0,0,0.04); border-bottom: 1px solid rgba(0,0,0,0.06);
     }
     .code-lang { font-weight: 500; text-transform: uppercase; font-size: 0.75rem; opacity: 0.8; }
     .code-copy-btn {
       background: transparent; border: 1px solid #d0d0d0; color: #555;
       padding: 3px 12px; border-radius: 6px; font-size: 0.75rem; cursor: pointer;
-      transition: all 0.2s; display: flex; align-items: center; gap: 4px;
     }
-    .code-copy-btn:hover { background: #eee; border-color: #bbb; }
-    .code-copy-btn.copied { background: #e6f7e6; border-color: #b7eb8f; color: #52c41a; }
     .code-block-wrapper pre {
-      margin: 0; padding: 1.2rem 1.5rem; overflow-x: auto;
-      background: transparent; border: none; border-radius: 0;
+      margin: 0; padding: 1.2rem 1.5rem; overflow-x: auto; background: transparent;
     }
     .code-block-wrapper pre code {
-      font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', Consolas, monospace;
-      font-size: 0.9rem; line-height: 1.65; background: transparent !important;
-      padding: 0 !important; color: #24292e; white-space: pre;
+      font-family: 'JetBrains Mono', 'Fira Code', Consolas, monospace;
+      font-size: 0.9rem; line-height: 1.65; color: #24292e;
     }
 
-    /* ========== 语法高亮（强力覆盖，类似 VSCode 风格） ========== */
-    /* 确保所有 token 都有颜色 */
-    .markdown-section pre code[class*="language-"] {
-      color: #24292e !important;
-    }
-    .markdown-section .token.comment,
-    .markdown-section .token.prolog,
-    .markdown-section .token.doctype,
-    .markdown-section .token.cdata { color: #6a737d !important; font-style: italic !important; }
-
-    .markdown-section .token.punctuation { color: #393a34 !important; }
-
-    .markdown-section .token.property,
-    .markdown-section .token.tag,
-    .markdown-section .token.constant,
-    .markdown-section .token.symbol,
-    .markdown-section .token.deleted { color: #d73a49 !important; }
-
-    .markdown-section .token.boolean,
-    .markdown-section .token.number { color: #005cc5 !important; }
-
-    .markdown-section .token.selector,
-    .markdown-section .token.attr-name,
-    .markdown-section .token.string,
-    .markdown-section .token.char,
-    .markdown-section .token.builtin,
-    .markdown-section .token.inserted { color: #032f62 !important; }
-
-    .markdown-section .token.operator,
-    .markdown-section .token.entity,
-    .markdown-section .token.url,
-    .markdown-section .language-css .token.string,
-    .markdown-section .style .token.string { color: #d73a49 !important; }
-
-    .markdown-section .token.atrule,
-    .markdown-section .token.attr-value,
+    /* 语法高亮（浅色） */
+    .markdown-section .token.comment { color: #6a737d !important; font-style: italic; }
     .markdown-section .token.keyword { color: #d73a49 !important; }
+    .markdown-section .token.string { color: #032f62 !important; }
+    .markdown-section .token.number { color: #005cc5 !important; }
+    .markdown-section .token.function { color: #6f42c1 !important; }
 
-    .markdown-section .token.function,
-    .markdown-section .token.class-name { color: #6f42c1 !important; }
-
-    .markdown-section .token.regex,
-    .markdown-section .token.important,
-    .markdown-section .token.variable { color: #e36209 !important; }
-
-    .markdown-section .token.italic { font-style: italic !important; }
-    .markdown-section .token.bold { font-weight: bold !important; }
-
-    /* 深色模式下的语法高亮 */
+    /* 深色模式适配 */
     @media (prefers-color-scheme: dark) {
-      .code-block-wrapper {
-        background: #1e1e1e; border-color: #2d2d2d;
-        box-shadow: 0 4px 16px rgba(0,0,0,0.3);
-      }
-      .code-toolbar { background: rgba(255,255,255,0.05); border-bottom-color: #333; color: #ccc; }
-      .code-copy-btn { border-color: #555; color: #ccc; }
-      .code-copy-btn:hover { background: #333; }
-      .code-copy-btn.copied { background: #1e3a1e; border-color: #2e5a2e; color: #6fcf6f; }
-      .markdown-section pre code[class*="language-"] { color: #d4d4d4 !important; }
-
-      .markdown-section .token.comment,
-      .markdown-section .token.prolog,
-      .markdown-section .token.doctype,
-      .markdown-section .token.cdata { color: #6a9955 !important; }
-      .markdown-section .token.punctuation { color: #d4d4d4 !important; }
-      .markdown-section .token.property,
-      .markdown-section .token.tag,
-      .markdown-section .token.constant,
-      .markdown-section .token.symbol,
-      .markdown-section .token.deleted { color: #569cd6 !important; }
-      .markdown-section .token.boolean,
-      .markdown-section .token.number { color: #b5cea8 !important; }
-      .markdown-section .token.selector,
-      .markdown-section .token.attr-name,
-      .markdown-section .token.string,
-      .markdown-section .token.char,
-      .markdown-section .token.builtin,
-      .markdown-section .token.inserted { color: #ce9178 !important; }
-      .markdown-section .token.operator,
-      .markdown-section .token.entity,
-      .markdown-section .token.url,
-      .markdown-section .language-css .token.string,
-      .markdown-section .style .token.string { color: #d4d4d4 !important; }
-      .markdown-section .token.atrule,
-      .markdown-section .token.attr-value,
+      .code-block-wrapper { background: #1e1e1e; border-color: #2d2d2d; }
+      .code-block-wrapper pre code { color: #d4d4d4 !important; }
+      .markdown-section .token.comment { color: #6a9955 !important; }
       .markdown-section .token.keyword { color: #569cd6 !important; }
-      .markdown-section .token.function,
-      .markdown-section .token.class-name { color: #dcdcaa !important; }
-      .markdown-section .token.regex,
-      .markdown-section .token.important,
-      .markdown-section .token.variable { color: #d16969 !important; }
-    }
-
-    @media (max-width: 768px) {
-      .code-block-wrapper pre { padding: 1rem; }
+      .markdown-section .token.string { color: #ce9178 !important; }
+      .markdown-section .token.number { color: #b5cea8 !important; }
+      .markdown-section .token.function { color: #dcdcaa !important; }
     }
   </style>
 </head>
 <body>
-  <!-- 毛玻璃加载层 -->
+  <!-- 毛玻璃加载 -->
   <div id="loading">
     <div class="loader-wrapper" id="loaderWrapper">
       <div class="loader-triangle" id="loaderTriangle">
-        <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-          <polygon class="triangle-bg" points="50,10 91.7,80 8.3,80" />
-          <polygon class="triangle-progress" points="50,10 91.7,80 8.3,80" pathLength="120" />
-        </svg>
+        <svg viewBox="0 0 100 100"><polygon class="triangle-bg" points="50,10 91.7,80 8.3,80"/><polygon class="triangle-progress" points="50,10 91.7,80 8.3,80" pathLength="120"/></svg>
       </div>
       <div class="loading-text">正在加载文档</div>
     </div>
   </div>
 
-  <!-- 文档区域固定抬头（初始隐藏，加载完成后由 JS 显示） -->
-  <div class="doc-header" id="docHeader" style="display: none;">
+  <!-- 文档区域固定抬头 -->
+  <div class="doc-header" id="docHeader">
     <div class="capsule" id="capsuleGroup">
       <button class="icon-btn" id="capsuleSidebarBtn" title="打开侧边栏">
         <svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
@@ -301,23 +210,21 @@
   <div class="search-modal-overlay" id="searchModalOverlay">
     <div class="search-modal">
       <div class="search-modal-header">
-        <svg class="search-icon" width="22" height="22" viewBox="0 0 24 24" stroke="#888" fill="none" stroke-width="2">
-          <circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/>
-        </svg>
-        <input type="text" class="search-modal-input" id="searchModalInput" placeholder="在文档中搜索…" autofocus>
-        <button class="search-modal-close" id="searchModalClose" title="关闭">
-          <svg width="20" height="20" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2">
-            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
-          </svg>
+        <svg class="search-icon" width="22" height="22" viewBox="0 0 24 24" stroke="#888" fill="none"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg>
+        <input type="text" class="search-modal-input" id="searchModalInput" placeholder="在文档中搜索…">
+        <button class="search-modal-close" id="searchModalClose">
+          <svg width="20" height="20" viewBox="0 0 24 24" stroke="currentColor" fill="none"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
       </div>
       <div class="search-results" id="searchResults"></div>
     </div>
   </div>
 
+  <!-- Docsify 渲染容器 -->
   <div id="app"></div>
 
   <script>
+    // ========== Docsify 配置 ==========
     window.$docsify = {
       name: '我的知识库',
       repo: '',
@@ -328,18 +235,18 @@
           hook.ready(function() {
             var loadingEl = document.getElementById('loading');
             var docHeader = document.getElementById('docHeader');
-
             if (loadingEl) {
               loadingEl.style.opacity = '0';
               setTimeout(function() {
                 loadingEl.style.display = 'none';
-                // 显示抬头
                 if (docHeader) docHeader.style.display = 'flex';
-                if (window._loaderMouseHandler) document.removeEventListener('mousemove', window._loaderMouseHandler);
+                if (window._loaderMouseHandler) {
+                  document.removeEventListener('mousemove', window._loaderMouseHandler);
+                }
               }, 500);
             }
 
-            // 侧边栏改造
+            // 侧边栏改造（知识库总览、搜索文档名、关闭按钮）
             var sidebar = document.querySelector('.sidebar');
             if (sidebar) {
               var header = document.createElement('div');
@@ -365,10 +272,14 @@
               var searchBtn = document.getElementById('sidebarSearchBtn');
               var closeBtn = document.getElementById('sidebarCloseBtn');
 
+              // 文档名过滤函数
               function filterSidebarLinks(keyword) {
                 var links = document.querySelectorAll('.sidebar-nav li');
                 var kw = keyword.toLowerCase();
-                links.forEach(li => li.style.display = (kw === '' || li.textContent.toLowerCase().includes(kw)) ? '' : 'none');
+                links.forEach(function(li) {
+                  var text = li.textContent.toLowerCase();
+                  li.style.display = (kw === '' || text.includes(kw)) ? '' : 'none';
+                });
               }
 
               searchBtn.addEventListener('click', function() {
@@ -383,8 +294,10 @@
                   filterInput.focus();
                 }
               });
-              filterInput.addEventListener('input', e => filterSidebarLinks(e.target.value));
-              filterInput.addEventListener('keydown', e => {
+              filterInput.addEventListener('input', function(e) {
+                filterSidebarLinks(e.target.value);
+              });
+              filterInput.addEventListener('keydown', function(e) {
                 if (e.key === 'Escape') {
                   filterInput.classList.remove('show');
                   filterInput.value = '';
@@ -392,7 +305,7 @@
                   filterSidebarLinks('');
                 }
               });
-              closeBtn.addEventListener('click', () => {
+              closeBtn.addEventListener('click', function() {
                 document.body.classList.add('close');
                 filterInput.classList.remove('show');
                 filterInput.value = '';
@@ -401,34 +314,99 @@
               });
             }
 
-            document.getElementById('capsuleSidebarBtn').addEventListener('click', () => document.body.classList.remove('close'));
-            document.getElementById('capsuleSearchBtn').addEventListener('click', openSearchModal);
+            // 胶囊按钮事件
+            document.getElementById('capsuleSidebarBtn').addEventListener('click', function() {
+              document.body.classList.remove('close');
+            });
+            document.getElementById('capsuleSearchBtn').addEventListener('click', function() {
+              openSearchModal();
+            });
+
             document.body.classList.remove('close');
             updateDocTitle();
+            initSidebarFolders(); // 初始化文件夹折叠
           });
 
+          // 每次页面切换后
           hook.doneEach(function() {
             updateDocTitle();
             closeSearchModal();
             enhanceCodeBlocks();
-            if (window.MathJax && MathJax.typesetPromise) MathJax.typesetPromise();
+            initSidebarFolders(); // 重新应用文件夹折叠
+            if (window.MathJax && MathJax.typesetPromise) {
+              MathJax.typesetPromise();
+            }
           });
         }
       ]
     };
 
+    // 全局更新文档标题
     function updateDocTitle() {
       var active = document.querySelector('.sidebar-nav .active');
-      var title = active ? active.textContent.trim() : (document.querySelector('.markdown-section h1') || {}).textContent || '';
+      var title = active ? active.textContent.trim() : '';
+      if (!title) {
+        var h1 = document.querySelector('.markdown-section h1');
+        if (h1) title = h1.textContent.trim();
+      }
       document.getElementById('docTitle').textContent = title || '文档';
     }
 
-    // 代码块增强
+    // ========== 文件夹展开/折叠功能 ==========
+    function initSidebarFolders() {
+      var sidebarNav = document.querySelector('.sidebar-nav');
+      if (!sidebarNav) return;
+      var allLis = sidebarNav.querySelectorAll('li');
+      allLis.forEach(function(li) {
+        var childUl = li.querySelector('ul');
+        if (childUl) {
+          // 避免重复添加图标
+          if (li.querySelector('.folder-toggle')) return;
+          var a = li.querySelector(':scope > a');
+          var folderName = a ? a.textContent.trim() : li.childNodes[0]?.textContent.trim();
+          if (!folderName) return;
+
+          var icon = document.createElement('span');
+          icon.className = 'folder-toggle';
+          icon.textContent = '+';
+          icon.addEventListener('click', function(e) {
+            e.stopPropagation();
+            if (childUl.style.display === 'none') {
+              childUl.style.display = '';
+              icon.textContent = '-';
+            } else {
+              childUl.style.display = 'none';
+              icon.textContent = '+';
+            }
+          });
+
+          if (a) {
+            a.setAttribute('href', 'javascript:void(0)');
+            a.style.cursor = 'pointer';
+            a.addEventListener('click', function(e) {
+              e.preventDefault();
+              icon.click();
+            });
+            a.parentNode.insertBefore(icon, a);
+          } else {
+            li.insertBefore(icon, li.firstChild);
+          }
+          // 默认折叠
+          childUl.style.display = 'none';
+        }
+      });
+    }
+
+    // ========== 代码块增强 ==========
     function enhanceCodeBlocks() {
-      document.querySelectorAll('.markdown-section pre').forEach(pre => {
+      document.querySelectorAll('.markdown-section pre').forEach(function(pre) {
         if (pre.parentNode.classList.contains('code-block-wrapper')) return;
         var code = pre.querySelector('code');
-        var lang = (code && code.className.match(/lang(?:uage)?-(\w+)/) || [])[1] || pre.getAttribute('data-lang') || '';
+        var lang = '';
+        if (code && code.className) {
+          var match = code.className.match(/lang(?:uage)?-(\w+)/);
+          if (match) lang = match[1];
+        }
         var wrapper = document.createElement('div');
         wrapper.className = 'code-block-wrapper';
         var toolbar = document.createElement('div');
@@ -436,23 +414,31 @@
         toolbar.innerHTML = '<span class="code-lang">' + (lang || 'code') + '</span>';
         var btn = document.createElement('button');
         btn.className = 'code-copy-btn';
-        btn.innerHTML = '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> 复制';
-        btn.onclick = function() {
-          navigator.clipboard.writeText(pre.textContent).then(() => {
+        btn.innerHTML = '<svg viewBox="0 0 24 24" width="14" height="14"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> 复制';
+        btn.addEventListener('click', function() {
+          var text = pre.textContent;
+          navigator.clipboard.writeText(text).then(function() {
             btn.classList.add('copied');
-            btn.innerHTML = '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><polyline points="20 6 9 17 4 12"/></svg> 已复制';
-            setTimeout(() => {
+            btn.innerHTML = '✓ 已复制';
+            setTimeout(function() {
               btn.classList.remove('copied');
-              btn.innerHTML = '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> 复制';
+              btn.innerHTML = '<svg viewBox="0 0 24 24" width="14" height="14"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> 复制';
             }, 2000);
-          }).catch(() => {
+          }).catch(function() {
             var ta = document.createElement('textarea');
-            ta.value = pre.textContent; document.body.appendChild(ta); ta.select();
-            document.execCommand('copy'); document.body.removeChild(ta);
-            btn.classList.add('copied'); btn.textContent = '已复制';
-            setTimeout(() => { btn.classList.remove('copied'); btn.innerHTML = '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> 复制'; }, 2000);
+            ta.value = text;
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand('copy');
+            document.body.removeChild(ta);
+            btn.classList.add('copied');
+            btn.textContent = '已复制';
+            setTimeout(function() {
+              btn.classList.remove('copied');
+              btn.innerHTML = '<svg viewBox="0 0 24 24" width="14" height="14"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> 复制';
+            }, 2000);
           });
-        };
+        });
         toolbar.appendChild(btn);
         wrapper.appendChild(toolbar);
         pre.parentNode.insertBefore(wrapper, pre);
@@ -460,7 +446,7 @@
       });
     }
 
-    // 全文搜索
+    // ========== 全文搜索（模态） ==========
     var searchModalOverlay = document.getElementById('searchModalOverlay');
     var searchModalInput = document.getElementById('searchModalInput');
     var searchResults = document.getElementById('searchResults');
@@ -468,86 +454,146 @@
 
     function openSearchModal() {
       searchModalOverlay.classList.add('active');
-      searchModalInput.value = ''; searchResults.innerHTML = ''; searchModalInput.focus();
+      searchModalInput.value = '';
+      searchResults.innerHTML = '';
+      searchModalInput.focus();
       clearHighlights();
     }
+
     function closeSearchModal() {
       searchModalOverlay.classList.remove('active');
-      searchResults.innerHTML = ''; clearHighlights();
+      searchResults.innerHTML = '';
+      clearHighlights();
     }
+
     function clearHighlights() {
-      currentHighlights.forEach(mark => {
-        var p = mark.parentNode;
-        if (p) { p.replaceChild(document.createTextNode(mark.textContent), mark); p.normalize(); }
+      currentHighlights.forEach(function(mark) {
+        var parent = mark.parentNode;
+        if (parent) {
+          parent.replaceChild(document.createTextNode(mark.textContent), mark);
+          parent.normalize();
+        }
       });
       currentHighlights = [];
     }
 
-    function highlightInDocument(kw) {
-      clearHighlights(); if (!kw.trim()) return;
-      var container = document.querySelector('.markdown-section'); if (!container) return;
+    function highlightInDocument(keyword) {
+      clearHighlights();
+      if (!keyword.trim()) return;
+      var container = document.querySelector('.markdown-section');
+      if (!container) return;
       var walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT, {
-        acceptNode: node => {
-          if (node.parentNode.closest('.search-modal, .code-block-wrapper, script, style')) return NodeFilter.FILTER_REJECT;
+        acceptNode: function(node) {
+          if (node.parentNode.tagName === 'SCRIPT' || node.parentNode.tagName === 'STYLE' ||
+              node.parentNode.classList.contains('search-modal-input') ||
+              node.parentNode.closest('.search-modal')) {
+            return NodeFilter.FILTER_REJECT;
+          }
           return NodeFilter.FILTER_ACCEPT;
         }
       });
-      var nodes = []; while (walker.nextNode()) nodes.push(walker.currentNode);
-      var regex = new RegExp(kw.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
-      nodes.forEach(node => {
-        var text = node.textContent, frag = document.createDocumentFragment(), lastIdx = 0, match;
+      var nodes = [];
+      while (walker.nextNode()) nodes.push(walker.currentNode);
+      var regex = new RegExp(keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
+      nodes.forEach(function(node) {
+        var text = node.textContent;
+        var frag = document.createDocumentFragment();
+        var lastIdx = 0;
+        var match;
         while ((match = regex.exec(text)) !== null) {
-          if (match.index > lastIdx) frag.appendChild(document.createTextNode(text.slice(lastIdx, match.index)));
-          var mark = document.createElement('mark'); mark.className = 'search-highlight'; mark.textContent = match[0];
-          frag.appendChild(mark); currentHighlights.push(mark); lastIdx = regex.lastIndex;
+          if (match.index > lastIdx) {
+            frag.appendChild(document.createTextNode(text.slice(lastIdx, match.index)));
+          }
+          var mark = document.createElement('mark');
+          mark.className = 'search-highlight';
+          mark.textContent = match[0];
+          frag.appendChild(mark);
+          currentHighlights.push(mark);
+          lastIdx = regex.lastIndex;
         }
-        if (lastIdx < text.length) frag.appendChild(document.createTextNode(text.slice(lastIdx)));
-        if (frag.childNodes.length) node.parentNode.replaceChild(frag, node);
+        if (lastIdx < text.length) {
+          frag.appendChild(document.createTextNode(text.slice(lastIdx)));
+        }
+        if (frag.childNodes.length) {
+          node.parentNode.replaceChild(frag, node);
+        }
       });
     }
 
-    function generateResults(kw) {
-      searchResults.innerHTML = ''; if (!kw.trim()) return;
-      var container = document.querySelector('.markdown-section'); if (!container) return;
+    function generateSearchResults(keyword) {
+      searchResults.innerHTML = '';
+      if (!keyword.trim()) return;
+      var container = document.querySelector('.markdown-section');
+      if (!container) return;
       var blocks = container.querySelectorAll('p, li, td, th, h1, h2, h3, h4, h5, h6, div');
-      var regex = new RegExp(kw.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
-      var seen = new Set();
-      blocks.forEach(block => {
-        var text = block.textContent; regex.lastIndex = 0;
+      var regex = new RegExp(keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
+      var seenBlocks = new Set();
+      blocks.forEach(function(block) {
+        var text = block.textContent;
+        regex.lastIndex = 0;
         if (regex.test(text)) {
-          if (seen.has(block)) return; seen.add(block);
-          var div = document.createElement('div'); div.className = 'search-result-item';
-          regex.lastIndex = 0; var match = regex.exec(text) || {};
-          var start = Math.max(0, (match.index||0)-40), end = Math.min(text.length, (match.index||0)+(match[0]||'').length+40);
-          var excerpt = (start>0?'…':'') + text.slice(start, end) + (end<text.length?'…':'');
-          div.innerHTML = excerpt.replace(regex, m => '<mark>' + m + '</mark>');
-          div.addEventListener('click', () => block.scrollIntoView({ behavior: 'smooth', block: 'center' }));
+          if (seenBlocks.has(block)) return;
+          seenBlocks.add(block);
+          var div = document.createElement('div');
+          div.className = 'search-result-item';
+          regex.lastIndex = 0;
+          var match = regex.exec(text) || {};
+          var start = Math.max(0, (match.index || 0) - 40);
+          var end = Math.min(text.length, (match.index || 0) + (match[0] || '').length + 40);
+          var excerpt = text.substring(start, end);
+          if (start > 0) excerpt = '…' + excerpt;
+          if (end < text.length) excerpt = excerpt + '…';
+          div.innerHTML = excerpt.replace(regex, '<mark>$&</mark>');
+          div.addEventListener('click', function() {
+            block.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          });
           searchResults.appendChild(div);
         }
       });
-      if (!searchResults.children.length) searchResults.innerHTML = '<div class="search-no-results">未找到匹配内容</div>';
+      if (!searchResults.children.length) {
+        searchResults.innerHTML = '<div class="search-no-results">未找到匹配内容</div>';
+      }
     }
 
-    searchModalInput.addEventListener('input', () => {
-      highlightInDocument(searchModalInput.value);
-      generateResults(searchModalInput.value);
+    searchModalInput.addEventListener('input', function() {
+      var keyword = this.value;
+      highlightInDocument(keyword);
+      generateSearchResults(keyword);
     });
     document.getElementById('searchModalClose').addEventListener('click', closeSearchModal);
-    searchModalOverlay.addEventListener('click', e => { if (e.target === searchModalOverlay) closeSearchModal(); });
-    document.addEventListener('keydown', e => { if (e.key === 'Escape' && searchModalOverlay.classList.contains('active')) closeSearchModal(); });
+    searchModalOverlay.addEventListener('click', function(e) {
+      if (e.target === searchModalOverlay) closeSearchModal();
+    });
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape' && searchModalOverlay.classList.contains('active')) {
+        closeSearchModal();
+      }
+    });
 
+    // ========== MathJax 配置 ==========
     window.MathJax = {
-      tex: { inlineMath: [['$','$'], ['\\(','\\)']], displayMath: [['$$','$$'], ['\\[','\\]']], processEscapes: true },
-      options: { skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre'], ignoreHtmlClass: 'tex2jax_ignore', processHtmlClass: 'tex2jax_process' }
+      tex: {
+        inlineMath: [['$','$'], ['\\(','\\)']],
+        displayMath: [['$$','$$'], ['\\[','\\]']],
+        processEscapes: true
+      },
+      options: {
+        skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+        ignoreHtmlClass: 'tex2jax_ignore',
+        processHtmlClass: 'tex2jax_process'
+      }
     };
 
     // 加载动画立体交互
     (function() {
-      var wrapper = document.getElementById('loaderWrapper'), triangle = document.getElementById('loaderTriangle');
+      var wrapper = document.getElementById('loaderWrapper');
+      var triangle = document.getElementById('loaderTriangle');
       if (!wrapper || !triangle) return;
-      var maxAngle = 10, baseFilter = 'drop-shadow(0 0 8px rgba(255,255,255,0.15)) drop-shadow(0 0 2px rgba(0,0,0,0.2))';
+      var maxAngle = 10;
+      var baseFilter = 'drop-shadow(0 0 8px rgba(255,255,255,0.15)) drop-shadow(0 0 2px rgba(0,0,0,0.2))';
       function handleMouse(e) {
-        var dx = (e.clientX - innerWidth/2) / (innerWidth/2), dy = (e.clientY - innerHeight/2) / (innerHeight/2);
+        var dx = (e.clientX - window.innerWidth/2) / (window.innerWidth/2);
+        var dy = (e.clientY - window.innerHeight/2) / (window.innerHeight/2);
         wrapper.style.transform = 'rotateX('+(-dy*maxAngle)+'deg) rotateY('+(dx*maxAngle)+'deg) translateZ(15px)';
         triangle.style.filter = baseFilter + ' drop-shadow('+(dx*8)+'px '+(dy*8)+'px 8px rgba(0,0,0,0.35))';
       }
@@ -556,7 +602,13 @@
     })();
   </script>
 
+  <!-- PDF 内嵌插件 -->
+  <script src="//cdn.jsdelivr.net/npm/docsify-pdf-embed/dist/docsify-pdf-embed.min.js"></script>
+
+  <!-- Docsify 核心 -->
   <script src="//cdn.jsdelivr.net/npm/docsify@4"></script>
+
+  <!-- MathJax 3 -->
   <script id="MathJax-script" async src="//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 </body>
 </html>
