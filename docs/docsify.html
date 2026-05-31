@@ -6,6 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
   <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify@4/lib/themes/vue.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
 
   <style>
     /* ========== 加载动画遮罩 ========== */
@@ -67,19 +68,35 @@
   // basePath 注释掉或删除
   plugins: [
     function(hook, vm) {
-      hook.ready(function() {
-        var loadingEl = document.getElementById('loading');
-        if (loadingEl) {
-          loadingEl.style.opacity = '0';
-          setTimeout(function() {
-            loadingEl.style.display = 'none';
-          }, 400);
+          hook.ready(function() {
+            var loadingEl = document.getElementById('loading');
+            if (loadingEl) {
+              loadingEl.style.opacity = '0';
+              setTimeout(function() {
+                loadingEl.style.display = 'none';
+              }, 400);
+            }
+          });
+        },
+        // 👇 新增 KaTeX 渲染插件（注意前面的逗号）
+        function(hook, vm) {
+          hook.doneEach(function() {
+            renderMathInElement(document.getElementById('app'), {
+              delimiters: [
+                {left: '$$', right: '$$', display: true},
+                {left: '$', right: '$', display: false},
+                {left: '\\(', right: '\\)', display: false},
+                {left: '\\[', right: '\\]', display: true}
+              ],
+              throwOnError: false
+            });
+          });
         }
-      });
+      ]
     }
-  ]
-}
   </script>
   <script src="//cdn.jsdelivr.net/npm/docsify@4"></script>
+  <script src="//cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
 </body>
 </html>
