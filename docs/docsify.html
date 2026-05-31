@@ -79,6 +79,7 @@
     .icon-btn svg { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 2; }
     .sidebar-toggle { display: none !important; }
 
+    /* 侧边栏条目胶囊样式 */
     .sidebar-nav li { list-style: none; margin: 2px 0; }
     .sidebar-nav a, .sidebar-nav .folder-item > span:first-child, .sidebar-nav .folder-item > a {
       display: block; padding: 6px 12px; border-radius: 8px;
@@ -218,6 +219,7 @@
   </style>
 </head>
 <body>
+  <!-- 毛玻璃加载 -->
   <div id="loading">
     <div class="loader-wrapper" id="loaderWrapper">
       <div class="loader-triangle" id="loaderTriangle">
@@ -227,6 +229,7 @@
     </div>
   </div>
 
+  <!-- 文档区域固定抬头 -->
   <div class="doc-header" id="docHeader">
     <div class="capsule" id="capsuleGroup">
       <button class="icon-btn" id="capsuleSidebarBtn"><svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
@@ -235,6 +238,7 @@
     <span class="doc-title" id="docTitle">文档加载中…</span>
   </div>
 
+  <!-- 全文搜索模态 -->
   <div class="search-modal-overlay" id="searchModalOverlay">
     <div class="search-modal">
       <div class="search-modal-header">
@@ -249,12 +253,13 @@
   <div id="app"></div>
 
   <script>
+    // ========== Docsify 配置 ==========
     window.$docsify = {
       name: '我的知识库',
       repo: '',
-      loadSidebar: true,
-      basePath: '/my-docs/docs/',   // 使用绝对基准路径，稳定可靠
-      // relativePath: true,          // 已删除，避免路由混乱
+      // 不再使用 basePath 或 relativePath，而是通过绝对路径加载所有资源
+      sidebar: '/my-docs/docs/_sidebar.md',      // 侧边栏文件绝对路径
+      homepage: '/my-docs/docs/README.md',        // 首页文件绝对路径
       plugins: [
         function(hook, vm) {
           hook.ready(function() {
@@ -271,6 +276,7 @@
               }, 500);
             }
 
+            // 侧边栏头部
             var sidebar = document.querySelector('.sidebar');
             if (sidebar) {
               var header = document.createElement('div');
@@ -369,21 +375,24 @@
       document.getElementById('docTitle').textContent = title || '文档';
     }
 
+    // 核心修复：将侧边栏链接转换为绝对路径并编码
     function fixChinesePaths() {
+      var base = '/my-docs/docs/';
       document.querySelectorAll('.sidebar-nav a').forEach(function(a) {
-        var original = a.getAttribute('data-original-href');
         var href = a.getAttribute('href');
-        if (href && href !== 'javascript:void(0)' && !href.startsWith('#')) {
-          if (!original) {
-            a.setAttribute('data-original-href', href);
-            original = href;
-          }
-          var hashIndex = original.indexOf('#');
-          var path = hashIndex === -1 ? original : original.substring(0, hashIndex);
-          var hash = hashIndex === -1 ? '' : original.substring(hashIndex);
-          var encodedPath = encodeURI(path);
-          a.setAttribute('href', encodedPath + hash);
+        if (!href || href === 'javascript:void(0)' || href.startsWith('#') || href.startsWith('http')) return;
+
+        // 如果是相对路径（不以 / 开头），则加上 base
+        var fullPath = href;
+        if (!href.startsWith('/')) {
+          fullPath = base + href;
         }
+        // 编码中文路径
+        var hashIndex = fullPath.indexOf('#');
+        var path = hashIndex === -1 ? fullPath : fullPath.substring(0, hashIndex);
+        var hash = hashIndex === -1 ? '' : fullPath.substring(hashIndex);
+        var encodedPath = encodeURI(path);
+        a.setAttribute('href', encodedPath + hash);
       });
     }
 
@@ -510,7 +519,7 @@
       });
     }
 
-    // 全文搜索（完整保留）
+    // 全文搜索
     var searchModalOverlay = document.getElementById('searchModalOverlay');
     var searchModalInput = document.getElementById('searchModalInput');
     var searchResults = document.getElementById('searchResults');
