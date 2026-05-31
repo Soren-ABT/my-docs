@@ -25,26 +25,24 @@
       align-items: center;
       justify-content: center;
       transition: opacity 0.5s ease;
-      perspective: 600px;            /* 3D 透视舞台 */
+      perspective: 600px;
     }
 
-    /* 立体交互包裹层（三角 + 文字） */
     .loader-wrapper {
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       transform-style: preserve-3d;
-      transition: transform 0.1s ease; /* 平滑跟随 */
+      transition: transform 0.1s ease;
     }
 
-    /* 三角形容器 */
     .loader-triangle {
       width: 96px;
       height: 96px;
       margin-bottom: 1.5rem;
-      filter: drop-shadow(0 0 8px rgba(255,255,255,0.15))   /* 基础光晕 */
-              drop-shadow(0 0 2px rgba(0,0,0,0.2));        /* 微小暗边 */
+      filter: drop-shadow(0 0 8px rgba(255,255,255,0.15))
+              drop-shadow(0 0 2px rgba(0,0,0,0.2));
       transition: filter 0.1s ease;
     }
 
@@ -53,7 +51,6 @@
       height: 100%;
     }
 
-    /* 工业感三角边框（无填充，深灰金属） */
     .triangle-bg {
       fill: none;
       stroke: #666666;
@@ -61,7 +58,6 @@
       stroke-linejoin: round;
     }
 
-    /* 黄色进度条 */
     .triangle-progress {
       fill: none;
       stroke: #f1c40f;
@@ -78,20 +74,75 @@
       100% { stroke-dashoffset: -120; }
     }
 
-    /* 加载文字 */
     .loading-text {
       color: #4a4a4a;
       font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
       font-size: 0.95rem;
       letter-spacing: 1px;
-      text-shadow: none;
+    }
+
+    /* ========== 侧边栏动画与景深 ========== */
+    /* 侧边栏默认状态：打开，带阴影景深 */
+    .sidebar {
+      transition: transform 0.45s cubic-bezier(0.45, 0.05, 0.55, 0.95),
+                  box-shadow 0.45s cubic-bezier(0.45, 0.05, 0.55, 0.95);
+      box-shadow: 4px 0 20px rgba(0, 0, 0, 0.25);  /* 右侧模糊阴影 */
+    }
+
+    /* 侧边栏关闭状态（Docsify 自动添加 .close 类） */
+    .sidebar.close {
+      transform: translateX(-100%);
+      box-shadow: 0 0 0 rgba(0, 0, 0, 0);  /* 关闭时无阴影 */
+    }
+
+    /* 保证移动端也能正确动画 */
+    @media screen and (max-width: 768px) {
+      .sidebar {
+        transition: transform 0.4s cubic-bezier(0.45, 0.05, 0.55, 0.95);
+        box-shadow: 4px 0 20px rgba(0, 0, 0, 0.25);
+      }
+    }
+
+    /* 切换按钮始终可见，并调整位置 */
+    .sidebar-toggle {
+      display: block !important;           /* 覆盖默认隐藏 */
+      position: fixed;
+      top: 20px;
+      left: 260px;                         /* 侧边栏宽度默认 260px，放在右侧边缘 */
+      z-index: 1000;
+      background: rgba(255,255,255,0.9);
+      border: 1px solid #ddd;
+      border-radius: 0 6px 6px 0;
+      padding: 6px 10px;
+      cursor: pointer;
+      transition: left 0.45s cubic-bezier(0.45, 0.05, 0.55, 0.95),
+                  background 0.3s;
+      box-shadow: 2px 0 8px rgba(0,0,0,0.1);
+      outline: none;
+    }
+
+    /* 按钮图标美化（默认 Docsify 使用三道杠，保留） */
+    .sidebar-toggle .sidebar-toggle-button {
+      /* 保持默认样式，可调整颜色 */
+      background: #555;
+    }
+
+    /* 当侧边栏关闭时，按钮移到最左侧 */
+    body.close .sidebar-toggle {
+      left: 10px;
+      border-radius: 6px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+
+    /* 避免按钮在加载动画时可见 */
+    #loading .sidebar-toggle {
+      display: none !important;
     }
   </style>
 </head>
 <body>
   <!-- 毛玻璃加载层 -->
   <div id="loading">
-    <!-- 立体交互容器 -->
     <div class="loader-wrapper" id="loaderWrapper">
       <div class="loader-triangle" id="loaderTriangle">
         <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
@@ -106,6 +157,7 @@
     </div>
   </div>
 
+  <!-- Docsify 渲染容器 -->
   <div id="app"></div>
 
   <script>
@@ -115,7 +167,9 @@
       repo: '',
       loadSidebar: true,
       relativePath: true,
+      // 侧边栏默认打开（不设置 closeSidebar 即为打开）
       plugins: [
+        // 1. 加载动画关闭
         function(hook, vm) {
           hook.ready(function() {
             var loadingEl = document.getElementById('loading');
@@ -123,12 +177,12 @@
               loadingEl.style.opacity = '0';
               setTimeout(function() {
                 loadingEl.style.display = 'none';
-                // 释放鼠标监听
                 document.removeEventListener('mousemove', onMouseMove);
               }, 500);
             }
           });
         },
+        // 2. 每次页面渲染后触发 MathJax 排版
         function(hook, vm) {
           hook.doneEach(function() {
             if (window.MathJax && MathJax.typesetPromise) {
@@ -153,34 +207,28 @@
       }
     };
 
-    // ========== 立体交互 + 动态光影 ==========
+    // ========== 立体加载交互（三角随鼠标微倾） ==========
     (function() {
       var wrapper = document.getElementById('loaderWrapper');
       var triangle = document.getElementById('loaderTriangle');
       if (!wrapper || !triangle) return;
 
-      var maxAngle = 10;  // 最大倾斜角度
-
-      // 基础光晕 filter（与 CSS 中一致）
+      var maxAngle = 10;
       var baseFilter = 'drop-shadow(0 0 8px rgba(255,255,255,0.15)) drop-shadow(0 0 2px rgba(0,0,0,0.2))';
 
       function onMouseMove(e) {
-        // 鼠标位置相对于窗口中心的偏移（-0.5 ~ 0.5）
         var halfW = window.innerWidth / 2;
         var halfH = window.innerHeight / 2;
         var dx = (e.clientX - halfW) / halfW;
         var dy = (e.clientY - halfH) / halfH;
 
-        // 1. 立体旋转（Y轴对应左右，X轴对应上下，反向 dy 让“抬头”效果自然）
         var rotateY = dx * maxAngle;
         var rotateX = -dy * maxAngle;
         wrapper.style.transform = 'rotateX(' + rotateX + 'deg) rotateY(' + rotateY + 'deg) translateZ(15px)';
 
-        // 2. 动态阴影偏移（模拟固定光源照在倾斜薄片上的投影变化）
-        var shadowX = dx * 8;   // 水平偏移
-        var shadowY = dy * 8;   // 垂直偏移（随鼠标上下）
-        var blur = 8;           // 模糊程度
-        var dynamicShadow = 'drop-shadow(' + shadowX + 'px ' + shadowY + 'px ' + blur + 'px rgba(0,0,0,0.35))';
+        var shadowX = dx * 8;
+        var shadowY = dy * 8;
+        var dynamicShadow = 'drop-shadow(' + shadowX + 'px ' + shadowY + 'px 8px rgba(0,0,0,0.35))';
         triangle.style.filter = baseFilter + ' ' + dynamicShadow;
       }
 
