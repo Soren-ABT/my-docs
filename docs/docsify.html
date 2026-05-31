@@ -79,7 +79,6 @@
     .icon-btn svg { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 2; }
     .sidebar-toggle { display: none !important; }
 
-    /* 侧边栏条目胶囊样式 */
     .sidebar-nav li { list-style: none; margin: 2px 0; }
     .sidebar-nav a, .sidebar-nav .folder-item > span:first-child, .sidebar-nav .folder-item > a {
       display: block; padding: 6px 12px; border-radius: 8px;
@@ -253,16 +252,16 @@
   <div id="app"></div>
 
   <script>
-    // ========== Docsify 配置 ==========
     window.$docsify = {
       name: '我的知识库',
       repo: '',
-      // 不再使用 basePath 或 relativePath，而是通过绝对路径加载所有资源
-      sidebar: '/my-docs/docs/_sidebar.md',      // 侧边栏文件绝对路径
-      homepage: '/my-docs/docs/README.md',        // 首页文件绝对路径
+      // 使用绝对路径加载侧边栏和首页（确保文件已推送）
+      sidebar: '/my-docs/docs/sidebar.md',
+      homepage: '/my-docs/docs/README.md',
       plugins: [
         function(hook, vm) {
           hook.ready(function() {
+            // 隐藏加载层
             var loadingEl = document.getElementById('loading');
             var docHeader = document.getElementById('docHeader');
             if (loadingEl) {
@@ -276,9 +275,9 @@
               }, 500);
             }
 
-            // 侧边栏头部
+            // 侧边栏头部（如果侧边栏已加载）
             var sidebar = document.querySelector('.sidebar');
-            if (sidebar) {
+            if (sidebar && sidebar.querySelector('.sidebar-nav')) {
               var header = document.createElement('div');
               header.className = 'sidebar-header';
               header.innerHTML = `
@@ -291,64 +290,22 @@
               `;
               var nav = sidebar.querySelector('.sidebar-nav');
               if (nav) sidebar.insertBefore(header, nav);
-              else sidebar.appendChild(header);
-
-              var brand = document.getElementById('sidebarBrand');
-              var filterInput = document.getElementById('sidebarFilterInput');
-              var searchBtn = document.getElementById('sidebarSearchBtn');
-              var closeBtn = document.getElementById('sidebarCloseBtn');
-
-              function filterSidebarLinks(keyword) {
-                var links = document.querySelectorAll('.sidebar-nav li');
-                var kw = keyword.toLowerCase();
-                links.forEach(function(li) {
-                  var text = li.textContent.toLowerCase();
-                  li.style.display = (kw === '' || text.includes(kw)) ? '' : 'none';
-                });
-              }
-
-              searchBtn.addEventListener('click', function() {
-                if (filterInput.classList.contains('show')) {
-                  filterInput.classList.remove('show');
-                  filterInput.value = '';
-                  brand.classList.remove('hidden');
-                  filterSidebarLinks('');
-                } else {
-                  brand.classList.add('hidden');
-                  filterInput.classList.add('show');
-                  filterInput.focus();
-                }
-              });
-              filterInput.addEventListener('input', function(e) { filterSidebarLinks(e.target.value); });
-              filterInput.addEventListener('keydown', function(e) {
-                if (e.key === 'Escape') {
-                  filterInput.classList.remove('show');
-                  filterInput.value = '';
-                  brand.classList.remove('hidden');
-                  filterSidebarLinks('');
-                }
-              });
-              closeBtn.addEventListener('click', function() {
-                document.body.classList.add('close');
-                filterInput.classList.remove('show');
-                filterInput.value = '';
-                brand.classList.remove('hidden');
-                filterSidebarLinks('');
-              });
             }
 
-            document.getElementById('capsuleSidebarBtn').addEventListener('click', function() {
-              document.body.classList.remove('close');
-            });
-            document.getElementById('capsuleSearchBtn').addEventListener('click', openSearchModal);
+            // 绑定按钮事件（如果元素存在）
+            var capsuleSidebarBtn = document.getElementById('capsuleSidebarBtn');
+            var capsuleSearchBtn = document.getElementById('capsuleSearchBtn');
+            if (capsuleSidebarBtn) capsuleSidebarBtn.addEventListener('click', function() { document.body.classList.remove('close'); });
+            if (capsuleSearchBtn) capsuleSearchBtn.addEventListener('click', openSearchModal);
 
             document.body.classList.remove('close');
             updateDocTitle();
 
+            // 延迟执行侧边栏初始化，确保 DOM 完全渲染
             setTimeout(function() {
               initSidebarFolders();
               fixChinesePaths();
-            }, 100);
+            }, 200);
           });
 
           hook.doneEach(function() {
@@ -372,27 +329,24 @@
         var h1 = document.querySelector('.markdown-section h1');
         if (h1) title = h1.textContent.trim();
       }
-      document.getElementById('docTitle').textContent = title || '文档';
+      var docTitle = document.getElementById('docTitle');
+      if (docTitle) docTitle.textContent = title || '文档';
     }
 
-    // 核心修复：将侧边栏链接转换为绝对路径并编码
+    // 中文路径编码 + 绝对化
     function fixChinesePaths() {
       var base = '/my-docs/docs/';
       document.querySelectorAll('.sidebar-nav a').forEach(function(a) {
         var href = a.getAttribute('href');
         if (!href || href === 'javascript:void(0)' || href.startsWith('#') || href.startsWith('http')) return;
-
-        // 如果是相对路径（不以 / 开头），则加上 base
         var fullPath = href;
         if (!href.startsWith('/')) {
           fullPath = base + href;
         }
-        // 编码中文路径
         var hashIndex = fullPath.indexOf('#');
         var path = hashIndex === -1 ? fullPath : fullPath.substring(0, hashIndex);
         var hash = hashIndex === -1 ? '' : fullPath.substring(hashIndex);
-        var encodedPath = encodeURI(path);
-        a.setAttribute('href', encodedPath + hash);
+        a.setAttribute('href', encodeURI(path) + hash);
       });
     }
 
@@ -400,6 +354,7 @@
       var sidebarNav = document.querySelector('.sidebar-nav');
       if (!sidebarNav) return;
 
+      // 标记子列表
       var allUls = sidebarNav.querySelectorAll('ul');
       allUls.forEach(function(ul) {
         if (ul.parentNode.classList.contains('sidebar-nav') || ul === sidebarNav.firstElementChild) {
@@ -526,6 +481,7 @@
     var currentHighlights = [];
 
     function openSearchModal() {
+      if (!searchModalOverlay) return;
       searchModalOverlay.classList.add('active');
       searchModalInput.value = '';
       searchResults.innerHTML = '';
@@ -533,6 +489,7 @@
       clearHighlights();
     }
     function closeSearchModal() {
+      if (!searchModalOverlay) return;
       searchModalOverlay.classList.remove('active');
       searchResults.innerHTML = '';
       clearHighlights();
@@ -572,9 +529,7 @@
         var lastIdx = 0;
         var match;
         while ((match = regex.exec(text)) !== null) {
-          if (match.index > lastIdx) {
-            frag.appendChild(document.createTextNode(text.slice(lastIdx, match.index)));
-          }
+          if (match.index > lastIdx) frag.appendChild(document.createTextNode(text.slice(lastIdx, match.index)));
           var mark = document.createElement('mark');
           mark.className = 'search-highlight';
           mark.textContent = match[0];
@@ -582,12 +537,8 @@
           currentHighlights.push(mark);
           lastIdx = regex.lastIndex;
         }
-        if (lastIdx < text.length) {
-          frag.appendChild(document.createTextNode(text.slice(lastIdx)));
-        }
-        if (frag.childNodes.length) {
-          node.parentNode.replaceChild(frag, node);
-        }
+        if (lastIdx < text.length) frag.appendChild(document.createTextNode(text.slice(lastIdx)));
+        if (frag.childNodes.length) node.parentNode.replaceChild(frag, node);
       });
     }
 
@@ -615,42 +566,31 @@
           if (start > 0) excerpt = '…' + excerpt;
           if (end < text.length) excerpt = excerpt + '…';
           div.innerHTML = excerpt.replace(regex, '<mark>$&</mark>');
-          div.addEventListener('click', function() {
-            block.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          });
+          div.addEventListener('click', function() { block.scrollIntoView({ behavior: 'smooth', block: 'center' }); });
           searchResults.appendChild(div);
         }
       });
-      if (!searchResults.children.length) {
-        searchResults.innerHTML = '<div class="search-no-results">未找到匹配内容</div>';
-      }
+      if (!searchResults.children.length) searchResults.innerHTML = '<div class="search-no-results">未找到匹配内容</div>';
     }
 
-    searchModalInput.addEventListener('input', function() {
-      highlightInDocument(this.value);
-      generateSearchResults(this.value);
-    });
-    document.getElementById('searchModalClose').addEventListener('click', closeSearchModal);
-    searchModalOverlay.addEventListener('click', function(e) {
-      if (e.target === searchModalOverlay) closeSearchModal();
-    });
+    if (searchModalInput) {
+      searchModalInput.addEventListener('input', function() {
+        highlightInDocument(this.value);
+        generateSearchResults(this.value);
+      });
+    }
+    var closeBtn = document.getElementById('searchModalClose');
+    if (closeBtn) closeBtn.addEventListener('click', closeSearchModal);
+    if (searchModalOverlay) {
+      searchModalOverlay.addEventListener('click', function(e) { if (e.target === searchModalOverlay) closeSearchModal(); });
+    }
     document.addEventListener('keydown', function(e) {
-      if (e.key === 'Escape' && searchModalOverlay.classList.contains('active')) {
-        closeSearchModal();
-      }
+      if (e.key === 'Escape' && searchModalOverlay && searchModalOverlay.classList.contains('active')) closeSearchModal();
     });
 
     window.MathJax = {
-      tex: {
-        inlineMath: [['$','$'], ['\\(','\\)']],
-        displayMath: [['$$','$$'], ['\\[','\\]']],
-        processEscapes: true
-      },
-      options: {
-        skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
-        ignoreHtmlClass: 'tex2jax_ignore',
-        processHtmlClass: 'tex2jax_process'
-      }
+      tex: { inlineMath: [['$','$'], ['\\(','\\)']], displayMath: [['$$','$$'], ['\\[','\\]']], processEscapes: true },
+      options: { skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre'], ignoreHtmlClass: 'tex2jax_ignore', processHtmlClass: 'tex2jax_process' }
     };
 
     (function() {
@@ -670,13 +610,11 @@
     })();
   </script>
 
-  <!-- PDF 内嵌插件 -->
+  <!-- PDF 内嵌 -->
   <script src="//cdn.jsdelivr.net/npm/docsify-pdf-embed/dist/docsify-pdf-embed.min.js"></script>
-
   <!-- Docsify 核心 -->
   <script src="//cdn.jsdelivr.net/npm/docsify@4"></script>
-
-  <!-- MathJax 3 -->
+  <!-- MathJax -->
   <script id="MathJax-script" async src="//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 </body>
 </html>
