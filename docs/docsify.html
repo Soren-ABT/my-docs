@@ -28,7 +28,7 @@
       transition: opacity 0.5s ease;
     }
 
-    /* 三角形加载图标容器 - 放大到 96px */
+    /* 三角形加载图标容器 */
     .loader-triangle {
       width: 96px;
       height: 96px;
@@ -40,18 +40,19 @@
       height: 100%;
     }
 
-    /* 灰色三角形边框（背景） */
+    /* 工业感深灰三角形边框 */
     .triangle-bg {
-      fill: none;
-      stroke: rgba(255, 255, 255, 0.2);
-      stroke-width: 4;
+      fill: rgba(0, 0, 0, 0.08);        /* 极淡暗色填充，增加金属凹陷感 */
+      stroke: #666666;                   /* 深灰边框，工业金属质感 */
+      stroke-width: 5;
       stroke-linejoin: round;
+      filter: drop-shadow(0 0 2px rgba(0,0,0,0.3)); /* 轻微投影，增强立体感 */
     }
 
-    /* 黄色进度条 */
+    /* 黄色进度条，保持不变 */
     .triangle-progress {
       fill: none;
-      stroke: #f1c40f;
+      stroke: #f1c40f;                   /* 明亮黄色 */
       stroke-width: 6;
       stroke-linecap: round;
       stroke-linejoin: round;
@@ -65,13 +66,13 @@
       100% { stroke-dashoffset: -120; }
     }
 
-    /* 加载文字 - 浓灰色 */
+    /* 加载文字 */
     .loading-text {
-      color: #4a4a4a;               /* 深灰，清晰可见 */
+      color: #4a4a4a;
       font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
       font-size: 0.95rem;
       letter-spacing: 1px;
-      text-shadow: none;            /* 去掉阴影，更干净 */
+      text-shadow: none;
     }
   </style>
 </head>
