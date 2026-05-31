@@ -80,70 +80,35 @@
     .sidebar-toggle { display: none !important; }
 
     /* 侧边栏条目胶囊样式 */
-    .sidebar-nav li {
-      list-style: none;
-      margin: 2px 0;
-    }
+    .sidebar-nav li { list-style: none; margin: 2px 0; }
     .sidebar-nav a,
     .sidebar-nav .folder-item > span:first-child,
     .sidebar-nav .folder-item > a {
-      display: block;
-      padding: 6px 12px;
-      border-radius: 8px;
-      color: #333;
-      text-decoration: none;
-      transition: background 0.15s;
-      cursor: pointer;
-      background: transparent;
+      display: block; padding: 6px 12px; border-radius: 8px;
+      color: #333; text-decoration: none; transition: background 0.15s;
+      cursor: pointer; background: transparent;
     }
     .sidebar-nav a:hover,
     .sidebar-nav .folder-item:hover > a,
     .sidebar-nav .folder-item:hover > span:first-child {
       background: rgba(0,0,0,0.06);
     }
-    .sidebar-nav .active > a {
-      background: rgba(0,0,0,0.08);
-      font-weight: 500;
-    }
+    .sidebar-nav .active > a { background: rgba(0,0,0,0.08); font-weight: 500; }
 
-    /* 文件夹条目：flex 布局，文字在左，+/- 在右 */
-    .folder-item {
-      display: flex !important;
-      justify-content: space-between;
-      align-items: center;
-    }
+    .folder-item { display: flex !important; justify-content: space-between; align-items: center; }
     .folder-item > a,
-    .folder-item > span:first-child {
-      flex: 1;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
+    .folder-item > span:first-child { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .folder-toggle {
-      margin-left: 8px;
-      font-size: 14px;
-      font-weight: bold;
-      color: #666;
-      user-select: none;
-      min-width: 16px;
-      text-align: center;
-      transition: transform 0.2s;
+      margin-left: 8px; font-size: 14px; font-weight: bold; color: #666;
+      user-select: none; min-width: 16px; text-align: center; transition: transform 0.2s;
     }
 
-    /* 子列表平滑折叠动画 */
     .sidebar-nav ul {
-      padding-left: 1.5rem;
-      max-height: 0;
-      overflow: hidden;
+      padding-left: 1.5rem; max-height: 0; overflow: hidden;
       transition: max-height 0.35s ease;
     }
-    .sidebar-nav ul.expanded {
-      max-height: 500px; /* 足够大，适应多数情况 */
-    }
-    /* 子列表字体稍小，缩进已通过 padding-left 实现 */
-    .sidebar-nav ul li {
-      font-size: 0.9rem;
-    }
+    .sidebar-nav ul.expanded { max-height: 500px; }
+    .sidebar-nav ul li { font-size: 0.9rem; }
 
     /* ========== 文档区域固定抬头 ========== */
     .doc-header {
@@ -161,7 +126,6 @@
     }
     .markdown-section { padding-top: 56px !important; max-width: 960px; margin: 0 auto; }
 
-    /* 胶囊按钮 */
     .capsule {
       display: none; align-items: center; background: rgba(255,255,255,0.95);
       backdrop-filter: blur(10px); border: 1px solid #e0e0e0; border-radius: 24px;
@@ -212,22 +176,18 @@
       background: transparent; border: 1px solid #d0d0d0; color: #555;
       padding: 3px 12px; border-radius: 6px; font-size: 0.75rem; cursor: pointer;
     }
-    .code-block-wrapper pre {
-      margin: 0; padding: 1.2rem 1.5rem; overflow-x: auto; background: transparent;
-    }
+    .code-block-wrapper pre { margin: 0; padding: 1.2rem 1.5rem; overflow-x: auto; background: transparent; }
     .code-block-wrapper pre code {
       font-family: 'JetBrains Mono', 'Fira Code', Consolas, monospace;
       font-size: 0.9rem; line-height: 1.65; color: #24292e;
     }
 
-    /* 语法高亮（浅色） */
     .markdown-section .token.comment { color: #6a737d !important; font-style: italic; }
     .markdown-section .token.keyword { color: #d73a49 !important; }
     .markdown-section .token.string { color: #032f62 !important; }
     .markdown-section .token.number { color: #005cc5 !important; }
     .markdown-section .token.function { color: #6f42c1 !important; }
 
-    /* 深色模式适配 */
     @media (prefers-color-scheme: dark) {
       .code-block-wrapper { background: #1e1e1e; border-color: #2d2d2d; }
       .code-block-wrapper pre code { color: #d4d4d4 !important; }
@@ -240,7 +200,6 @@
   </style>
 </head>
 <body>
-  <!-- 毛玻璃加载 -->
   <div id="loading">
     <div class="loader-wrapper" id="loaderWrapper">
       <div class="loader-triangle" id="loaderTriangle">
@@ -250,34 +209,25 @@
     </div>
   </div>
 
-  <!-- 文档区域固定抬头 -->
   <div class="doc-header" id="docHeader">
     <div class="capsule" id="capsuleGroup">
-      <button class="icon-btn" id="capsuleSidebarBtn" title="打开侧边栏">
-        <svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
-      </button>
-      <button class="icon-btn" id="capsuleSearchBtn" title="全文搜索">
-        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg>
-      </button>
+      <button class="icon-btn" id="capsuleSidebarBtn"><svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
+      <button class="icon-btn" id="capsuleSearchBtn"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg></button>
     </div>
     <span class="doc-title" id="docTitle">文档加载中…</span>
   </div>
 
-  <!-- 全文搜索模态 -->
   <div class="search-modal-overlay" id="searchModalOverlay">
     <div class="search-modal">
       <div class="search-modal-header">
         <svg class="search-icon" width="22" height="22" viewBox="0 0 24 24" stroke="#888" fill="none"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg>
         <input type="text" class="search-modal-input" id="searchModalInput" placeholder="在文档中搜索…">
-        <button class="search-modal-close" id="searchModalClose">
-          <svg width="20" height="20" viewBox="0 0 24 24" stroke="currentColor" fill="none"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-        </button>
+        <button class="search-modal-close" id="searchModalClose"><svg width="20" height="20" viewBox="0 0 24 24" stroke="currentColor" fill="none"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
       </div>
       <div class="search-results" id="searchResults"></div>
     </div>
   </div>
 
-  <!-- Docsify 渲染容器 -->
   <div id="app"></div>
 
   <script>
@@ -296,13 +246,10 @@
               setTimeout(function() {
                 loadingEl.style.display = 'none';
                 if (docHeader) docHeader.style.display = 'flex';
-                if (window._loaderMouseHandler) {
-                  document.removeEventListener('mousemove', window._loaderMouseHandler);
-                }
+                if (window._loaderMouseHandler) document.removeEventListener('mousemove', window._loaderMouseHandler);
               }, 500);
             }
 
-            // 侧边栏头部
             var sidebar = document.querySelector('.sidebar');
             if (sidebar) {
               var header = document.createElement('div');
@@ -311,12 +258,8 @@
                 <span class="sidebar-brand" id="sidebarBrand">知识库总览</span>
                 <input type="text" class="sidebar-filter-input" id="sidebarFilterInput" placeholder="过滤文档名…">
                 <div class="sidebar-actions">
-                  <button class="icon-btn" id="sidebarSearchBtn" title="搜索文档名">
-                    <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg>
-                  </button>
-                  <button class="icon-btn" id="sidebarCloseBtn" title="收起侧边栏">
-                    <svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
-                  </button>
+                  <button class="icon-btn" id="sidebarSearchBtn"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg></button>
+                  <button class="icon-btn" id="sidebarCloseBtn"><svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
                 </div>
               `;
               var nav = sidebar.querySelector('.sidebar-nav');
@@ -375,6 +318,7 @@
             document.body.classList.remove('close');
             updateDocTitle();
             initSidebarFolders();
+            fixChinesePaths();
           });
 
           hook.doneEach(function() {
@@ -382,6 +326,7 @@
             closeSearchModal();
             enhanceCodeBlocks();
             initSidebarFolders();
+            fixChinesePaths();
             if (window.MathJax && MathJax.typesetPromise) MathJax.typesetPromise();
           });
         }
@@ -398,12 +343,23 @@
       document.getElementById('docTitle').textContent = title || '文档';
     }
 
-    // ========== 侧边栏文件夹初始化（+/- 右侧、平滑展开、排序） ==========
+    function fixChinesePaths() {
+      document.querySelectorAll('.sidebar-nav a').forEach(function(a) {
+        var href = a.getAttribute('href');
+        if (href && href !== 'javascript:void(0)' && !href.startsWith('#')) {
+          var hashIndex = href.indexOf('#');
+          var path = hashIndex === -1 ? href : href.substring(0, hashIndex);
+          var hash = hashIndex === -1 ? '' : href.substring(hashIndex);
+          var encodedPath = encodeURI(path);
+          a.setAttribute('href', encodedPath + hash);
+        }
+      });
+    }
+
     function initSidebarFolders() {
       var sidebarNav = document.querySelector('.sidebar-nav');
       if (!sidebarNav) return;
 
-      // 递归排序：文件夹优先，再按名称排序
       function sortList(ul) {
         var items = Array.from(ul.children).filter(li => li.tagName === 'LI');
         items.sort(function(a, b) {
@@ -421,7 +377,6 @@
       var allUls = sidebarNav.querySelectorAll('ul');
       allUls.forEach(sortList);
 
-      // 处理文件夹条目
       var allLis = sidebarNav.querySelectorAll('li');
       allLis.forEach(function(li) {
         var childUl = li.querySelector('ul');
@@ -443,7 +398,6 @@
               li.appendChild(textElement);
             }
           } else {
-            // 文件夹链接不跳转
             textElement.setAttribute('href', 'javascript:void(0)');
           }
           textElement.style.flex = '1';
@@ -454,9 +408,7 @@
           icon.textContent = '+';
           li.appendChild(icon);
 
-          // 初始状态：折叠
-          childUl.style.maxHeight = null; // 移除内联样式，让CSS控制
-          // 添加点击切换
+          childUl.style.maxHeight = null;
           li.addEventListener('click', function(e) {
             e.stopPropagation();
             if (childUl.classList.contains('expanded')) {
@@ -467,13 +419,10 @@
               icon.textContent = '-';
             }
           });
-
-          // 默认折叠（expanded 类不存在）
         }
       });
     }
 
-    // ========== 代码块增强 ==========
     function enhanceCodeBlocks() {
       document.querySelectorAll('.markdown-section pre').forEach(function(pre) {
         if (pre.parentNode.classList.contains('code-block-wrapper')) return;
@@ -522,7 +471,7 @@
       });
     }
 
-    // ========== 全文搜索 ==========
+    // ========== 全文搜索（完整实现） ==========
     var searchModalOverlay = document.getElementById('searchModalOverlay');
     var searchModalInput = document.getElementById('searchModalInput');
     var searchResults = document.getElementById('searchResults');
@@ -535,76 +484,123 @@
       searchModalInput.focus();
       clearHighlights();
     }
+
     function closeSearchModal() {
       searchModalOverlay.classList.remove('active');
       searchResults.innerHTML = '';
       clearHighlights();
     }
+
     function clearHighlights() {
-      currentHighlights.forEach(m => {
-        var p = m.parentNode;
-        if (p) { p.replaceChild(document.createTextNode(m.textContent), m); p.normalize(); }
+      currentHighlights.forEach(function(mark) {
+        var parent = mark.parentNode;
+        if (parent) {
+          parent.replaceChild(document.createTextNode(mark.textContent), mark);
+          parent.normalize();
+        }
       });
       currentHighlights = [];
     }
-    function highlightInDocument(kw) {
-      clearHighlights(); if (!kw.trim()) return;
-      var container = document.querySelector('.markdown-section'); if (!container) return;
+
+    function highlightInDocument(keyword) {
+      clearHighlights();
+      if (!keyword.trim()) return;
+      var container = document.querySelector('.markdown-section');
+      if (!container) return;
       var walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT, {
-        acceptNode: node => {
-          if (node.parentNode.closest('.search-modal, .code-block-wrapper, script, style')) return NodeFilter.FILTER_REJECT;
+        acceptNode: function(node) {
+          if (node.parentNode.tagName === 'SCRIPT' || node.parentNode.tagName === 'STYLE' ||
+              node.parentNode.classList.contains('search-modal-input') ||
+              node.parentNode.closest('.search-modal')) {
+            return NodeFilter.FILTER_REJECT;
+          }
           return NodeFilter.FILTER_ACCEPT;
         }
       });
-      var nodes = []; while (walker.nextNode()) nodes.push(walker.currentNode);
-      var regex = new RegExp(kw.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
-      nodes.forEach(node => {
-        var text = node.textContent, frag = document.createDocumentFragment(), lastIdx = 0, match;
+      var nodes = [];
+      while (walker.nextNode()) nodes.push(walker.currentNode);
+      var regex = new RegExp(keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
+      nodes.forEach(function(node) {
+        var text = node.textContent;
+        var frag = document.createDocumentFragment();
+        var lastIdx = 0;
+        var match;
         while ((match = regex.exec(text)) !== null) {
-          if (match.index > lastIdx) frag.appendChild(document.createTextNode(text.slice(lastIdx, match.index)));
-          var mark = document.createElement('mark'); mark.className = 'search-highlight'; mark.textContent = match[0];
-          frag.appendChild(mark); currentHighlights.push(mark); lastIdx = regex.lastIndex;
+          if (match.index > lastIdx) {
+            frag.appendChild(document.createTextNode(text.slice(lastIdx, match.index)));
+          }
+          var mark = document.createElement('mark');
+          mark.className = 'search-highlight';
+          mark.textContent = match[0];
+          frag.appendChild(mark);
+          currentHighlights.push(mark);
+          lastIdx = regex.lastIndex;
         }
-        if (lastIdx < text.length) frag.appendChild(document.createTextNode(text.slice(lastIdx)));
-        if (frag.childNodes.length) node.parentNode.replaceChild(frag, node);
+        if (lastIdx < text.length) {
+          frag.appendChild(document.createTextNode(text.slice(lastIdx)));
+        }
+        if (frag.childNodes.length) {
+          node.parentNode.replaceChild(frag, node);
+        }
       });
     }
-    function generateResults(kw) {
-      searchResults.innerHTML = ''; if (!kw.trim()) return;
-      var container = document.querySelector('.markdown-section'); if (!container) return;
+
+    function generateSearchResults(keyword) {
+      searchResults.innerHTML = '';
+      if (!keyword.trim()) return;
+      var container = document.querySelector('.markdown-section');
+      if (!container) return;
       var blocks = container.querySelectorAll('p, li, td, th, h1, h2, h3, h4, h5, h6, div');
-      var regex = new RegExp(kw.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
-      var seen = new Set();
-      blocks.forEach(block => {
-        var text = block.textContent; regex.lastIndex = 0;
+      var regex = new RegExp(keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
+      var seenBlocks = new Set();
+      blocks.forEach(function(block) {
+        var text = block.textContent;
+        regex.lastIndex = 0;
         if (regex.test(text)) {
-          if (seen.has(block)) return; seen.add(block);
-          var div = document.createElement('div'); div.className = 'search-result-item';
-          regex.lastIndex = 0; var match = regex.exec(text) || {};
-          var start = Math.max(0, (match.index||0)-40), end = Math.min(text.length, (match.index||0)+(match[0]||'').length+40);
-          var excerpt = (start>0?'…':'') + text.slice(start, end) + (end<text.length?'…':'');
+          if (seenBlocks.has(block)) return;
+          seenBlocks.add(block);
+          var div = document.createElement('div');
+          div.className = 'search-result-item';
+          regex.lastIndex = 0;
+          var match = regex.exec(text) || {};
+          var start = Math.max(0, (match.index || 0) - 40);
+          var end = Math.min(text.length, (match.index || 0) + (match[0] || '').length + 40);
+          var excerpt = text.substring(start, end);
+          if (start > 0) excerpt = '…' + excerpt;
+          if (end < text.length) excerpt = excerpt + '…';
           div.innerHTML = excerpt.replace(regex, '<mark>$&</mark>');
-          div.addEventListener('click', () => block.scrollIntoView({ behavior: 'smooth', block: 'center' }));
+          div.addEventListener('click', function() {
+            block.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          });
           searchResults.appendChild(div);
         }
       });
-      if (!searchResults.children.length) searchResults.innerHTML = '<div class="search-no-results">未找到匹配内容</div>';
+      if (!searchResults.children.length) {
+        searchResults.innerHTML = '<div class="search-no-results">未找到匹配内容</div>';
+      }
     }
-    searchModalInput.addEventListener('input', () => {
-      highlightInDocument(searchModalInput.value);
-      generateResults(searchModalInput.value);
+
+    searchModalInput.addEventListener('input', function() {
+      var keyword = this.value;
+      highlightInDocument(keyword);
+      generateSearchResults(keyword);
     });
     document.getElementById('searchModalClose').addEventListener('click', closeSearchModal);
-    searchModalOverlay.addEventListener('click', e => { if (e.target === searchModalOverlay) closeSearchModal(); });
-    document.addEventListener('keydown', e => { if (e.key === 'Escape' && searchModalOverlay.classList.contains('active')) closeSearchModal(); });
+    searchModalOverlay.addEventListener('click', function(e) {
+      if (e.target === searchModalOverlay) closeSearchModal();
+    });
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape' && searchModalOverlay.classList.contains('active')) {
+        closeSearchModal();
+      }
+    });
 
-    // MathJax 配置
+    // MathJax
     window.MathJax = {
       tex: { inlineMath: [['$','$'], ['\\(','\\)']], displayMath: [['$$','$$'], ['\\[','\\]']], processEscapes: true },
       options: { skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre'], ignoreHtmlClass: 'tex2jax_ignore', processHtmlClass: 'tex2jax_process' }
     };
 
-    // 加载动画立体交互
     (function() {
       var wrapper = document.getElementById('loaderWrapper'), triangle = document.getElementById('loaderTriangle');
       if (!wrapper || !triangle) return;
@@ -619,13 +615,8 @@
     })();
   </script>
 
-  <!-- PDF 内嵌插件 -->
   <script src="//cdn.jsdelivr.net/npm/docsify-pdf-embed/dist/docsify-pdf-embed.min.js"></script>
-
-  <!-- Docsify 核心 -->
   <script src="//cdn.jsdelivr.net/npm/docsify@4"></script>
-
-  <!-- MathJax 3 -->
   <script id="MathJax-script" async src="//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 </body>
 </html>
