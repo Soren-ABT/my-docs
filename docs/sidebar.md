@@ -1,6 +1,6 @@
 - [首页](/my-docs/docs/README.md)
 - 复变函数与积分变换
-  - [第二章](/my-doc/docs/files/复变函数与积分变换/第二章/U2.complex-analysis-review.md)
+  - [第二章](/my-docs/docs/files/复变函数与积分变换/第二章/U2.complex-analysis-review.md)
 - 科研
   - 深度学习和信号处理
     - [0-1的AMC深度学习](/my-docs/docs/files/科研/From-0-to-1-Deep-Learning-Based-AMC.md)
