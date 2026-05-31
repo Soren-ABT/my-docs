@@ -8,9 +8,6 @@
   
   <!-- Docsify 主题 -->
   <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify@4/lib/themes/vue.css">
-  
-  <!-- KaTeX 样式 -->
-  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
 
   <style>
     /* ========== 加载动画遮罩 ========== */
@@ -66,8 +63,17 @@
       name: '我的知识库',
       repo: '',
       loadSidebar: true,
-      relativePath: true,   // 相对路径，适合 /my-docs/docs/ 结构
-      katex: {},            // 启用 docsify-katex 插件
+      relativePath: true,
+      // MathJax 配置
+      mathjax: {
+        tex: {
+          inlineMath: [['$','$'], ['\\(','\\)']],
+          displayMath: [['$$','$$'], ['\\[','\\]']]
+        },
+        options: {
+          skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+        }
+      },
       plugins: [
         function(hook, vm) {
           hook.ready(function() {
@@ -84,10 +90,10 @@
     }
   </script>
 
-  <!-- Docsify 核心 -->
+  <!-- Docsify 核心库 -->
   <script src="//cdn.jsdelivr.net/npm/docsify@4"></script>
   
-  <!-- docsify-katex 插件（自动渲染所有公式） -->
-  <script src="//cdn.jsdelivr.net/npm/docsify-katex/dist/docsify-katex.min.js"></script>
+  <!-- docsify-mathjax 插件（自动渲染公式） -->
+  <script src="//cdn.jsdelivr.net/npm/docsify-mathjax/dist/docsify-mathjax.min.js"></script>
 </body>
 </html>
