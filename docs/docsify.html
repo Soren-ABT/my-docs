@@ -13,10 +13,7 @@
     /* ========== 毛玻璃加载遮罩 ========== */
     #loading {
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
+      top: 0; left: 0; width: 100%; height: 100%;
       background: rgba(255, 255, 255, 0.08);
       backdrop-filter: blur(7px);
       -webkit-backdrop-filter: blur(7px);
@@ -27,7 +24,6 @@
       transition: opacity 0.5s ease;
       perspective: 600px;
     }
-
     .loader-wrapper {
       display: flex;
       flex-direction: column;
@@ -36,107 +32,125 @@
       transform-style: preserve-3d;
       transition: transform 0.1s ease;
     }
-
     .loader-triangle {
-      width: 96px;
-      height: 96px;
+      width: 96px; height: 96px;
       margin-bottom: 1.5rem;
-      filter: drop-shadow(0 0 8px rgba(255,255,255,0.15))
-              drop-shadow(0 0 2px rgba(0,0,0,0.2));
+      filter: drop-shadow(0 0 8px rgba(255,255,255,0.15)) drop-shadow(0 0 2px rgba(0,0,0,0.2));
       transition: filter 0.1s ease;
     }
-
-    .loader-triangle svg {
-      width: 100%;
-      height: 100%;
-    }
-
+    .loader-triangle svg { width: 100%; height: 100%; }
     .triangle-bg {
-      fill: none;
-      stroke: #666666;
-      stroke-width: 5;
-      stroke-linejoin: round;
+      fill: none; stroke: #666666; stroke-width: 5; stroke-linejoin: round;
     }
-
     .triangle-progress {
-      fill: none;
-      stroke: #f1c40f;
-      stroke-width: 6;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-      stroke-dasharray: 10 110;
-      stroke-dashoffset: 0;
+      fill: none; stroke: #f1c40f; stroke-width: 6;
+      stroke-linecap: round; stroke-linejoin: round;
+      stroke-dasharray: 10 110; stroke-dashoffset: 0;
       animation: dashRhythm 2s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
     }
-
     @keyframes dashRhythm {
-      0% { stroke-dashoffset: 0; }
-      100% { stroke-dashoffset: -120; }
+      0% { stroke-dashoffset: 0; } 100% { stroke-dashoffset: -120; }
     }
-
     .loading-text {
       color: #4a4a4a;
       font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-      font-size: 0.95rem;
-      letter-spacing: 1px;
+      font-size: 0.95rem; letter-spacing: 1px;
     }
 
-    /* ========== 侧边栏动画与景深 ========== */
-    /* 侧边栏默认状态：打开，带阴影景深 */
+    /* ========== 侧边栏 – 淡灰底色 + 更强的景深 ========== */
     .sidebar {
+      background: #f7f7f8;              /* 仿 DeepSeek 淡灰 */
+      border-right: 1px solid #e5e5e5;
+      /* 景深强化 */
+      box-shadow: 4px 0 28px rgba(0, 0, 0, 0.18);
       transition: transform 0.45s cubic-bezier(0.45, 0.05, 0.55, 0.95),
-                  box-shadow 0.45s cubic-bezier(0.45, 0.05, 0.55, 0.95);
-      box-shadow: 4px 0 20px rgba(0, 0, 0, 0.25);  /* 右侧模糊阴影 */
+                  box-shadow 0.45s cubic-bezier(0.45, 0.05, 0.55, 0.95) !important;
     }
-
-    /* 侧边栏关闭状态（Docsify 自动添加 .close 类） */
     .sidebar.close {
       transform: translateX(-100%);
-      box-shadow: 0 0 0 rgba(0, 0, 0, 0);  /* 关闭时无阴影 */
+      box-shadow: 0 0 0 rgba(0, 0, 0, 0);
     }
 
-    /* 保证移动端也能正确动画 */
-    @media screen and (max-width: 768px) {
-      .sidebar {
-        transition: transform 0.4s cubic-bezier(0.45, 0.05, 0.55, 0.95);
-        box-shadow: 4px 0 20px rgba(0, 0, 0, 0.25);
-      }
+    /* 侧边栏顶部导航（搜索 + 切换） */
+    .sidebar-header {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding: 8px 12px;
+      border-bottom: 1px solid #eee;
+      height: 48px;
     }
-
-    /* 切换按钮始终可见，并调整位置 */
-    .sidebar-toggle {
-      display: block !important;           /* 覆盖默认隐藏 */
-      position: fixed;
-      top: 20px;
-      left: 260px;                         /* 侧边栏宽度默认 260px，放在右侧边缘 */
-      z-index: 1000;
-      background: rgba(255,255,255,0.9);
-      border: 1px solid #ddd;
-      border-radius: 0 6px 6px 0;
-      padding: 6px 10px;
+    .sidebar-header .icon-btn {
+      background: none;
+      border: none;
       cursor: pointer;
-      transition: left 0.45s cubic-bezier(0.45, 0.05, 0.55, 0.95),
-                  background 0.3s;
-      box-shadow: 2px 0 8px rgba(0,0,0,0.1);
+      width: 32px; height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-left: 4px;
+      border-radius: 6px;
+      transition: background 0.2s;
+      color: #555;
+    }
+    .sidebar-header .icon-btn:hover {
+      background: rgba(0,0,0,0.05);
+    }
+    .sidebar-header .icon-btn svg {
+      width: 20px; height: 20px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2;
+    }
+
+    /* Docsify 默认搜索框位置调整，由我们自定义触发 */
+    .sidebar .search {
+      margin: 8px 12px;
+      display: none;           /* 默认隐藏，点击搜索图标后显示 */
+    }
+    .sidebar .search.show {
+      display: block;
+    }
+    .sidebar .search input {
+      width: 100%;
+      padding: 6px 10px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      background: #fff;
       outline: none;
     }
 
-    /* 按钮图标美化（默认 Docsify 使用三道杠，保留） */
-    .sidebar-toggle .sidebar-toggle-button {
-      /* 保持默认样式，可调整颜色 */
-      background: #555;
-    }
-
-    /* 当侧边栏关闭时，按钮移到最左侧 */
-    body.close .sidebar-toggle {
-      left: 10px;
-      border-radius: 6px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-    }
-
-    /* 避免按钮在加载动画时可见 */
-    #loading .sidebar-toggle {
+    /* 隐藏 Docsify 原生的侧边栏切换按钮，用我们自己的 */
+    .sidebar-toggle {
       display: none !important;
+    }
+
+    /* 文档区域左上角标题 */
+    .page-title {
+      position: fixed;
+      top: 12px;
+      left: 280px;            /* 侧边栏宽度 + 间距 */
+      font-size: 14px;
+      color: #888;
+      font-weight: 500;
+      z-index: 100;
+      pointer-events: none;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: calc(100% - 300px);
+      transition: left 0.45s cubic-bezier(0.45, 0.05, 0.55, 0.95);
+    }
+    body.close .page-title {
+      left: 20px;             /* 侧边栏关闭后靠近左边缘 */
+    }
+
+    /* 移动端适配 */
+    @media screen and (max-width: 768px) {
+      .page-title {
+        left: 20px;
+        font-size: 13px;
+      }
     }
   </style>
 </head>
@@ -146,16 +160,16 @@
     <div class="loader-wrapper" id="loaderWrapper">
       <div class="loader-triangle" id="loaderTriangle">
         <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-          <polygon class="triangle-bg"
-                   points="50,10 91.7,80 8.3,80" />
-          <polygon class="triangle-progress"
-                   points="50,10 91.7,80 8.3,80"
-                   pathLength="120" />
+          <polygon class="triangle-bg" points="50,10 91.7,80 8.3,80" />
+          <polygon class="triangle-progress" points="50,10 91.7,80 8.3,80" pathLength="120" />
         </svg>
       </div>
       <div class="loading-text">正在加载文档</div>
     </div>
   </div>
+
+  <!-- 文档区域标题（动态插入） -->
+  <div class="page-title" id="pageTitle"></div>
 
   <!-- Docsify 渲染容器 -->
   <div id="app"></div>
@@ -167,9 +181,13 @@
       repo: '',
       loadSidebar: true,
       relativePath: true,
-      // 侧边栏默认打开（不设置 closeSidebar 即为打开）
+      search: {
+        maxAge: 86400000,
+        placeholder: '搜索文档...',
+        noData: '无结果'
+      },
       plugins: [
-        // 1. 加载动画关闭
+        // 1. 加载动画关闭 & 侧边栏自定义头部 & 搜索/切换图标绑定
         function(hook, vm) {
           hook.ready(function() {
             var loadingEl = document.getElementById('loading');
@@ -180,11 +198,73 @@
                 document.removeEventListener('mousemove', onMouseMove);
               }, 500);
             }
+
+            // 创建侧边栏顶部栏
+            var sidebar = document.querySelector('.sidebar');
+            if (sidebar && !document.querySelector('.sidebar-header')) {
+              var header = document.createElement('div');
+              header.className = 'sidebar-header';
+              header.innerHTML = `
+                <button class="icon-btn search-btn" title="搜索">
+                  <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg>
+                </button>
+                <button class="icon-btn toggle-btn" title="收起侧边栏">
+                  <svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+                </button>
+              `;
+              // 插入到侧边栏导航之前
+              var nav = sidebar.querySelector('.sidebar-nav');
+              if (nav) {
+                sidebar.insertBefore(header, nav);
+              } else {
+                sidebar.insertBefore(header, sidebar.firstChild);
+              }
+
+              // 搜索按钮行为：显示/隐藏 Docsify 的搜索输入框
+              var searchBtn = header.querySelector('.search-btn');
+              var searchBox = document.querySelector('.sidebar .search');
+              if (searchBtn && searchBox) {
+                searchBtn.addEventListener('click', function() {
+                  searchBox.classList.toggle('show');
+                  if (searchBox.classList.contains('show')) {
+                    var input = searchBox.querySelector('input');
+                    if (input) input.focus();
+                  }
+                });
+              }
+
+              // 切换侧边栏按钮行为：调用 Docsify 的 toggleSidebar
+              var toggleBtn = header.querySelector('.toggle-btn');
+              if (toggleBtn) {
+                toggleBtn.addEventListener('click', function() {
+                  if (vm && typeof vm.toggleSidebar === 'function') {
+                    vm.toggleSidebar();
+                  }
+                });
+              }
+            }
+
+            // 初始化时让搜索框默认隐藏（类已在 CSS 中定义）
+            var searchBox = document.querySelector('.sidebar .search');
+            if (searchBox) searchBox.classList.remove('show');
           });
-        },
-        // 2. 每次页面渲染后触发 MathJax 排版
-        function(hook, vm) {
+
+          // 2. 每次页面渲染后，更新左上角文档标题
           hook.doneEach(function() {
+            // 从侧边栏获取当前激活的链接文本
+            var activeLink = document.querySelector('.sidebar-nav .active');
+            var title = '';
+            if (activeLink) {
+              title = activeLink.textContent.trim();
+            } else {
+              // 回退：获取 Markdown 中的第一个 h1
+              var h1 = document.querySelector('.markdown-section h1');
+              if (h1) title = h1.textContent.trim();
+            }
+            var pageTitle = document.getElementById('pageTitle');
+            if (pageTitle) pageTitle.textContent = title || '';
+
+            // 同时触发 MathJax 排版
             if (window.MathJax && MathJax.typesetPromise) {
               MathJax.typesetPromise();
             }
@@ -207,38 +287,30 @@
       }
     };
 
-    // ========== 立体加载交互（三角随鼠标微倾） ==========
+    // ========== 加载动画的立体交互（三角随鼠标微倾） ==========
     (function() {
       var wrapper = document.getElementById('loaderWrapper');
       var triangle = document.getElementById('loaderTriangle');
       if (!wrapper || !triangle) return;
-
       var maxAngle = 10;
       var baseFilter = 'drop-shadow(0 0 8px rgba(255,255,255,0.15)) drop-shadow(0 0 2px rgba(0,0,0,0.2))';
 
       function onMouseMove(e) {
-        var halfW = window.innerWidth / 2;
-        var halfH = window.innerHeight / 2;
-        var dx = (e.clientX - halfW) / halfW;
-        var dy = (e.clientY - halfH) / halfH;
-
-        var rotateY = dx * maxAngle;
-        var rotateX = -dy * maxAngle;
+        var halfW = window.innerWidth / 2, halfH = window.innerHeight / 2;
+        var dx = (e.clientX - halfW) / halfW, dy = (e.clientY - halfH) / halfH;
+        var rotateY = dx * maxAngle, rotateX = -dy * maxAngle;
         wrapper.style.transform = 'rotateX(' + rotateX + 'deg) rotateY(' + rotateY + 'deg) translateZ(15px)';
-
-        var shadowX = dx * 8;
-        var shadowY = dy * 8;
-        var dynamicShadow = 'drop-shadow(' + shadowX + 'px ' + shadowY + 'px 8px rgba(0,0,0,0.35))';
-        triangle.style.filter = baseFilter + ' ' + dynamicShadow;
+        var shadowX = dx * 8, shadowY = dy * 8;
+        triangle.style.filter = baseFilter + ' drop-shadow(' + shadowX + 'px ' + shadowY + 'px 8px rgba(0,0,0,0.35))';
       }
-
       document.addEventListener('mousemove', onMouseMove);
     })();
   </script>
 
   <!-- Docsify 核心 -->
   <script src="//cdn.jsdelivr.net/npm/docsify@4"></script>
-  
+  <!-- 搜索插件 -->
+  <script src="//cdn.jsdelivr.net/npm/docsify/lib/plugins/search.min.js"></script>
   <!-- MathJax 3 -->
   <script id="MathJax-script" async src="//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 </body>
