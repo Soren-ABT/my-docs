@@ -1,3 +1,4 @@
 - [首页](docsify.html)
 - [复变函数与积分变换](U2.complex-analysis-review.md)
-- [从0到1的AMC](From 0 to 1 Deep Learning-Based Automatic Modulation Classification.md)
+- [从0到1的AMC](From-0-to-1-Deep-Learning-Based-AMC.md)
+
