@@ -1,203 +1,400 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
-  <meta charset="UTF-8">
-  <title>Document</title>
-  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
-  <meta name="description" content="Description">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
-  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify@4/lib/themes/vue.css">
-<style>
-  /* ========== 封面专属：NativeDSD 暗色风格 ========== */
-  .cover {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 999;
-    background: #1a1a1a;
-    color: #e0e0e0;
-    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 2rem;
-    box-sizing: border-box;
-}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>欢迎来到Soren的知识库</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-  /* 主标题 */
-  /* 强制封面全屏固定 */
-section.cover.show,
-body .cover.show,
-#app .cover.show,
-/* ========== 优化版欢迎页封面 ========== */
-.cover {
-    position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
-    width: 100% !important;
-    height: 100% !important;
-    z-index: 999 !important;
-    background: transparent !important;
-    color: #e0e0e0;
-    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-    text-align: center;
-    display: flex !important;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 2rem;
-    box-sizing: border-box;
-    overflow: hidden;
-    user-select: none;
-}
+        /* 隐藏系统光标 */
+        body {
+            background: #1a1a1a;
+            color: #e0e0e0;
+            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            overflow: hidden;
+            user-select: none;
+            transition: opacity 0.4s ease;
+            cursor: none; /* 👈 隐藏默认箭头 */
+        }
 
-/* 网格背景纹理（在粒子下方） */
-.cover::before {
-    content: "";
-    position: absolute;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background-image: 
-        linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
-    background-size: 40px 40px;
-    pointer-events: none;
-    z-index: 0;
-}
+        body.fade-out {
+            opacity: 0;
+        }
 
-/* 标题容器，用于动画 */
-.cover .cover-main {
-    position: relative;
-    z-index: 2;
-}
+        /* 网格背景纹理 */
+        body::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image:
+                linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+            pointer-events: none;
+            z-index: 0;
+        }
 
-/* 标题逐字动画 */
-.cover h1 {
-    font-size: 3.2rem;
-    font-weight: 700;
-    letter-spacing: 2px;
-    margin-bottom: 0.5rem;
-    color: #ffffff;
-    animation: fadeInUp 0.8s ease-out;
-}
+        /* 自定义光标 - 呼吸原点 */
+        #cursor {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 10px;
+            height: 10px;
+            margin-left: -10px;
+            margin-top: -10px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.8);
+            box-shadow: 0 0 15px rgba(255,255,255,0.5);
+            pointer-events: none;
+            z-index: 9999;
+            transition: transform 0.1s ease;
+            animation: cursorBreathe 2s ease-in-out infinite;
+        }
 
-.cover h1 span {
-    display: inline-block;
-    opacity: 0;
-    transform: translateY(30px);
-    animation: letterRise 0.6s ease forwards;
-}
+        @keyframes cursorBreathe {
+            0%, 100% { transform: scale(1); opacity: 0.9; }
+            50% { transform: scale(1.4); opacity: 0.6; }
+        }
 
-/* 副标题延迟出现 */
-.cover blockquote {
-    font-size: 1.2rem;
-    border-left: none;
-    color: #b0b0b0;
-    margin: 1rem auto 2.5rem;
-    opacity: 0;
-    transform: translateY(20px);
-    animation: fadeInUp 0.8s 0.3s ease forwards;
-}
+        /* 波纹扩散元素 */
+        .ripple {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 20px;
+            height: 20px;
+            margin-left: -10px;
+            margin-top: -10px;
+            border-radius: 50%;
+            border: 1px solid rgba(255,255,255,0.6);
+            pointer-events: none;
+            z-index: 9998;
+            animation: rippleExpand 0.6s ease-out forwards;
+        }
 
-/* 按钮容器延迟出现 */
-.cover .cover-main > p {
-    margin-top: 2rem;
-    opacity: 0;
-    transform: translateY(20px);
-    animation: fadeInUp 0.8s 0.5s ease forwards;
-}
+        @keyframes rippleExpand {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(8); opacity: 0; }
+        }
 
-/* 按钮样式优化 */
-.cover .cover-main a {
-    display: inline-block;
-    padding: 0.75rem 2.2rem;
-    margin: 0.5rem;
-    border-radius: 4px;
-    font-size: 1rem;
-    font-weight: 500;
-    text-decoration: none;
-    transition: all 0.3s ease;
-    border: 1.5px solid #888;
-    color: #e0e0e0;
-    background: transparent;
-    letter-spacing: 0.5px;
-    position: relative;
-    overflow: hidden;
-}
+        /* 内容层 */
+        .content {
+            position: relative;
+            z-index: 2;
+            animation: fadeInUp 0.8s ease-out;
+        }
 
-/* 主按钮实心白色 */
-.cover .cover-main a:first-child {
-    background: #ffffff;
-    color: #1a1a1a;
-    border-color: #ffffff;
-    font-weight: 600;
-}
-
-/* 按钮悬停效果 */
-.cover .cover-main a:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 12px 28px rgba(255,255,255,0.12);
-}
-.cover .cover-main a:active {
-    transform: translateY(-1px);
-}
-
-/* 底部滚动提示箭头 */
-.cover .scroll-hint {
-    position: absolute;
-    bottom: 2rem;
-    left: 50%;
-    transform: translateX(-50%);
-    color: rgba(255,255,255,0.5);
-    font-size: 0.9rem;
-    letter-spacing: 1px;
-    z-index: 2;
-    animation: bounce 2s infinite;
-}
-.cover .scroll-hint::after {
-    content: "↓";
-    display: block;
-    font-size: 1.4rem;
-    margin-top: 0.3rem;
-}
-
-/* 动画定义 */
-@keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(30px);
+        h1 {
+        font-size: 3.2rem;
+        font-weight: 700;
+        letter-spacing: 2px;
+        margin-bottom: 0.5rem;
+        /* 回退纯色 */
+        color: #ffffff;
+        /* 渐变覆盖（仅对支持者生效） */
+        background: linear-gradient(135deg, #ffffff 0%, #c9a962 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        /* 发光阴影增强可读性 */
+        text-shadow: 0 0 10px rgba(201, 169, 98, 0.3), 0 0 2px rgba(255,255,255,0.5);
+        /* 如果渐变色无法显示，回退到纯白 */
+        -webkit-text-fill-color: transparent;
+        /* 确保文字不会消失 */
     }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
 
-@keyframes letterRise {
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
+        h1 span {
+            display: inline-block;
+            opacity: 0;
+            transform: translateY(30px);
+            animation: letterRise 0.6s ease forwards;
+        }
 
-@keyframes bounce {
-    0%, 20%, 50%, 80%, 100% { transform: translateX(-50%) translateY(0); }
-    40% { transform: translateX(-50%) translateY(-10px); }
-    60% { transform: translateX(-50%) translateY(-5px); }
-}
-</style>
+        .subtitle {
+            font-size: 1.2rem;
+            color: #b0b0b0;
+            margin: 1rem auto 2.5rem;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.8s 0.3s ease forwards;
+        }
+
+        .buttons {
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.8s 0.5s ease forwards;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 0.75rem 2.2rem;
+            margin: 0.5rem;
+            border-radius: 4px;
+            font-size: 1rem;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border: 1.5px solid #888;
+            color: #e0e0e0;
+            background: transparent;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary {
+            background: #ffffff;
+            color: #1a1a1a;
+            border-color: #ffffff;
+            font-weight: 600;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 28px rgba(255,255,255,0.12);
+        }
+
+        .btn:active {
+            transform: translateY(-1px);
+        }
+
+        /* 滚动提示 - 三个呼吸灯点 */
+        .scroll-hint {
+            position: absolute;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 2;
+            display: flex;
+            gap: 8px;
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            background: rgba(255,255,255,0.4);
+            border-radius: 50%;
+            animation: dotBounce 1.4s infinite ease-in-out;
+        }
+
+        .dot:nth-child(2) { animation-delay: 0.2s; }
+        .dot:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes dotBounce {
+            0%, 80%, 100% { transform: scale(0.6); opacity: 0.3; }
+            40% { transform: scale(1.2); opacity: 1; }
+        }
+
+        /* 粒子画布 */
+        #particles-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes letterRise {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 600px) {
+            h1 { font-size: 2rem; letter-spacing: 1px; }
+            .subtitle { font-size: 1rem; margin: 1rem auto 2rem; }
+            .btn { padding: 0.6rem 1.5rem; font-size: 0.9rem; }
+        }
+    </style>
+</head>
 <body>
-  <div id="app"></div>
-  <script>
-    window.$docsify = {
-      name: '我的知识库',           // 这里可以改成你的网站名
-      repo: ''
-    }
-  </script>
-  <!-- Docsify v4 -->
-  <script src="//cdn.jsdelivr.net/npm/docsify@4"></script>
+    <!-- 自定义光标元素 -->
+    <div id="cursor"></div>
+
+    <div class="content">
+        <h1 id="cover-title">Soren的知识库</h1>
+        <div class="subtitle" id="greeting">记录思考 · 沉淀技术 · 无限突破</div>
+        <div class="buttons">
+            <a href="javascript:void(0)" class="btn btn-primary" onclick="goToDocs()">开始阅读</a>
+            <a href="https://github.com/你的用户名" class="btn" target="_blank">GitHub</a>
+        </div>
+    </div>
+
+    <div class="scroll-hint">
+        <span class="dot"></span>
+        <span class="dot"></span>
+        <span class="dot"></span>
+    </div>
+
+    <canvas id="particles-canvas"></canvas>
+
+    <script>
+        // ========== 自定义光标（呼吸原点 + 点击波纹） ==========
+        (function() {
+            var cursor = document.getElementById('cursor');
+            var body = document.body;
+
+            // 鼠标移动更新位置
+            document.addEventListener('mousemove', function(e) {
+                cursor.style.left = e.clientX + 'px';
+                cursor.style.top = e.clientY + 'px';
+            });
+
+            // 鼠标点击创建波纹
+            document.addEventListener('click', function(e) {
+                var ripple = document.createElement('div');
+                ripple.className = 'ripple';
+                ripple.style.left = e.clientX + 'px';
+                ripple.style.top = e.clientY + 'px';
+                document.body.appendChild(ripple);
+
+                // 动画结束后移除波纹元素
+                ripple.addEventListener('animationend', function() {
+                    ripple.remove();
+                });
+            });
+        })();
+
+        // ========== 动态问候语 ==========
+        (function() {
+            var hour = new Date().getHours();
+            var baseText = '记录思考 · 沉淀技术 · 无限突破';
+            if (hour < 12) baseText = '上午好，' + baseText;
+            else if (hour < 18) baseText = '下午好，' + baseText;
+            else baseText = '晚上好，' + baseText;
+            document.getElementById('greeting').textContent = baseText;
+        })();
+
+        // ========== 页面淡出跳转 ==========
+        function goToDocs() {
+            document.body.classList.add('fade-out');
+            setTimeout(function() {
+                window.location.href = 'docsify.html';
+            }, 400);
+        }
+
+        // ========== 标题逐字动画 ==========
+        (function() {
+            var titleEl = document.getElementById('cover-title');
+            if (titleEl) {
+                var text = titleEl.textContent.trim();
+                var html = '';
+                for (var i = 0; i < text.length; i++) {
+                    var char = text[i] === ' ' ? '&nbsp;' : text[i];
+                    html += '<span style="animation-delay:' + (i * 0.05) + 's">' + char + '</span>';
+                }
+                titleEl.innerHTML = html;
+            }
+        })();
+
+        // ========== 粒子动画（增强排斥 + 数量增多） ==========
+        (function() {
+            var canvas = document.getElementById('particles-canvas');
+            var ctx = canvas.getContext('2d');
+            var w, h;
+            var particles = [];
+
+            function resize() {
+                w = canvas.width = window.innerWidth;
+                h = canvas.height = window.innerHeight;
+            }
+            resize();
+            window.addEventListener('resize', resize);
+
+            var mouseX = -1000, mouseY = -1000;
+            document.addEventListener('mousemove', function(e) {
+                mouseX = e.clientX;
+                mouseY = e.clientY;
+            });
+            document.addEventListener('mouseleave', function() {
+                mouseX = -1000;
+                mouseY = -1000;
+            });
+
+            function Particle() {
+                this.x = Math.random() * w;
+                this.y = Math.random() * h;
+                this.vx = (Math.random() - 0.5) * 1.2; // 基础速度稍快
+                this.vy = (Math.random() - 0.5) * 1.2;
+                this.radius = Math.random() * 2.5 + 0.8;
+                this.opacity = Math.random() * 0.6 + 0.2;
+                this.color = Math.random() < 0.15 ? '201,169,98' : '255,255,255';
+            }
+
+            Particle.prototype.update = function() {
+                this.x += this.vx;
+                this.y += this.vy;
+
+                if (this.x < 0 || this.x > w) this.vx *= -1;
+                if (this.y < 0 || this.y > h) this.vy *= -1;
+
+                // 鼠标排斥（力度加大，范围加大）
+                var dx = this.x - mouseX;
+                var dy = this.y - mouseY;
+                var dist = Math.sqrt(dx * dx + dy * dy);
+                if (dist < 150 && dist > 0) {
+                    var force = (150 - dist) / 150;
+                    this.x += (dx / dist) * force * 5;   // 力度 *5，原来为2
+                    this.y += (dy / dist) * force * 5;
+                }
+            };
+
+            Particle.prototype.draw = function() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(' + this.color + ', ' + this.opacity + ')';
+                ctx.fill();
+            };
+
+            // 👇 粒子数量增加到 180
+            var particleCount = 180;
+            for (var i = 0; i < particleCount; i++) {
+                particles.push(new Particle());
+            }
+
+            function animate() {
+                ctx.clearRect(0, 0, w, h);
+                ctx.fillStyle = '#1a1a1a';
+                ctx.fillRect(0, 0, w, h);
+
+                for (var i = 0; i < particles.length; i++) {
+                    particles[i].update();
+                    particles[i].draw();
+                }
+
+                for (var i = 0; i < particles.length; i++) {
+                    for (var j = i + 1; j < particles.length; j++) {
+                        var dx = particles[i].x - particles[j].x;
+                        var dy = particles[i].y - particles[j].y;
+                        var dist = Math.sqrt(dx * dx + dy * dy);
+                        if (dist < 100) {
+                            var alpha = (0.15 * (1 - dist / 100));
+                            var color = particles[i].color === '201,169,98' ? '201,169,98' : '255,255,255';
+                            ctx.beginPath();
+                            ctx.moveTo(particles[i].x, particles[i].y);
+                            ctx.lineTo(particles[j].x, particles[j].y);
+                            ctx.strokeStyle = 'rgba(' + color + ', ' + alpha + ')';
+                            ctx.lineWidth = 0.5;
+                            ctx.stroke();
+                        }
+                    }
+                }
+                requestAnimationFrame(animate);
+            }
+            animate();
+        })();
+    </script>
 </body>
 </html>
