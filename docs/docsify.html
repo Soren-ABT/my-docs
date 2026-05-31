@@ -26,8 +26,20 @@
       align-items: center;
       justify-content: center;
       transition: opacity 0.5s ease;
+      perspective: 600px;   /* 为内部元素提供 3D 透视舞台 */
     }
 
+    /* 统一容器，方便做立体交互（三角 + 文字） */
+    .loader-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      will-change: transform;
+      transform-style: preserve-3d;
+    }
+
+    /* 三角形加载图标容器 */
     .loader-triangle {
       width: 96px;
       height: 96px;
@@ -39,21 +51,15 @@
       height: 100%;
     }
 
-    /* 景深阴影三角形：稍偏移的深色半透明层 */
-    .triangle-shadow {
-      fill: none;
-      stroke: rgba(0, 0, 0, 0.25);
-      stroke-width: 6;
-      stroke-linejoin: round;
-      transform: translate(3px, 3px);   /* 向右下偏移，形成厚度 */
-    }
-
-    /* 主三角形边框（无填充） */
+    /* 工业感三角边框（去掉填充，增加景深光晕） */
     .triangle-bg {
-      fill: none;                       /* 去掉填充 */
+      fill: none;                       /* 去除填充 */
       stroke: #666666;
       stroke-width: 5;
       stroke-linejoin: round;
+      /* 自然模糊的景深：用多层 drop-shadow 模拟光晕散开 */
+      filter: drop-shadow(0 0 4px rgba(255,255,255,0.1))
+              drop-shadow(0 0 8px rgba(255,255,255,0.06));
     }
 
     /* 黄色进度条 */
@@ -73,36 +79,38 @@
       100% { stroke-dashoffset: -120; }
     }
 
+    /* 加载文字 */
     .loading-text {
       color: #4a4a4a;
       font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
       font-size: 0.95rem;
       letter-spacing: 1px;
+      text-shadow: none;
     }
   </style>
 </head>
 <body>
+  <!-- 毛玻璃加载层 -->
   <div id="loading">
-    <div class="loader-triangle">
-      <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-        <!-- 景深阴影层（偏移后绘制在底层） -->
-        <polygon class="triangle-shadow"
-                 points="50,10 91.7,80 8.3,80" />
-        <!-- 主三角形边框 -->
-        <polygon class="triangle-bg"
-                 points="50,10 91.7,80 8.3,80" />
-        <!-- 黄色进度条（覆盖在最上层） -->
-        <polygon class="triangle-progress"
-                 points="50,10 91.7,80 8.3,80"
-                 pathLength="120" />
-      </svg>
+    <!-- 立体交互包裹层 -->
+    <div class="loader-wrapper" id="loaderWrapper">
+      <div class="loader-triangle">
+        <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <polygon class="triangle-bg"
+                   points="50,10 91.7,80 8.3,80" />
+          <polygon class="triangle-progress"
+                   points="50,10 91.7,80 8.3,80"
+                   pathLength="120" />
+        </svg>
+      </div>
+      <div class="loading-text">正在加载文档</div>
     </div>
-    <div class="loading-text">正在加载文档</div>
   </div>
 
   <div id="app"></div>
 
   <script>
+    // ========== Docsify 配置 ==========
     window.$docsify = {
       name: '我的知识库',
       repo: '',
@@ -116,6 +124,8 @@
               loadingEl.style.opacity = '0';
               setTimeout(function() {
                 loadingEl.style.display = 'none';
+                // 加载完成后移除鼠标监听，释放资源
+                document.removeEventListener('mousemove', onMouseMove);
               }, 500);
             }
           });
@@ -130,6 +140,7 @@
       ]
     };
 
+    // ========== MathJax 配置 ==========
     window.MathJax = {
       tex: {
         inlineMath: [['$','$'], ['\\(','\\)']],
@@ -142,9 +153,37 @@
         processHtmlClass: 'tex2jax_process'
       }
     };
+
+    // ========== 立体鼠标交互 ==========
+    (function() {
+      var wrapper = document.getElementById('loaderWrapper');
+      if (!wrapper) return;
+
+      var maxAngle = 8; // 最大倾斜角度（度）
+
+      function onMouseMove(e) {
+        // 计算鼠标相对于窗口中心的偏移比（-0.5 ~ 0.5）
+        var halfW = window.innerWidth / 2;
+        var halfH = window.innerHeight / 2;
+        var dx = (e.clientX - halfW) / halfW;
+        var dy = (e.clientY - halfH) / halfH;
+
+        // 根据偏移比计算旋转角度（注意：X轴旋转对应上下，用dy；Y轴旋转对应左右，用dx）
+        var rotateY = dx * maxAngle;
+        var rotateX = -dy * maxAngle;
+
+        // 应用变换，营造薄片立体随鼠标微倾的效果
+        wrapper.style.transform = 'rotateX(' + rotateX + 'deg) rotateY(' + rotateY + 'deg) translateZ(10px)';
+      }
+
+      document.addEventListener('mousemove', onMouseMove);
+    })();
   </script>
 
+  <!-- Docsify 核心 -->
   <script src="//cdn.jsdelivr.net/npm/docsify@4"></script>
+  
+  <!-- MathJax 3 -->
   <script id="MathJax-script" async src="//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 </body>
 </html>
