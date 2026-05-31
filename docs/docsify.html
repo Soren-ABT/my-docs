@@ -9,6 +9,11 @@
   <!-- Docsify 主题 -->
   <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify@4/lib/themes/vue.css">
 
+  <!-- 等宽编程字体 -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+
   <style>
     /* ========== 毛玻璃加载遮罩 ========== */
     #loading {
@@ -61,7 +66,6 @@
       box-shadow: none;
     }
 
-    /* 侧边栏自定义头部 */
     .sidebar-header {
       display: flex;
       align-items: center;
@@ -108,7 +112,6 @@
       width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 2;
     }
 
-    /* 隐藏原生切换按钮 */
     .sidebar-toggle { display: none !important; }
 
     /* ========== 文档区域固定抬头 ========== */
@@ -132,8 +135,6 @@
       overflow: visible;
     }
     body.close .doc-header { left: 0; }
-
-    /* 抬头内标题 */
     .doc-title {
       font-size: 15px;
       font-weight: 500;
@@ -144,14 +145,13 @@
       flex: 1;
     }
 
-    /* ========== 文档正文区域：居中并避开抬头 ========== */
     .markdown-section {
-      padding-top: 56px !important;   /* 留出抬头高度 */
+      padding-top: 56px !important;
       max-width: 960px;
-      margin: 0 auto;                /* 水平居中 */
+      margin: 0 auto;
     }
 
-    /* ========== 胶囊按钮组（侧边栏关闭时显示） ========== */
+    /* ========== 胶囊按钮组 ========== */
     .capsule {
       display: none;
       align-items: center;
@@ -170,96 +170,240 @@
     }
     body.close .capsule { display: flex; }
     body.close .doc-title { padding-left: 80px; }
-
-    .capsule .icon-btn {
-      width: 28px; height: 28px;
-      border-radius: 50%;
-      color: #555;
-    }
+    .capsule .icon-btn { width: 28px; height: 28px; border-radius: 50%; color: #555; }
     .capsule .icon-btn:hover { background: rgba(0,0,0,0.1); }
 
-    /* ========== 自定义全文搜索模态框 ========== */
+    /* ========== 全文搜索模态框 ========== */
     .search-modal-overlay {
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
       background: rgba(0, 0, 0, 0.3);
       backdrop-filter: blur(8px);
       -webkit-backdrop-filter: blur(8px);
       z-index: 10000;
       display: none;
-      align-items: flex-start;
-      justify-content: center;
+      align-items: flex-start; justify-content: center;
       padding-top: 10vh;
     }
     .search-modal-overlay.active { display: flex; }
-
     .search-modal {
       background: #fff;
       border-radius: 24px;
-      width: 90%;
-      max-width: 600px;
+      width: 90%; max-width: 600px;
       box-shadow: 0 20px 40px rgba(0,0,0,0.2);
       overflow: hidden;
-      display: flex;
-      flex-direction: column;
+      display: flex; flex-direction: column;
       max-height: 70vh;
     }
-
     .search-modal-header {
-      display: flex;
-      align-items: center;
+      display: flex; align-items: center;
       padding: 12px 18px;
       border-bottom: 1px solid #eee;
     }
-    .search-modal-header .search-icon {
-      color: #888;
-      margin-right: 10px;
-    }
+    .search-modal-header .search-icon { color: #888; margin-right: 10px; }
     .search-modal-input {
-      flex: 1;
-      border: none;
-      outline: none;
-      font-size: 1.1rem;
-      padding: 8px 0;
-      background: transparent;
+      flex: 1; border: none; outline: none;
+      font-size: 1.1rem; padding: 8px 0; background: transparent;
     }
     .search-modal-close {
-      background: none;
-      border: none;
-      cursor: pointer;
-      color: #888;
-      padding: 4px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      background: none; border: none; cursor: pointer;
+      color: #888; padding: 4px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
     }
     .search-modal-close:hover { background: #f0f0f0; color: #333; }
-
-    .search-results {
-      overflow-y: auto;
-      flex: 1;
-      padding: 8px 0;
-    }
+    .search-results { overflow-y: auto; flex: 1; padding: 8px 0; }
     .search-result-item {
-      padding: 10px 18px;
-      cursor: pointer;
+      padding: 10px 18px; cursor: pointer;
       border-bottom: 1px solid #f5f5f5;
-      font-size: 0.95rem;
-      line-height: 1.5;
+      font-size: 0.95rem; line-height: 1.5;
       transition: background 0.15s;
     }
     .search-result-item:hover { background: #f9f9f9; }
     .search-result-item mark {
-      background: #b9f6ca;
-      color: #000;
-      border-radius: 2px;
-      padding: 0 2px;
+      background: #b9f6ca; color: #000;
+      border-radius: 2px; padding: 0 2px;
     }
-    .search-no-results {
-      padding: 20px;
-      text-align: center;
-      color: #888;
+    .search-no-results { padding: 20px; text-align: center; color: #888; }
+
+    /* ========== 代码块增强样式 ========== */
+    /* 卡片容器：包裹 pre 的外层 div (由 JS 自动创建) */
+    .code-block-wrapper {
+      margin: 1.8rem 0;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.06), 0 1px 4px rgba(0,0,0,0.04);
+      background: #f8f9fa;
+      border: 1px solid rgba(0,0,0,0.05);
+      transition: box-shadow 0.25s, border-color 0.25s;
+    }
+    .code-block-wrapper:hover {
+      box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+    }
+
+    /* 代码顶栏：语言标签 + 复制按钮 */
+    .code-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.6rem 1.2rem;
+      background: rgba(0,0,0,0.04);
+      border-bottom: 1px solid rgba(0,0,0,0.06);
+      font-size: 0.85rem;
+      color: #555;
+      user-select: none;
+    }
+    .code-lang {
+      font-weight: 500;
+      letter-spacing: 0.3px;
+      text-transform: uppercase;
+      font-size: 0.75rem;
+      opacity: 0.8;
+    }
+    .code-copy-btn {
+      background: transparent;
+      border: 1px solid #d0d0d0;
+      color: #555;
+      padding: 3px 12px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .code-copy-btn:hover {
+      background: #eee;
+      border-color: #bbb;
+    }
+    .code-copy-btn.copied {
+      background: #e6f7e6;
+      border-color: #b7eb8f;
+      color: #52c41a;
+    }
+    .code-copy-btn svg {
+      width: 14px; height: 14px;
+    }
+
+    /* 实际的 pre 和 code 样式 */
+    .code-block-wrapper pre {
+      margin: 0;
+      padding: 1.2rem 1.5rem;
+      overflow-x: auto;
+      background: transparent;
+      border: none;
+      border-radius: 0;
+    }
+    .code-block-wrapper pre code {
+      font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', Consolas, 'Courier New', monospace;
+      font-size: 0.9rem;
+      line-height: 1.65;
+      background: transparent !important;
+      padding: 0 !important;
+      color: #24292e; /* 浅色模式基础文字 */
+      white-space: pre;
+    }
+
+    /* 深色模式适配 */
+    @media (prefers-color-scheme: dark) {
+      .code-block-wrapper {
+        background: #1e1e1e;
+        border-color: #2d2d2d;
+        box-shadow: 0 4px 16px rgba(0,0,0,0.3), 0 1px 4px rgba(0,0,0,0.2);
+      }
+      .code-block-wrapper:hover {
+        box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+      }
+      .code-toolbar {
+        background: rgba(255,255,255,0.05);
+        border-bottom-color: #333;
+        color: #ccc;
+      }
+      .code-copy-btn {
+        border-color: #555;
+        color: #ccc;
+      }
+      .code-copy-btn:hover {
+        background: #333;
+        border-color: #777;
+      }
+      .code-copy-btn.copied {
+        background: #1e3a1e;
+        border-color: #2e5a2e;
+        color: #6fcf6f;
+      }
+      .code-block-wrapper pre code {
+        color: #d4d4d4;
+      }
+      /* Prism 深色主题微调（会复用 vue.css 自带的暗色基本样式，稍作加强） */
+      .token.comment,
+      .token.prolog,
+      .token.doctype,
+      .token.cdata { color: #6a9955; }
+      .token.punctuation { color: #d4d4d4; }
+      .token.property,
+      .token.tag,
+      .token.boolean,
+      .token.number,
+      .token.constant,
+      .token.symbol,
+      .token.deleted { color: #b5cea8; }
+      .token.selector,
+      .token.attr-name,
+      .token.string,
+      .token.char,
+      .token.builtin,
+      .token.inserted { color: #ce9178; }
+      .token.operator,
+      .token.entity,
+      .token.url,
+      .language-css .token.string,
+      .style .token.string { color: #d4d4d4; }
+      .token.atrule,
+      .token.attr-value,
+      .token.keyword { color: #569cd6; }
+      .token.function,
+      .token.class-name { color: #dcdcaa; }
+      .token.regex,
+      .token.important,
+      .token.variable { color: #d16969; }
+    }
+
+    /* 浅色模式微调 Prism 颜色（让柔和但不刺眼） */
+    .token.comment,
+    .token.prolog,
+    .token.doctype,
+    .token.cdata { color: #6a737d; }
+    .token.punctuation { color: #5c6370; }
+    .token.property,
+    .token.tag,
+    .token.boolean,
+    .token.number,
+    .token.constant,
+    .token.symbol,
+    .token.deleted { color: #e36209; }
+    .token.selector,
+    .token.attr-name,
+    .token.string,
+    .token.char,
+    .token.builtin,
+    .token.inserted { color: #032f62; }
+    .token.operator,
+    .token.entity,
+    .token.url { color: #9a6e3a; }
+    .token.atrule,
+    .token.attr-value,
+    .token.keyword { color: #d73a49; }
+    .token.function,
+    .token.class-name { color: #6f42c1; }
+    .token.regex,
+    .token.important,
+    .token.variable { color: #e36209; }
+
+    /* 确保移动端代码块边距合适 */
+    @media (max-width: 768px) {
+      .code-block-wrapper pre {
+        padding: 1rem;
+      }
     }
   </style>
 </head>
@@ -290,7 +434,7 @@
     <span class="doc-title" id="docTitle">文档加载中…</span>
   </div>
 
-  <!-- 自定义全文搜索模态 -->
+  <!-- 全文搜索模态 -->
   <div class="search-modal-overlay" id="searchModalOverlay">
     <div class="search-modal">
       <div class="search-modal-header">
@@ -308,11 +452,9 @@
     </div>
   </div>
 
-  <!-- Docsify 渲染容器 -->
   <div id="app"></div>
 
   <script>
-    // ========== Docsify 配置 ==========
     window.$docsify = {
       name: '我的知识库',
       repo: '',
@@ -321,7 +463,6 @@
       plugins: [
         function(hook, vm) {
           hook.ready(function() {
-            // 隐藏加载层
             var loadingEl = document.getElementById('loading');
             if (loadingEl) {
               loadingEl.style.opacity = '0';
@@ -333,7 +474,7 @@
               }, 500);
             }
 
-            // ===== 侧边栏改造 =====
+            // 侧边栏改造
             var sidebar = document.querySelector('.sidebar');
             if (sidebar) {
               var header = document.createElement('div');
@@ -405,7 +546,6 @@
               });
             }
 
-            // ===== 胶囊按钮组功能 =====
             var capsuleSidebarBtn = document.getElementById('capsuleSidebarBtn');
             var capsuleSearchBtn = document.getElementById('capsuleSearchBtn');
             if (capsuleSidebarBtn) {
@@ -423,9 +563,11 @@
             updateDocTitle();
           });
 
+          // 每次页面切换后，更新标题、关闭搜索、美化代码块
           hook.doneEach(function() {
             updateDocTitle();
             closeSearchModal();
+            enhanceCodeBlocks();
             if (window.MathJax && MathJax.typesetPromise) {
               MathJax.typesetPromise();
             }
@@ -445,6 +587,75 @@
       }
       var docTitle = document.getElementById('docTitle');
       if (docTitle) docTitle.textContent = title || '文档';
+    }
+
+    // ========== 代码块增强 ==========
+    function enhanceCodeBlocks() {
+      // 避免重复包装
+      document.querySelectorAll('.markdown-section pre').forEach(function(pre) {
+        if (pre.parentNode.classList.contains('code-block-wrapper')) return;
+
+        // 检测语言
+        var code = pre.querySelector('code');
+        var lang = '';
+        if (code && code.className) {
+          var match = code.className.match(/lang(?:uage)?-(\w+)/);
+          if (match) lang = match[1];
+        }
+        // 如果没有检测到语言，尝试从 pre 的 data-lang 读取
+        if (!lang && pre.getAttribute('data-lang')) {
+          lang = pre.getAttribute('data-lang');
+        }
+
+        // 创建卡片容器
+        var wrapper = document.createElement('div');
+        wrapper.className = 'code-block-wrapper';
+
+        // 创建顶部工具栏
+        var toolbar = document.createElement('div');
+        toolbar.className = 'code-toolbar';
+        var langSpan = document.createElement('span');
+        langSpan.className = 'code-lang';
+        langSpan.textContent = lang || 'code';
+        toolbar.appendChild(langSpan);
+
+        var copyBtn = document.createElement('button');
+        copyBtn.className = 'code-copy-btn';
+        copyBtn.innerHTML = '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> 复制';
+        toolbar.appendChild(copyBtn);
+
+        // 复制功能
+        copyBtn.addEventListener('click', function() {
+          var text = pre.textContent;
+          navigator.clipboard.writeText(text).then(function() {
+            copyBtn.classList.add('copied');
+            copyBtn.innerHTML = '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><polyline points="20 6 9 17 4 12"/></svg> 已复制';
+            setTimeout(function() {
+              copyBtn.classList.remove('copied');
+              copyBtn.innerHTML = '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> 复制';
+            }, 2000);
+          }).catch(function() {
+            // fallback
+            var textarea = document.createElement('textarea');
+            textarea.value = pre.textContent;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+            copyBtn.classList.add('copied');
+            copyBtn.textContent = '已复制';
+            setTimeout(function() {
+              copyBtn.classList.remove('copied');
+              copyBtn.innerHTML = '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> 复制';
+            }, 2000);
+          });
+        });
+
+        wrapper.appendChild(toolbar);
+        // 将 pre 移入 wrapper
+        pre.parentNode.insertBefore(wrapper, pre);
+        wrapper.appendChild(pre);
+      });
     }
 
     // ========== 全文搜索模态逻辑 ==========
@@ -496,9 +707,7 @@
         }
       });
       var textNodes = [];
-      while (walker.nextNode()) {
-        textNodes.push(walker.currentNode);
-      }
+      while (walker.nextNode()) textNodes.push(walker.currentNode);
       var regex = new RegExp(keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
       textNodes.forEach(function(node) {
         var text = node.textContent;
@@ -541,6 +750,7 @@
           seenBlocks.add(block);
           var div = document.createElement('div');
           div.className = 'search-result-item';
+          regex.lastIndex = 0;
           var match = regex.exec(text) || {};
           var start = Math.max(0, (match.index || 0) - 40);
           var end = Math.min(text.length, (match.index || 0) + (match[0] || '').length + 40);
@@ -567,7 +777,6 @@
       highlightInDocument(keyword);
       generateSearchResults(keyword);
     });
-
     searchModalClose.addEventListener('click', closeSearchModal);
     searchModalOverlay.addEventListener('click', function(e) {
       if (e.target === searchModalOverlay) closeSearchModal();
@@ -578,7 +787,6 @@
       }
     });
 
-    // ========== MathJax 配置 ==========
     window.MathJax = {
       tex: {
         inlineMath: [['$','$'], ['\\(','\\)']],
@@ -592,7 +800,6 @@
       }
     };
 
-    // 加载动画立体交互
     (function() {
       var wrapper = document.getElementById('loaderWrapper');
       var triangle = document.getElementById('loaderTriangle');
@@ -612,9 +819,7 @@
     })();
   </script>
 
-  <!-- Docsify 核心 -->
   <script src="//cdn.jsdelivr.net/npm/docsify@4"></script>
-  <!-- MathJax 3 -->
   <script id="MathJax-script" async src="//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 </body>
 </html>
