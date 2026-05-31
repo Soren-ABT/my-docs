@@ -81,18 +81,27 @@
 
     /* 侧边栏条目胶囊样式 */
     .sidebar-nav li { list-style: none; margin: 2px 0; }
-    .sidebar-nav a, .sidebar-nav .folder-item > span:first-child, .sidebar-nav .folder-item > a {
+    .sidebar-nav a,
+    .sidebar-nav .folder-item > span:first-child,
+    .sidebar-nav .folder-item > a {
       display: block; padding: 6px 12px; border-radius: 8px;
       color: #333; text-decoration: none; transition: background 0.15s;
       cursor: pointer; background: transparent;
     }
-    .sidebar-nav a:hover, .sidebar-nav .folder-item:hover > a, .sidebar-nav .folder-item:hover > span:first-child {
+    .sidebar-nav a:hover,
+    .sidebar-nav .folder-item:hover > a,
+    .sidebar-nav .folder-item:hover > span:first-child {
       background: rgba(0,0,0,0.06);
     }
-    .sidebar-nav .active > a { background: rgba(0,0,0,0.08); font-weight: 500; }
+    .sidebar-nav .active > a {
+      background: rgba(0,0,0,0.08); font-weight: 500;
+    }
 
-    .folder-item { display: flex !important; justify-content: space-between; align-items: center; }
-    .folder-item > a, .folder-item > span:first-child {
+    .folder-item {
+      display: flex !important; justify-content: space-between; align-items: center;
+    }
+    .folder-item > a,
+    .folder-item > span:first-child {
       flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
     .folder-toggle {
@@ -100,12 +109,23 @@
       color: #666; user-select: none; min-width: 16px; text-align: center;
     }
 
-    .sidebar-nav ul {
-      padding-left: 1.5rem; max-height: 0; overflow: hidden;
+    /* 关键修复：仅对嵌套的子列表（sidebar-sub）应用折叠动画，根列表保持可见 */
+    .sidebar-nav ul.sidebar-sub {
+      padding-left: 1.5rem;
+      max-height: 0;
+      overflow: hidden;
       transition: max-height 0.35s ease;
     }
-    .sidebar-nav ul.expanded { max-height: 500px; }
-    .sidebar-nav ul li { font-size: 0.9rem; }
+    .sidebar-nav ul.sidebar-sub.expanded {
+      max-height: 500px;
+    }
+    /* 根列表和普通列表正常显示，不做高度限制 */
+    .sidebar-nav > ul {
+      padding-left: 0;
+    }
+    .sidebar-nav ul.sidebar-sub li {
+      font-size: 0.9rem;
+    }
 
     /* ========== 文档区域固定抬头 ========== */
     .doc-header {
@@ -231,11 +251,12 @@
   <div id="app"></div>
 
   <script>
+    // ========== Docsify 配置 ==========
     window.$docsify = {
       name: '我的知识库',
       repo: '',
       loadSidebar: true,
-      relativePath: true,
+      relativePath: true,   // 确保从 docs/ 相对加载 _sidebar.md
       plugins: [
         function(hook, vm) {
           hook.ready(function() {
@@ -320,16 +341,23 @@
 
             document.body.classList.remove('close');
             updateDocTitle();
-            initSidebarFolders();
-            fixChinesePaths();
+
+            // 页面完全就绪后再处理侧边栏（确保侧边栏 DOM 已生成）
+            setTimeout(function() {
+              initSidebarFolders();
+              fixChinesePaths();
+            }, 100);
           });
 
+          // 每次页面切换后重新应用
           hook.doneEach(function() {
             updateDocTitle();
             closeSearchModal();
             enhanceCodeBlocks();
-            initSidebarFolders();
-            fixChinesePaths();
+            setTimeout(function() {
+              initSidebarFolders();
+              fixChinesePaths();
+            }, 100);
             if (window.MathJax && MathJax.typesetPromise) MathJax.typesetPromise();
           });
         }
@@ -346,24 +374,44 @@
       document.getElementById('docTitle').textContent = title || '文档';
     }
 
-    // 中文路径自动编码
+    // 中文路径自动编码（只编码一次，避免重复）
     function fixChinesePaths() {
       document.querySelectorAll('.sidebar-nav a').forEach(function(a) {
+        var original = a.getAttribute('data-original-href');
         var href = a.getAttribute('href');
         if (href && href !== 'javascript:void(0)' && !href.startsWith('#')) {
-          var hashIndex = href.indexOf('#');
-          var path = hashIndex === -1 ? href : href.substring(0, hashIndex);
-          var hash = hashIndex === -1 ? '' : href.substring(hashIndex);
+          // 保存原始未编码路径
+          if (!original) {
+            a.setAttribute('data-original-href', href);
+            original = href;
+          }
+          // 对原始路径进行编码（忽略已经编码过的）
+          var hashIndex = original.indexOf('#');
+          var path = hashIndex === -1 ? original : original.substring(0, hashIndex);
+          var hash = hashIndex === -1 ? '' : original.substring(hashIndex);
           var encodedPath = encodeURI(path);
           a.setAttribute('href', encodedPath + hash);
         }
       });
     }
 
+    // 侧边栏文件夹初始化（修复版）
     function initSidebarFolders() {
       var sidebarNav = document.querySelector('.sidebar-nav');
       if (!sidebarNav) return;
 
+      // 给所有 ul 去掉可能遗留的 sidebar-sub 类，重新标记
+      var allUls = sidebarNav.querySelectorAll('ul');
+      allUls.forEach(function(ul) {
+        // 根 ul 不加 sidebar-sub
+        if (ul.parentNode.classList.contains('sidebar-nav') || ul === sidebarNav.firstElementChild) {
+          ul.classList.remove('sidebar-sub', 'expanded');
+        } else {
+          ul.classList.add('sidebar-sub');
+        }
+      });
+
+      // 文件夹排序：文件夹优先，然后按名称排序
       function sortList(ul) {
         var items = Array.from(ul.children).filter(li => li.tagName === 'LI');
         items.sort(function(a, b) {
@@ -378,16 +426,18 @@
         items.forEach(function(li) { ul.appendChild(li); });
       }
 
-      var allUls = sidebarNav.querySelectorAll('ul');
       allUls.forEach(sortList);
 
+      // 处理文件夹条目
       var allLis = sidebarNav.querySelectorAll('li');
       allLis.forEach(function(li) {
         var childUl = li.querySelector('ul');
         if (childUl) {
-          if (li.classList.contains('folder-item')) return;
+          // 避免重复处理：如果已经添加了图标，跳过
+          if (li.classList.contains('folder-item') && li.querySelector('.folder-toggle')) return;
           li.classList.add('folder-item');
 
+          // 获取文本元素（可能是 a 或直接文本）
           var textElement = li.querySelector(':scope > a');
           if (!textElement) {
             var firstText = li.childNodes[0];
@@ -402,16 +452,19 @@
               li.appendChild(textElement);
             }
           } else {
+            // 确保文件夹 a 不会跳转
             textElement.setAttribute('href', 'javascript:void(0)');
           }
           textElement.style.flex = '1';
           textElement.style.cursor = 'pointer';
 
+          // 添加右侧 + / - 图标
           var icon = document.createElement('span');
           icon.className = 'folder-toggle';
-          icon.textContent = '+';
+          icon.textContent = childUl.classList.contains('expanded') ? '-' : '+';
           li.appendChild(icon);
 
+          // 点击整行切换展开/折叠
           li.addEventListener('click', function(e) {
             e.stopPropagation();
             if (childUl.classList.contains('expanded')) {
@@ -426,6 +479,7 @@
       });
     }
 
+    // 代码块增强
     function enhanceCodeBlocks() {
       document.querySelectorAll('.markdown-section pre').forEach(function(pre) {
         if (pre.parentNode.classList.contains('code-block-wrapper')) return;
@@ -597,7 +651,7 @@
       }
     });
 
-    // MathJax 配置
+    // MathJax
     window.MathJax = {
       tex: {
         inlineMath: [['$','$'], ['\\(','\\)']],
