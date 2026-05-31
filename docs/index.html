@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Document</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+  <meta name="description" content="Description">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify@4/lib/themes/vue.css">
+<style>
+  /* ========== 封面专属：NativeDSD 暗色风格 ========== */
+  .cover {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 999;
+    background: #1a1a1a;
+    color: #e0e0e0;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    box-sizing: border-box;
+}
+
+  /* 主标题 */
+  /* 强制封面全屏固定 */
+section.cover.show,
+body .cover.show,
+#app .cover.show,
+/* ========== 优化版欢迎页封面 ========== */
+.cover {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    z-index: 999 !important;
+    background: transparent !important;
+    color: #e0e0e0;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    text-align: center;
+    display: flex !important;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    box-sizing: border-box;
+    overflow: hidden;
+    user-select: none;
+}
+
+/* 网格背景纹理（在粒子下方） */
+.cover::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-image: 
+        linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* 标题容器，用于动画 */
+.cover .cover-main {
+    position: relative;
+    z-index: 2;
+}
+
+/* 标题逐字动画 */
+.cover h1 {
+    font-size: 3.2rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    margin-bottom: 0.5rem;
+    color: #ffffff;
+    animation: fadeInUp 0.8s ease-out;
+}
+
+.cover h1 span {
+    display: inline-block;
+    opacity: 0;
+    transform: translateY(30px);
+    animation: letterRise 0.6s ease forwards;
+}
+
+/* 副标题延迟出现 */
+.cover blockquote {
+    font-size: 1.2rem;
+    border-left: none;
+    color: #b0b0b0;
+    margin: 1rem auto 2.5rem;
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeInUp 0.8s 0.3s ease forwards;
+}
+
+/* 按钮容器延迟出现 */
+.cover .cover-main > p {
+    margin-top: 2rem;
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeInUp 0.8s 0.5s ease forwards;
+}
+
+/* 按钮样式优化 */
+.cover .cover-main a {
+    display: inline-block;
+    padding: 0.75rem 2.2rem;
+    margin: 0.5rem;
+    border-radius: 4px;
+    font-size: 1rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    border: 1.5px solid #888;
+    color: #e0e0e0;
+    background: transparent;
+    letter-spacing: 0.5px;
+    position: relative;
+    overflow: hidden;
+}
+
+/* 主按钮实心白色 */
+.cover .cover-main a:first-child {
+    background: #ffffff;
+    color: #1a1a1a;
+    border-color: #ffffff;
+    font-weight: 600;
+}
+
+/* 按钮悬停效果 */
+.cover .cover-main a:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 28px rgba(255,255,255,0.12);
+}
+.cover .cover-main a:active {
+    transform: translateY(-1px);
+}
+
+/* 底部滚动提示箭头 */
+.cover .scroll-hint {
+    position: absolute;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    color: rgba(255,255,255,0.5);
+    font-size: 0.9rem;
+    letter-spacing: 1px;
+    z-index: 2;
+    animation: bounce 2s infinite;
+}
+.cover .scroll-hint::after {
+    content: "↓";
+    display: block;
+    font-size: 1.4rem;
+    margin-top: 0.3rem;
+}
+
+/* 动画定义 */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes letterRise {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% { transform: translateX(-50%) translateY(0); }
+    40% { transform: translateX(-50%) translateY(-10px); }
+    60% { transform: translateX(-50%) translateY(-5px); }
+}
+</style>
+<body>
+  <div id="app"></div>
+  <script>
+    window.$docsify = {
+      name: '我的知识库',           // 这里可以改成你的网站名
+      repo: ''
+    }
+  </script>
+  <!-- Docsify v4 -->
+  <script src="//cdn.jsdelivr.net/npm/docsify@4"></script>
+</body>
+</html>

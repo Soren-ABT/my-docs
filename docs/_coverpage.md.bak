@@ -1,0 +1,89 @@
+<!-- 如果有 Logo 图片，用这行（推荐尺寸 120x120） -->
+![logo](_media/logo.png)
+
+# 我的知识库
+
+> 记录思考 · 沉淀技术 · 安静写字
+
+[开始阅读](README.md)
+[GitHub](https://github.com/你的用户名)
+<canvas id="particles-canvas" style="position:fixed; top:0; left:0; z-index:-1;"></canvas>
+<script>
+  (function() {
+    var canvas = document.getElementById('particles-canvas');
+    var ctx = canvas.getContext('2d');
+    var w, h;
+    var particles = [];
+
+    // 初始化画布尺寸
+    function resize() {
+      w = canvas.width = window.innerWidth;
+      h = canvas.height = window.innerHeight;
+    }
+    resize();
+    window.addEventListener('resize', resize);
+
+    // 粒子类
+    function Particle() {
+      this.x = Math.random() * w;
+      this.y = Math.random() * h;
+      this.vx = (Math.random() - 0.5) * 0.8; // 水平速度
+      this.vy = (Math.random() - 0.5) * 0.8; // 垂直速度
+      this.radius = Math.random() * 2.5 + 0.8; // 粒子大小
+      this.opacity = Math.random() * 0.6 + 0.2; // 透明度
+    }
+
+    Particle.prototype.update = function() {
+      this.x += this.vx;
+      this.y += this.vy;
+
+      // 边界反弹，制造漂浮感
+      if (this.x < 0 || this.x > w) this.vx *= -1;
+      if (this.y < 0 || this.y > h) this.vy *= -1;
+    };
+
+    Particle.prototype.draw = function() {
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(255, 255, 255, ' + this.opacity + ')';
+      ctx.fill();
+    };
+
+    // 创建粒子
+    var particleCount = 100; // 粒子数量，可调整
+    for (var i = 0; i < particleCount; i++) {
+      particles.push(new Particle());
+    }
+
+    // 动画循环
+    function animate() {
+      ctx.clearRect(0, 0, w, h);
+      ctx.fillStyle = '#1a1a1a';       // 暗色背景
+      ctx.fillRect(0, 0, w, h);
+      for (var i = 0; i < particles.length; i++) {
+        particles[i].update();
+        particles[i].draw();
+      }
+
+      // 绘制连线（可选，增强科技感）
+      for (var i = 0; i < particles.length; i++) {
+        for (var j = i + 1; j < particles.length; j++) {
+          var dx = particles[i].x - particles[j].x;
+          var dy = particles[i].y - particles[j].y;
+          var dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < 100) { // 距离小于100px时连线
+            ctx.beginPath();
+            ctx.moveTo(particles[i].x, particles[i].y);
+            ctx.lineTo(particles[j].x, particles[j].y);
+            ctx.strokeStyle = 'rgba(255, 255, 255, ' + (0.15 * (1 - dist / 100)) + ')';
+            ctx.lineWidth = 0.5;
+            ctx.stroke();
+          }
+        }
+      }
+      requestAnimationFrame(animate);
+    }
+
+    animate();
+  })();
+</script>
