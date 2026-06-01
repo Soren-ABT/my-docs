@@ -11,7 +11,6 @@
             box-sizing: border-box;
         }
 
-        /* 隐藏系统光标 */
         body {
             background: #1a1a1a;
             color: #e0e0e0;
@@ -25,11 +24,12 @@
             overflow: hidden;
             user-select: none;
             transition: opacity 0.4s ease;
-            cursor: none; /* 👈 隐藏默认箭头 */
+            cursor: none;
         }
 
         body.fade-out {
             opacity: 0;
+            pointer-events: none; /* 防止淡出期间误触 */
         }
 
         /* 网格背景纹理 */
@@ -52,8 +52,8 @@
             left: 0;
             width: 10px;
             height: 10px;
-            margin-left: -10px;
-            margin-top: -10px;
+            margin-left: -5px;   /* 修正：真正居中 (width/2) */
+            margin-top: -5px;
             border-radius: 50%;
             background: rgba(255, 255, 255, 0.8);
             box-shadow: 0 0 15px rgba(255,255,255,0.5);
@@ -61,6 +61,14 @@
             z-index: 9999;
             transition: transform 0.1s ease;
             animation: cursorBreathe 2s ease-in-out infinite;
+        }
+
+        /* 悬停可交互元素时光标放大 */
+        #cursor.hovering {
+            transform: scale(2.5);
+            background: rgba(201, 169, 98, 0.9);
+            box-shadow: 0 0 20px rgba(201, 169, 98, 0.7);
+            animation: none;
         }
 
         @keyframes cursorBreathe {
@@ -97,23 +105,17 @@
         }
 
         h1 {
-        font-size: 3.2rem;
-        font-weight: 700;
-        letter-spacing: 2px;
-        margin-bottom: 0.5rem;
-        /* 回退纯色 */
-        color: #ffffff;
-        /* 渐变覆盖（仅对支持者生效） */
-        background: linear-gradient(135deg, #ffffff 0%, #c9a962 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-        /* 发光阴影增强可读性 */
-        text-shadow: 0 0 10px rgba(201, 169, 98, 0.3), 0 0 2px rgba(255,255,255,0.5);
-        /* 如果渐变色无法显示，回退到纯白 */
-        -webkit-text-fill-color: transparent;
-        /* 确保文字不会消失 */
-    }
+            font-size: 3.2rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            margin-bottom: 0.5rem;
+            color: #ffffff;
+            background: linear-gradient(135deg, #ffffff 0%, #c9a962 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 10px rgba(201, 169, 98, 0.3), 0 0 2px rgba(255,255,255,0.5);
+        }
 
         h1 span {
             display: inline-block;
@@ -150,6 +152,7 @@
             color: #e0e0e0;
             background: transparent;
             letter-spacing: 0.5px;
+            cursor: none; /* 使用自定义光标 */
         }
 
         .btn-primary {
@@ -228,7 +231,7 @@
         <div class="subtitle" id="greeting">记录思考 · 沉淀技术 · 无限突破</div>
         <div class="buttons">
             <a href="javascript:void(0)" class="btn btn-primary" onclick="goToDocs()">开始阅读</a>
-            <a href="https://github.com/Soren-ABT" class="btn" target="_blank">GitHub</a>
+            <a href="https://github.com/Soren-ABT" class="btn" target="_blank" rel="noopener">GitHub</a>
         </div>
     </div>
 
@@ -241,10 +244,10 @@
     <canvas id="particles-canvas"></canvas>
 
     <script>
-        // ========== 自定义光标（呼吸原点 + 点击波纹） ==========
+        // ========== 自定义光标 ==========
         (function() {
             var cursor = document.getElementById('cursor');
-            var body = document.body;
+            if (!cursor) return;
 
             // 鼠标移动更新位置
             document.addEventListener('mousemove', function(e) {
@@ -252,7 +255,26 @@
                 cursor.style.top = e.clientY + 'px';
             });
 
-            // 鼠标点击创建波纹
+            // 鼠标悬停可交互元素时光标变大
+            var interactiveSelectors = 'a, button, .btn, input, [onclick]';
+            document.addEventListener('mouseover', function(e) {
+                var target = e.target;
+                if (target.closest && target.closest(interactiveSelectors)) {
+                    cursor.classList.add('hovering');
+                }
+            });
+            document.addEventListener('mouseout', function(e) {
+                var target = e.target;
+                if (target.closest && target.closest(interactiveSelectors)) {
+                    // 检查是否移到了另一个交互元素
+                    var related = e.relatedTarget;
+                    if (!related || !related.closest || !related.closest(interactiveSelectors)) {
+                        cursor.classList.remove('hovering');
+                    }
+                }
+            });
+
+            // 点击创建波纹
             document.addEventListener('click', function(e) {
                 var ripple = document.createElement('div');
                 ripple.className = 'ripple';
@@ -260,21 +282,27 @@
                 ripple.style.top = e.clientY + 'px';
                 document.body.appendChild(ripple);
 
-                // 动画结束后移除波纹元素
                 ripple.addEventListener('animationend', function() {
                     ripple.remove();
                 });
             });
+
+            // 移动端隐藏自定义光标
+            if ('ontouchstart' in window) {
+                cursor.style.display = 'none';
+            }
         })();
 
         // ========== 动态问候语 ==========
         (function() {
             var hour = new Date().getHours();
             var baseText = '记录思考 · 沉淀技术 · 无限突破';
-            if (hour < 12) baseText = '上午好，' + baseText;
+            if (hour < 6) baseText = '夜深了，' + baseText;
+            else if (hour < 12) baseText = '上午好，' + baseText;
             else if (hour < 18) baseText = '下午好，' + baseText;
             else baseText = '晚上好，' + baseText;
-            document.getElementById('greeting').textContent = baseText;
+            var el = document.getElementById('greeting');
+            if (el) el.textContent = baseText;
         })();
 
         // ========== 页面淡出跳转 ==========
@@ -299,12 +327,14 @@
             }
         })();
 
-        // ========== 粒子动画（增强排斥 + 数量增多） ==========
+        // ========== 粒子动画 ==========
         (function() {
             var canvas = document.getElementById('particles-canvas');
+            if (!canvas) return;
             var ctx = canvas.getContext('2d');
             var w, h;
             var particles = [];
+            var animationId = null;
 
             function resize() {
                 w = canvas.width = window.innerWidth;
@@ -326,7 +356,7 @@
             function Particle() {
                 this.x = Math.random() * w;
                 this.y = Math.random() * h;
-                this.vx = (Math.random() - 0.5) * 1.2; // 基础速度稍快
+                this.vx = (Math.random() - 0.5) * 1.2;
                 this.vy = (Math.random() - 0.5) * 1.2;
                 this.radius = Math.random() * 2.5 + 0.8;
                 this.opacity = Math.random() * 0.6 + 0.2;
@@ -340,13 +370,13 @@
                 if (this.x < 0 || this.x > w) this.vx *= -1;
                 if (this.y < 0 || this.y > h) this.vy *= -1;
 
-                // 鼠标排斥（力度加大，范围加大）
+                // 鼠标排斥
                 var dx = this.x - mouseX;
                 var dy = this.y - mouseY;
                 var dist = Math.sqrt(dx * dx + dy * dy);
                 if (dist < 150 && dist > 0) {
                     var force = (150 - dist) / 150;
-                    this.x += (dx / dist) * force * 5;   // 力度 *5，原来为2
+                    this.x += (dx / dist) * force * 5;
                     this.y += (dy / dist) * force * 5;
                 }
             };
@@ -358,7 +388,6 @@
                 ctx.fill();
             };
 
-            // 👇 粒子数量增加到 180
             var particleCount = 180;
             for (var i = 0; i < particleCount; i++) {
                 particles.push(new Particle());
@@ -391,9 +420,23 @@
                         }
                     }
                 }
-                requestAnimationFrame(animate);
+                animationId = requestAnimationFrame(animate);
             }
             animate();
+
+            // 页面隐藏时暂停动画（节省资源）
+            document.addEventListener('visibilitychange', function() {
+                if (document.hidden) {
+                    if (animationId) {
+                        cancelAnimationFrame(animationId);
+                        animationId = null;
+                    }
+                } else {
+                    if (!animationId) {
+                        animate();
+                    }
+                }
+            });
         })();
     </script>
 </body>
