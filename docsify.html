@@ -12,7 +12,7 @@
 
   <style>
     /* ============================================================
-       CSS Custom Properties — Light / Dark Theme (GitHub-style)
+       CSS Custom Properties — Light / Dark Theme
        ============================================================ */
     :root {
       --bg: #fff; --bg-secondary: #f5f5f5; --bg-tertiary: #fafafa;
@@ -72,10 +72,15 @@
     /* ============================================================
        Transition-freeze Utility
        ============================================================ */
-    .no-transition,
-    .no-transition *,
-    .no-transition *::before,
-    .no-transition *::after { transition: none !important; animation: none !important; }
+    .no-transition,.no-transition *,.no-transition *::before,.no-transition *::after{transition:none!important;animation:none!important}
+
+    /* ============================================================
+       ★ 波浪主题切换画布 (Apple‑style wave transition)
+       ============================================================ */
+    #theme-wave-canvas{
+      position:fixed;inset:0;z-index:9998;pointer-events:none;
+      display:none;
+    }
 
     /* ============================================================
        Reset & Global
@@ -87,7 +92,7 @@
     ::-webkit-scrollbar-thumb{background:var(--scrollbar-thumb);border-radius:3px}
 
     /* ============================================================
-       Loading Overlay (frosted glass + 3D triangle + mouse-tracking)
+       Loading Overlay
        ============================================================ */
     #loading{position:fixed;top:0;left:0;width:100%;height:100%;background:var(--loader-blur-bg);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity .45s ease;perspective:700px}
     #loading.fade-out{opacity:0;pointer-events:none}
@@ -107,7 +112,7 @@
     #reading-progress{position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,var(--progress-color),var(--progress-color-end));z-index:10000;transition:width .12s linear;border-radius:0 2px 2px 0;pointer-events:none}
 
     /* ============================================================
-       Toast Notification System
+       Toast
        ============================================================ */
     #toast-container{position:fixed;bottom:28px;left:50%;transform:translateX(-50%);z-index:10050;display:flex;flex-direction:column-reverse;align-items:center;gap:8px;pointer-events:none}
     .toast{padding:10px 22px;border-radius:20px;background:var(--toast-bg);color:var(--toast-text);font-size:.85rem;font-weight:500;box-shadow:0 8px 28px var(--shadow-lg);pointer-events:auto;animation:toastIn .35s cubic-bezier(.22,.61,.36,1),toastOut .3s 2s cubic-bezier(.55,.06,.68,.19) forwards}
@@ -134,7 +139,7 @@
     .icon-btn svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round}
 
     /* ============================================================
-       Sidebar Navigation (accordion folders + stagger animation)
+       Sidebar Navigation
        ============================================================ */
     .sidebar-nav{padding:6px 0}
     .sidebar-nav>ul{padding-left:0}
@@ -171,7 +176,7 @@
     .heading-anchor:hover{transform:scale(1.15);color:var(--text)}
 
     /* ============================================================
-       Doc Header (fixed top bar)
+       Doc Header
        ============================================================ */
     .doc-header{position:fixed;top:0;left:260px;right:0;height:56px;background:var(--header-bg);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--border-light);display:none;align-items:center;padding:0 20px;z-index:999;transition:left .35s cubic-bezier(.45,.05,.55,.95),background .3s}
     body.close .doc-header{left:0}
@@ -188,7 +193,7 @@
     body.dark #darkModeBtn .sun-icon{display:none}
 
     /* ============================================================
-       Back to Top + Circular Progress
+       Back to Top
        ============================================================ */
     #backToTop{position:fixed;bottom:28px;right:28px;z-index:998;width:44px;height:44px;border-radius:50%;background:var(--accent);color:#fff;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 14px var(--shadow-lg);opacity:0;transform:translateY(20px);transition:opacity .3s,transform .3s;pointer-events:none}
     body.dark #backToTop{color:#0d1117}
@@ -198,7 +203,7 @@
     #backToTop::before{content:'';position:absolute;inset:-3px;border-radius:50%;background:conic-gradient(var(--progress-color) var(--scroll-pct,0%),transparent var(--scroll-pct,0%));mask:radial-gradient(farthest-side,transparent calc(100% - 3px),#fff calc(100% - 3px));-webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 3px),#fff calc(100% - 3px));opacity:.55}
 
     /* ============================================================
-       Table of Contents Panel
+       TOC Panel
        ============================================================ */
     #toc-panel{position:fixed;right:16px;top:80px;z-index:997;background:var(--toc-bg);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:1px solid var(--border);border-radius:12px;padding:12px 16px;max-width:240px;max-height:60vh;overflow-y:auto;font-size:.8rem;box-shadow:0 8px 24px var(--shadow);transition:opacity .3s,transform .3s;opacity:0;transform:translateX(20px);pointer-events:none}
     #toc-panel.visible{opacity:1;transform:translateX(0);pointer-events:auto}
@@ -232,7 +237,7 @@
     .search-hint{padding:7px 18px;font-size:.72rem;color:var(--text-muted);border-bottom:1px solid var(--border-light)}
 
     /* ============================================================
-       Keyboard Shortcuts Panel
+       Shortcuts Panel
        ============================================================ */
     #shortcuts-panel{position:fixed;top:0;left:0;right:0;bottom:0;background:var(--modal-overlay);backdrop-filter:blur(4px);z-index:10002;display:none;align-items:center;justify-content:center}
     #shortcuts-panel.active{display:flex}
@@ -243,7 +248,7 @@
     .shortcuts-modal kbd{background:var(--bg-secondary);border:1px solid var(--border);border-radius:4px;padding:2px 7px;font-size:.73rem;font-family:'JetBrains Mono',monospace;color:var(--heading-color)}
 
     /* ============================================================
-       Code Block + Line Numbers + Prism Highlighting
+       Code Block + Line Numbers + Prism
        ============================================================ */
     .code-block-wrapper{margin:1.6rem 0;border-radius:10px;overflow:hidden;box-shadow:0 2px 10px var(--shadow);background:var(--code-bg);border:1px solid var(--code-border);position:relative}
     .code-toolbar{display:flex;justify-content:space-between;align-items:center;padding:.5rem 1.2rem;background:var(--bg-secondary);border-bottom:1px solid var(--code-border)}
@@ -256,7 +261,7 @@
     .code-line-numbers{flex-shrink:0;padding:1.2rem 0;user-select:none;background:var(--line-number-bg);border-right:1px solid var(--code-border)}
     .code-line-numbers span{display:block;font-family:'JetBrains Mono',monospace;font-size:.8rem;line-height:1.7;color:var(--line-number);text-align:right;padding:0 12px 0 14px;min-width:3.5rem}
 
-    /* Prism Light */
+    /* Prism */
     .markdown-section .token.comment,.markdown-section .token.prolog,.markdown-section .token.doctype,.markdown-section .token.cdata{color:#6a737d;font-style:italic}
     .markdown-section .token.punctuation{color:#393a34}
     .markdown-section .token.property,.markdown-section .token.tag,.markdown-section .token.boolean,.markdown-section .token.number,.markdown-section .token.constant,.markdown-section .token.symbol,.markdown-section .token.deleted{color:#005cc5}
@@ -267,8 +272,6 @@
     .markdown-section .token.regex,.markdown-section .token.important,.markdown-section .token.variable{color:#e36209}
     .markdown-section .token.important,.markdown-section .token.bold{font-weight:600}
     .markdown-section .token.italic{font-style:italic}
-
-    /* Prism Dark */
     body.dark .markdown-section .token.comment,body.dark .markdown-section .token.prolog,body.dark .markdown-section .token.doctype,body.dark .markdown-section .token.cdata{color:#8b949e;font-style:italic}
     body.dark .markdown-section .token.punctuation{color:#c9d1d9}
     body.dark .markdown-section .token.property,body.dark .markdown-section .token.tag,body.dark .markdown-section .token.boolean,body.dark .markdown-section .token.number,body.dark .markdown-section .token.constant,body.dark .markdown-section .token.symbol,body.dark .markdown-section .token.deleted{color:#79c0ff}
@@ -279,7 +282,7 @@
     body.dark .markdown-section .token.regex,body.dark .markdown-section .token.important,body.dark .markdown-section .token.variable{color:#ffa657}
 
     /* ============================================================
-       Markdown Content Styles
+       Markdown Content
        ============================================================ */
     .markdown-section{padding:72px 28px 40px!important;max-width:860px;margin:0 auto}
     .markdown-section h1,.markdown-section h2,.markdown-section h3,.markdown-section h4{color:var(--heading-color)}
@@ -325,9 +328,14 @@
 </head>
 <body>
 
-  <!-- ========== Skeleton / Static Elements ========== -->
+  <!-- ============================================================
+       Skeleton / Static Elements
+       ============================================================ -->
   <div id="reading-progress"></div>
   <div id="toast-container"></div>
+
+  <!-- ★ 波浪主题切换画布 -->
+  <canvas id="theme-wave-canvas"></canvas>
 
   <div id="loading">
     <div class="loader-wrapper" id="loaderWrapper">
@@ -396,7 +404,7 @@
   </script>
 
   <!-- ============================================================
-       Application Core (namespaced under `Kb`)
+       Application Core (namespaced under IIFE)
        ============================================================ -->
   <script>
     (function() {
@@ -418,7 +426,13 @@
         SCROLL_SAVE_DEBOUNCE: 500,
         BACK_TO_TOP_THRESHOLD: 400,
         TOC_MIN_HEADINGS: 2,
-        TOC_SCROLL_OFFSET: 80
+        TOC_SCROLL_OFFSET: 80,
+        // ★ 波浪动画参数
+        WAVE_DURATION: 800,          // 动画时长 (ms)
+        WAVE_FREQ: 2.5,              // 波浪频率
+        WAVE_MAX_AMP: 55,            // 最大振幅 (px)
+        WAVE_SPRING: 7,              // 弹簧刚度
+        WAVE_DAMPING: 3.5            // 弹簧阻尼
       };
 
       /* ==========================================================
@@ -429,11 +443,12 @@
         searchSelectedIdx: -1,
         currentOpenFolderUl: null,
         currentHighlights: [],
-        scrollTimer: null
+        scrollTimer: null,
+        waveAnimId: null            // ★ 波浪动画 ID
       };
 
       /* ==========================================================
-         DOM References (cached once on ready)
+         DOM References
          ========================================================== */
       var DOM = {};
 
@@ -460,9 +475,10 @@
         DOM.lightbox = document.getElementById('img-lightbox');
         DOM.lightboxImg = DOM.lightbox ? DOM.lightbox.querySelector('img') : null;
         DOM.app = document.getElementById('app');
-        // Capsule buttons
         DOM.capsuleSidebarBtn = document.getElementById('capsuleSidebarBtn');
         DOM.capsuleSearchBtn = document.getElementById('capsuleSearchBtn');
+        // ★ 波浪画布
+        DOM.waveCanvas = document.getElementById('theme-wave-canvas');
         // Sidebar header (injected later)
         DOM.sidebarSearchBtn = null;
         DOM.sidebarCloseBtn = null;
@@ -474,7 +490,6 @@
          Utility Functions
          ========================================================== */
 
-      /** Show a toast notification */
       function toast(msg, type) {
         type = type || 'info';
         if (!DOM.toastContainer) return;
@@ -485,7 +500,6 @@
         setTimeout(function() { if (el.parentNode) el.remove(); }, CFG.TOAST_DURATION);
       }
 
-      /** Freeze / unfreeze CSS transitions on an element */
       function freezeTransitions(el) {
         el.classList.add('no-transition');
         return function unfreeze() {
@@ -497,7 +511,6 @@
         };
       }
 
-      /** Safely copy text to clipboard with fallback */
       function copyToClipboard(text, onSuccess) {
         var done = function() { if (onSuccess) onSuccess(); };
         if (navigator.clipboard && navigator.clipboard.writeText) {
@@ -513,33 +526,29 @@
         ta.style.cssText = 'position:fixed;left:-9999px;top:-9999px';
         document.body.appendChild(ta);
         ta.select();
-        try { document.execCommand('copy'); } catch (e) { /* ignore */ }
+        try { document.execCommand('copy'); } catch (e) {}
         document.body.removeChild(ta);
         if (cb) cb();
       }
 
-      /** Escape regex special characters */
       function escapeRegex(str) {
         return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
       }
 
-      /** Generate a short random ID */
       function randomId() {
         return Math.random().toString(36).substr(2, 8);
       }
 
       /* ==========================================================
-         Module: Loader (3D triangle + mouse tracking)
+         Module: Loader
          ========================================================== */
       var Loader = {
         _mouseHandler: null,
-
         init: function() {
           if (!DOM.loaderWrapper || !DOM.loaderTriangle) return;
           var self = this;
           var maxAngle = CFG.LOADER_MAX_ANGLE;
           var baseShadow = CFG.LOADER_BASE_SHADOW;
-
           this._mouseHandler = function(e) {
             if (state.loading) return;
             var dx = (e.clientX - window.innerWidth / 2) / (window.innerWidth / 2);
@@ -547,38 +556,173 @@
             DOM.loaderWrapper.style.transform = 'rotateX(' + (-dy * maxAngle) + 'deg) rotateY(' + (dx * maxAngle) + 'deg) translateZ(14px)';
             DOM.loaderTriangle.style.filter = baseShadow + ' drop-shadow(' + (dx * 10) + 'px ' + (dy * 10) + 'px 12px rgba(0,0,0,0.35))';
           };
-
           document.addEventListener('mousemove', this._mouseHandler);
         },
-
         hide: function() {
           if (state.loading) return;
           state.loading = true;
-          if (DOM.loading) {
-            DOM.loading.classList.add('fade-out');
-            setTimeout(function() { if (DOM.loading) DOM.loading.style.display = 'none'; }, 450);
-          }
+          if (DOM.loading) { DOM.loading.classList.add('fade-out'); setTimeout(function() { if (DOM.loading) DOM.loading.style.display = 'none'; }, 450); }
           if (DOM.docHeader) DOM.docHeader.style.display = 'flex';
-          if (this._mouseHandler) {
-            document.removeEventListener('mousemove', this._mouseHandler);
-            this._mouseHandler = null;
-          }
+          if (this._mouseHandler) { document.removeEventListener('mousemove', this._mouseHandler); this._mouseHandler = null; }
         },
-
         showError: function() {
-          if (!state.loading && DOM.loadingError) {
-            DOM.loadingError.classList.add('show');
-          }
+          if (!state.loading && DOM.loadingError) DOM.loadingError.classList.add('show');
         }
       };
 
       /* ==========================================================
-         Module: Dark Mode
+         ★ Module: ThemeWave — Apple‑style liquid wave transition
+         ========================================================== */
+      var ThemeWave = {
+        _ctx: null,
+
+        /** One‑time canvas context cache */
+        _ensureContext: function() {
+          if (!this._ctx && DOM.waveCanvas) {
+            this._ctx = DOM.waveCanvas.getContext('2d');
+          }
+          return this._ctx;
+        },
+
+        /**
+         * Animate a wave sweeping from top to bottom.
+         * @param {string} oldBgColor - CSS color for the old theme background
+         * @param {number} [duration] - animation duration in ms
+         */
+        animate: function(oldBgColor, duration) {
+          var canvas = DOM.waveCanvas;
+          var ctx = this._ensureContext();
+          if (!canvas || !ctx) return;
+
+          duration = duration || CFG.WAVE_DURATION;
+
+          // Cancel any running animation
+          if (state.waveAnimId) { cancelAnimationFrame(state.waveAnimId); state.waveAnimId = null; }
+
+          // Size & show
+          canvas.width = window.innerWidth;
+          canvas.height = window.innerHeight;
+          canvas.style.display = 'block';
+
+          var self = this;
+          var w = canvas.width;
+          var h = canvas.height;
+          var freq = CFG.WAVE_FREQ;
+          var maxAmp = CFG.WAVE_MAX_AMP;
+          var spring = CFG.WAVE_SPRING;
+          var damping = CFG.WAVE_DAMPING;
+          var startTime = performance.now();
+
+          function frame(now) {
+            var elapsed = now - startTime;
+            var raw = Math.min(elapsed / duration, 1);
+
+            // Spring‑based easing with subtle overshoot (Apple‑style)
+            var t = raw;
+            var eased = 1 - Math.exp(-spring * t) * Math.cos(damping * Math.PI * t);
+            eased = Math.min(1, Math.max(0, eased));
+
+            // Wave vertical position: start above viewport, end below
+            var waveY = -maxAmp + eased * (h + maxAmp * 2);
+            // Amplitude fades as wave moves down (settling feel)
+            var amp = maxAmp * (1 - eased) * (1 + 0.3 * Math.sin(eased * Math.PI));
+
+            ctx.clearRect(0, 0, w, h);
+
+            // ---- Draw old‑theme shape below wave ----
+            ctx.beginPath();
+            ctx.moveTo(0, 0);
+
+            var steps = Math.max(2, Math.floor(w / 2));
+            for (var i = 0; i <= steps; i++) {
+              var x = (i / steps) * w;
+              var phase = (i / steps) * Math.PI * 2 * freq + eased * Math.PI * 1.5;
+              // Multi‑harmonic wave for organic feel
+              var y = waveY
+                    + Math.sin(phase) * amp
+                    + Math.sin(phase * 2.3) * amp * 0.25
+                    + Math.sin(phase * 4.7) * amp * 0.1;
+              ctx.lineTo(x, y);
+            }
+
+            ctx.lineTo(w, h);
+            ctx.lineTo(0, h);
+            ctx.closePath();
+            ctx.fillStyle = oldBgColor;
+            ctx.fill();
+
+            // ---- Subtle shadow gradient below the crest ----
+            ctx.save();
+            ctx.clip();
+            var gY1 = waveY - amp - 12;
+            var gY2 = waveY + amp + 60;
+            var grad = ctx.createLinearGradient(0, gY1, 0, gY2);
+            grad.addColorStop(0, 'rgba(0,0,0,0)');
+            grad.addColorStop(0.3, 'rgba(0,0,0,0)');
+            grad.addColorStop(0.6, 'rgba(0,0,0,0.12)');
+            grad.addColorStop(1, 'rgba(0,0,0,0)');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, gY1, w, gY2 - gY1);
+            ctx.restore();
+
+            // ---- Luminous crest line (primary glow) ----
+            ctx.beginPath();
+            for (var i = 0; i <= steps; i++) {
+              var x = (i / steps) * w;
+              var phase = (i / steps) * Math.PI * 2 * freq + eased * Math.PI * 1.5;
+              var y = waveY
+                    + Math.sin(phase) * amp
+                    + Math.sin(phase * 2.3) * amp * 0.25
+                    + Math.sin(phase * 4.7) * amp * 0.1;
+              if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+            }
+            ctx.strokeStyle = 'rgba(255,255,255,0.28)';
+            ctx.lineWidth = 1.8;
+            ctx.stroke();
+
+            // ---- Secondary hairline highlight (Apple crispness) ----
+            ctx.beginPath();
+            for (var i = 0; i <= steps; i++) {
+              var x = (i / steps) * w;
+              var phase = (i / steps) * Math.PI * 2 * freq + eased * Math.PI * 1.5;
+              var y = waveY
+                    + Math.sin(phase) * amp
+                    + Math.sin(phase * 2.3) * amp * 0.25
+                    + Math.sin(phase * 4.7) * amp * 0.1 - 1.5;
+              if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+            }
+            ctx.strokeStyle = 'rgba(255,255,255,0.45)';
+            ctx.lineWidth = 0.7;
+            ctx.stroke();
+
+            if (raw < 1) {
+              state.waveAnimId = requestAnimationFrame(frame);
+            } else {
+              // Cleanup
+              ctx.clearRect(0, 0, w, h);
+              canvas.style.display = 'none';
+              state.waveAnimId = null;
+            }
+          }
+
+          state.waveAnimId = requestAnimationFrame(frame);
+        }
+      };
+
+      /* ==========================================================
+         Module: Dark Mode (now with wave transition)
          ========================================================== */
       var DarkMode = {
         toggle: function() {
+          // ★ Capture old background BEFORE switching
+          var oldBg = getComputedStyle(document.body).getPropertyValue('--bg').trim() || '#fff';
+
+          // Switch
           var isDark = document.body.classList.toggle('dark');
           try { localStorage.setItem(CFG.DARK_MODE_KEY, String(isDark)); } catch (e) {}
+
+          // ★ Trigger Apple‑style wave
+          ThemeWave.animate(oldBg, CFG.WAVE_DURATION);
         },
 
         restore: function() {
@@ -591,7 +735,7 @@
       };
 
       /* ==========================================================
-         Module: Reading Progress Bar
+         Module: Progress Bar
          ========================================================== */
       var ProgressBar = {
         update: function() {
@@ -602,7 +746,7 @@
       };
 
       /* ==========================================================
-         Module: Back to Top Button
+         Module: Back to Top
          ========================================================== */
       var BackToTop = {
         update: function() {
@@ -618,14 +762,14 @@
       };
 
       /* ==========================================================
-         Module: Reading Time Estimation
+         Module: Reading Time
          ========================================================== */
       var ReadingTime = {
         update: function() {
           if (!DOM.readingTime) return;
-          var container = document.querySelector('.markdown-section');
-          if (!container) { DOM.readingTime.textContent = ''; return; }
-          var text = container.textContent || '';
+          var c = document.querySelector('.markdown-section');
+          if (!c) { DOM.readingTime.textContent = ''; return; }
+          var text = c.textContent || '';
           var words = text.replace(/\s+/g, ' ').trim().split(/\s+/).length;
           var chinese = (text.match(/[\u4e00-\u9fff]/g) || []).length;
           DOM.readingTime.textContent = '⏱ ~' + Math.max(1, Math.ceil((words / 200) + (chinese / 400))) + ' min';
@@ -633,24 +777,16 @@
       };
 
       /* ==========================================================
-         Module: Doc Header Title
+         Module: Doc Title
          ========================================================== */
       var DocTitle = {
         update: function() {
           if (!DOM.docTitle) return;
           var active = document.querySelector('.sidebar-nav .active');
           var title = '';
-          if (active) {
-            var link = active.querySelector(':scope > a');
-            title = (link || active).textContent.trim();
-          }
-          if (!title) {
-            var h1 = document.querySelector('.markdown-section h1');
-            if (h1) title = h1.textContent.trim();
-          }
-          if (!title && window.location.hash) {
-            title = decodeURIComponent(window.location.hash.substring(1)).replace(/\?.*$/, '').replace(/-/g, ' ');
-          }
+          if (active) { var link = active.querySelector(':scope > a'); title = (link || active).textContent.trim(); }
+          if (!title) { var h1 = document.querySelector('.markdown-section h1'); if (h1) title = h1.textContent.trim(); }
+          if (!title && window.location.hash) { title = decodeURIComponent(window.location.hash.substring(1)).replace(/\?.*$/, '').replace(/-/g, ' '); }
           DOM.docTitle.textContent = title || '文档';
         }
       };
@@ -660,20 +796,12 @@
          ========================================================== */
       var HeadingAnchors = {
         add: function() {
-          var container = document.querySelector('.markdown-section');
-          if (!container) return;
-          var headings = container.querySelectorAll('h1, h2, h3, h4');
-          headings.forEach(function(h) {
+          var c = document.querySelector('.markdown-section'); if (!c) return;
+          c.querySelectorAll('h1,h2,h3,h4').forEach(function(h) {
             if (h.querySelector('.heading-anchor')) return;
             if (!h.id) h.id = 'h-' + randomId();
-            var a = document.createElement('a');
-            a.className = 'heading-anchor';
-            a.innerHTML = '#';
-            a.title = '复制链接';
-            a.href = 'javascript:void(0)';
-            a.addEventListener('click', function(e) {
-              e.preventDefault();
-              e.stopPropagation();
+            var a = document.createElement('a'); a.className = 'heading-anchor'; a.innerHTML = '#'; a.title = '复制链接'; a.href = 'javascript:void(0)';
+            a.addEventListener('click', function(e) { e.preventDefault(); e.stopPropagation();
               var url = window.location.origin + window.location.pathname + '?id=' + h.id + '#' + h.id;
               copyToClipboard(url, function() { toast('✓ 链接已复制', 'success'); });
             });
@@ -683,643 +811,186 @@
       };
 
       /* ==========================================================
-         Module: Table of Contents
+         Module: TOC
          ========================================================== */
       var TOC = {
         generate: function() {
-          var container = document.querySelector('.markdown-section');
-          if (!container || !DOM.tocContent) return;
-          var headings = container.querySelectorAll('h1, h2, h3, h4');
-          if (headings.length < CFG.TOC_MIN_HEADINGS) {
+          var c = document.querySelector('.markdown-section'); if (!c || !DOM.tocContent) return;
+          var hs = c.querySelectorAll('h1,h2,h3,h4');
+          if (hs.length < CFG.TOC_MIN_HEADINGS) {
             if (DOM.tocPanel) DOM.tocPanel.classList.remove('visible');
             if (DOM.tocToggleBtn) { DOM.tocToggleBtn.classList.remove('active'); DOM.tocToggleBtn.style.display = 'none'; }
             return;
           }
           if (DOM.tocToggleBtn) DOM.tocToggleBtn.style.display = '';
-
           var html = '';
-          headings.forEach(function(h, i) {
-            if (!h.id) h.id = 'toc-' + i;
-            html += '<a href="#' + h.id + '" class="toc-' + h.tagName.toLowerCase() + '" data-target="' + h.id + '">' + h.textContent.trim() + '</a>';
-          });
+          hs.forEach(function(h, i) { if (!h.id) h.id = 'toc-' + i; html += '<a href="#' + h.id + '" class="toc-' + h.tagName.toLowerCase() + '" data-target="' + h.id + '">' + h.textContent.trim() + '</a>'; });
           DOM.tocContent.innerHTML = html;
-
-          var links = DOM.tocContent.querySelectorAll('a');
-          links.forEach(function(a) {
-            a.addEventListener('click', function(e) {
-              e.preventDefault();
-              var target = document.getElementById(a.getAttribute('data-target'));
-              if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            });
-          });
+          DOM.tocContent.querySelectorAll('a').forEach(function(a) { a.addEventListener('click', function(e) { e.preventDefault(); var t = document.getElementById(a.getAttribute('data-target')); if (t) t.scrollIntoView({ behavior: 'smooth', block: 'start' }); }); });
           this.highlight();
         },
-
         highlight: function() {
-          var links = document.querySelectorAll('#toc-content a');
-          if (!links.length) return;
-          var scrollTop = window.scrollY + CFG.TOC_SCROLL_OFFSET;
-          var activeId = null;
-          links.forEach(function(a) {
-            var el = document.getElementById(a.getAttribute('data-target'));
-            if (el && el.offsetTop <= scrollTop) activeId = a.getAttribute('data-target');
-          });
-          links.forEach(function(a) {
-            a.classList.toggle('active', a.getAttribute('data-target') === activeId);
-          });
+          var links = document.querySelectorAll('#toc-content a'); if (!links.length) return;
+          var st = window.scrollY + CFG.TOC_SCROLL_OFFSET, activeId = null;
+          links.forEach(function(a) { var el = document.getElementById(a.getAttribute('data-target')); if (el && el.offsetTop <= st) activeId = a.getAttribute('data-target'); });
+          links.forEach(function(a) { a.classList.toggle('active', a.getAttribute('data-target') === activeId); });
         },
-
-        clear: function() {
-          if (DOM.tocContent) DOM.tocContent.innerHTML = '';
-          if (DOM.tocPanel) DOM.tocPanel.classList.remove('visible');
-        },
-
-        toggle: function() {
-          if (DOM.tocPanel) DOM.tocPanel.classList.toggle('visible');
-          if (DOM.tocToggleBtn) DOM.tocToggleBtn.classList.toggle('active');
-        }
+        clear: function() { if (DOM.tocContent) DOM.tocContent.innerHTML = ''; if (DOM.tocPanel) DOM.tocPanel.classList.remove('visible'); },
+        toggle: function() { if (DOM.tocPanel) DOM.tocPanel.classList.toggle('visible'); if (DOM.tocToggleBtn) DOM.tocToggleBtn.classList.toggle('active'); }
       };
 
       /* ==========================================================
-         Module: Reading Position Persistence
+         Module: Reading Position
          ========================================================== */
       var ReadingPosition = {
-        _pageKey: function() {
-          return window.location.pathname + window.location.hash;
-        },
-
-        save: function() {
-          try {
-            var data = { scrollY: window.scrollY, pageKey: this._pageKey(), timestamp: Date.now() };
-            localStorage.setItem(CFG.READING_POSITION_KEY, JSON.stringify(data));
-          } catch (e) {}
-        },
-
-        restore: function() {
-          try {
-            var raw = localStorage.getItem(CFG.READING_POSITION_KEY);
-            if (!raw) return;
-            var data = JSON.parse(raw);
-            if (data.pageKey === this._pageKey() && typeof data.scrollY === 'number') {
-              setTimeout(function() { window.scrollTo({ top: data.scrollY, behavior: 'instant' }); }, 150);
-            }
-          } catch (e) {}
-        }
+        _pageKey: function() { return window.location.pathname + window.location.hash; },
+        save: function() { try { var d = { scrollY: window.scrollY, pageKey: this._pageKey(), timestamp: Date.now() }; localStorage.setItem(CFG.READING_POSITION_KEY, JSON.stringify(d)); } catch (e) {} },
+        restore: function() { try { var raw = localStorage.getItem(CFG.READING_POSITION_KEY); if (!raw) return; var d = JSON.parse(raw); if (d.pageKey === this._pageKey() && typeof d.scrollY === 'number') setTimeout(function() { window.scrollTo({ top: d.scrollY, behavior: 'instant' }); }, 150); } catch (e) {} }
       };
 
       /* ==========================================================
-         Module: Image Lightbox
+         Module: Lightbox
          ========================================================== */
       var Lightbox = {
         init: function() {
           if (!DOM.lightbox || !DOM.lightboxImg) return;
-          var self = this;
-          var lbClose = DOM.lightbox.querySelector('.lb-close');
-
-          DOM.lightbox.addEventListener('click', function(e) {
-            if (e.target === DOM.lightbox || e.target === lbClose) self.close();
-          });
+          var self = this, lbClose = DOM.lightbox.querySelector('.lb-close');
+          DOM.lightbox.addEventListener('click', function(e) { if (e.target === DOM.lightbox || e.target === lbClose) self.close(); });
           if (lbClose) lbClose.addEventListener('click', function() { self.close(); });
-
-          document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape' && DOM.lightbox.classList.contains('active')) self.close();
-          });
+          document.addEventListener('keydown', function(e) { if (e.key === 'Escape' && DOM.lightbox.classList.contains('active')) self.close(); });
         },
-
-        open: function(src, alt) {
-          if (!DOM.lightbox || !DOM.lightboxImg) return;
-          DOM.lightboxImg.src = src;
-          DOM.lightboxImg.alt = alt || '';
-          DOM.lightbox.classList.add('active');
-          document.body.style.overflow = 'hidden';
-        },
-
-        close: function() {
-          if (!DOM.lightbox) return;
-          DOM.lightbox.classList.remove('active');
-          document.body.style.overflow = '';
-        },
-
-        bindImages: function() {
-          var self = this;
-          document.querySelectorAll('.markdown-section img').forEach(function(img) {
-            if (img.hasAttribute('data-lb')) return;
-            img.setAttribute('data-lb', '1');
-            img.addEventListener('click', function(e) {
-              e.preventDefault();
-              self.open(img.src, img.alt || '');
-            });
-          });
-        }
+        open: function(src, alt) { if (!DOM.lightbox || !DOM.lightboxImg) return; DOM.lightboxImg.src = src; DOM.lightboxImg.alt = alt || ''; DOM.lightbox.classList.add('active'); document.body.style.overflow = 'hidden'; },
+        close: function() { if (!DOM.lightbox) return; DOM.lightbox.classList.remove('active'); document.body.style.overflow = ''; },
+        bindImages: function() { var self = this; document.querySelectorAll('.markdown-section img').forEach(function(img) { if (img.hasAttribute('data-lb')) return; img.setAttribute('data-lb', '1'); img.addEventListener('click', function(e) { e.preventDefault(); self.open(img.src, img.alt || ''); }); }); }
       };
 
       /* ==========================================================
-         Module: Code Block Enhancement + Line Numbers
+         Module: Code Block
          ========================================================== */
       var CodeBlock = {
-        /** Wrap raw <pre> elements into styled card */
         enhance: function() {
           document.querySelectorAll('.markdown-section pre').forEach(function(pre) {
             if (pre.parentNode.classList.contains('code-block-wrapper')) return;
-            var code = pre.querySelector('code');
-            var lang = '';
-            if (code && code.className) {
-              var m = code.className.match(/lang(?:uage)?-(\w+)/);
-              if (m) lang = m[1];
-            }
-
-            var wrapper = document.createElement('div');
-            wrapper.className = 'code-block-wrapper';
-
-            var toolbar = document.createElement('div');
-            toolbar.className = 'code-toolbar';
+            var code = pre.querySelector('code'), lang = '';
+            if (code && code.className) { var m = code.className.match(/lang(?:uage)?-(\w+)/); if (m) lang = m[1]; }
+            var wrapper = document.createElement('div'); wrapper.className = 'code-block-wrapper';
+            var toolbar = document.createElement('div'); toolbar.className = 'code-toolbar';
             toolbar.innerHTML = '<span class="code-lang">' + (lang || 'code') + '</span>';
-
-            var btn = document.createElement('button');
-            btn.className = 'code-copy-btn';
+            var btn = document.createElement('button'); btn.className = 'code-copy-btn';
             btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy';
-
             btn.addEventListener('click', function() {
               var text = pre.textContent || '';
-              var done = function() {
-                btn.classList.add('copied');
-                btn.innerHTML = '✓ Copied';
-                toast('✓ 代码已复制', 'success');
-                setTimeout(function() {
-                  btn.classList.remove('copied');
-                  btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy';
-                }, CFG.CODE_COPIED_DURATION);
-              };
+              var done = function() { btn.classList.add('copied'); btn.innerHTML = '✓ Copied'; toast('✓ 代码已复制', 'success'); setTimeout(function() { btn.classList.remove('copied'); btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy'; }, CFG.CODE_COPIED_DURATION); };
               copyToClipboard(text, done);
             });
-
-            toolbar.appendChild(btn);
-            wrapper.appendChild(toolbar);
-            pre.parentNode.insertBefore(wrapper, pre);
-            wrapper.appendChild(pre);
+            toolbar.appendChild(btn); wrapper.appendChild(toolbar);
+            pre.parentNode.insertBefore(wrapper, pre); wrapper.appendChild(pre);
           });
         },
-
-        /** Add line numbers column */
         addLineNumbers: function() {
           document.querySelectorAll('.code-block-wrapper pre').forEach(function(pre) {
             if (pre.querySelector('.code-line-numbers')) return;
-            var code = pre.querySelector('code');
-            if (!code) return;
+            var code = pre.querySelector('code'); if (!code) return;
             var lines = (code.textContent || '').split('\n');
             if (lines.length > 1 && lines[lines.length - 1].trim() === '') lines.pop();
-            var html = '';
-            for (var i = 0; i < lines.length; i++) html += '<span>' + (i + 1) + '</span>';
-            var lnDiv = document.createElement('div');
-            lnDiv.className = 'code-line-numbers';
-            lnDiv.innerHTML = html;
-            pre.insertBefore(lnDiv, pre.firstChild);
+            var html = ''; for (var i = 0; i < lines.length; i++) html += '<span>' + (i + 1) + '</span>';
+            var ln = document.createElement('div'); ln.className = 'code-line-numbers'; ln.innerHTML = html;
+            pre.insertBefore(ln, pre.firstChild);
           });
         }
       };
 
       /* ==========================================================
-         Module: Global Search
+         Module: Search
          ========================================================== */
       var Search = {
-        open: function() {
-          if (!DOM.searchOverlay) return;
-          DOM.searchOverlay.classList.add('active');
-          if (DOM.searchInput) { DOM.searchInput.value = ''; DOM.searchInput.focus(); }
-          if (DOM.searchResults) DOM.searchResults.innerHTML = '';
-          this._clearHighlights();
-          state.searchSelectedIdx = -1;
-        },
-
-        close: function() {
-          if (DOM.searchOverlay) DOM.searchOverlay.classList.remove('active');
-          if (DOM.searchResults) DOM.searchResults.innerHTML = '';
-          this._clearHighlights();
-          state.searchSelectedIdx = -1;
-        },
-
-        _clearHighlights: function() {
-          state.currentHighlights.forEach(function(mark) {
-            var p = mark.parentNode;
-            if (p) { p.replaceChild(document.createTextNode(mark.textContent || ''), mark); p.normalize(); }
-          });
-          state.currentHighlights = [];
-        },
-
-        highlightInDocument: function(keyword) {
-          this._clearHighlights();
-          if (!keyword || !keyword.trim()) return;
-          var container = document.querySelector('.markdown-section');
-          if (!container) return;
-
-          var walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT, {
-            acceptNode: function(n) {
-              if (!n.textContent || !n.textContent.trim()) return NodeFilter.FILTER_REJECT;
-              var p = n.parentNode;
-              if (!p) return NodeFilter.FILTER_REJECT;
-              if (p.tagName === 'SCRIPT' || p.tagName === 'STYLE') return NodeFilter.FILTER_REJECT;
-              if (p.closest && (p.closest('.search-modal') || p.closest('.code-copy-btn') || p.closest('#toc-panel') || p.closest('.heading-anchor') || p.closest('.code-line-numbers'))) return NodeFilter.FILTER_REJECT;
-              return NodeFilter.FILTER_ACCEPT;
-            }
-          });
-
-          var nodes = [], n;
-          while ((n = walker.nextNode())) nodes.push(n);
+        open: function() { if (!DOM.searchOverlay) return; DOM.searchOverlay.classList.add('active'); if (DOM.searchInput) { DOM.searchInput.value = ''; DOM.searchInput.focus(); } if (DOM.searchResults) DOM.searchResults.innerHTML = ''; this._clearHighlights(); state.searchSelectedIdx = -1; },
+        close: function() { if (DOM.searchOverlay) DOM.searchOverlay.classList.remove('active'); if (DOM.searchResults) DOM.searchResults.innerHTML = ''; this._clearHighlights(); state.searchSelectedIdx = -1; },
+        _clearHighlights: function() { state.currentHighlights.forEach(function(m) { var p = m.parentNode; if (p) { p.replaceChild(document.createTextNode(m.textContent || ''), m); p.normalize(); } }); state.currentHighlights = []; },
+        highlightInDocument: function(kw) {
+          this._clearHighlights(); if (!kw || !kw.trim()) return;
+          var c = document.querySelector('.markdown-section'); if (!c) return;
+          var w = document.createTreeWalker(c, NodeFilter.SHOW_TEXT, { acceptNode: function(n) { if (!n.textContent || !n.textContent.trim()) return NodeFilter.FILTER_REJECT; var p = n.parentNode; if (!p) return NodeFilter.FILTER_REJECT; if (p.tagName === 'SCRIPT' || p.tagName === 'STYLE') return NodeFilter.FILTER_REJECT; if (p.closest && (p.closest('.search-modal') || p.closest('.code-copy-btn') || p.closest('#toc-panel') || p.closest('.heading-anchor') || p.closest('.code-line-numbers'))) return NodeFilter.FILTER_REJECT; return NodeFilter.FILTER_ACCEPT; } });
+          var nodes = [], n; while ((n = w.nextNode())) nodes.push(n);
           if (!nodes.length) return;
-
-          var esc = escapeRegex(keyword);
-          var regex = new RegExp(esc, 'gi');
-
-          nodes.forEach(function(tn) {
-            var text = tn.textContent;
-            regex.lastIndex = 0;
-            var frag = document.createDocumentFragment();
-            var last = 0, match, hit = false;
-            while ((match = regex.exec(text)) !== null) {
-              hit = true;
-              if (match.index > last) frag.appendChild(document.createTextNode(text.slice(last, match.index)));
-              var mk = document.createElement('mark');
-              mk.className = 'search-highlight';
-              mk.textContent = match[0];
-              frag.appendChild(mk);
-              state.currentHighlights.push(mk);
-              last = regex.lastIndex;
-              if (match[0].length === 0) { regex.lastIndex++; if (regex.lastIndex > text.length) break; }
-            }
-            if (hit && last < text.length) frag.appendChild(document.createTextNode(text.slice(last)));
-            if (hit && frag.childNodes.length) tn.parentNode.replaceChild(frag, tn);
-          });
+          var esc = escapeRegex(kw), re = new RegExp(esc, 'gi');
+          nodes.forEach(function(tn) { var text = tn.textContent; re.lastIndex = 0; var frag = document.createDocumentFragment(), last = 0, match, hit = false; while ((match = re.exec(text)) !== null) { hit = true; if (match.index > last) frag.appendChild(document.createTextNode(text.slice(last, match.index))); var mk = document.createElement('mark'); mk.className = 'search-highlight'; mk.textContent = match[0]; frag.appendChild(mk); state.currentHighlights.push(mk); last = re.lastIndex; if (match[0].length === 0) { re.lastIndex++; if (re.lastIndex > text.length) break; } } if (hit && last < text.length) frag.appendChild(document.createTextNode(text.slice(last))); if (hit && frag.childNodes.length) tn.parentNode.replaceChild(frag, tn); });
         },
-
-        generateResults: function(keyword) {
-          if (!DOM.searchResults) return;
-          DOM.searchResults.innerHTML = '';
-          if (!keyword || !keyword.trim()) return;
-
-          var container = document.querySelector('.markdown-section');
-          if (!container) { DOM.searchResults.innerHTML = '<div class="search-no-results">暂无内容</div>'; return; }
-
-          var blocks = container.querySelectorAll('p, li, td, th, h1, h2, h3, h4, h5, h6');
-          var esc = escapeRegex(keyword);
-          var regex = new RegExp(esc, 'gi');
-          var seen = new Set(), count = 0;
-
-          blocks.forEach(function(block) {
-            if (block.closest('pre') || block.closest('.code-block-wrapper') || block.closest('#toc-panel') || block.closest('.heading-anchor') || block.closest('.code-line-numbers')) return;
-            if (seen.has(block)) return;
-            var text = block.textContent || '';
-            regex.lastIndex = 0;
-            if (!regex.test(text)) return;
-            seen.add(block);
-            count++;
-            regex.lastIndex = 0;
-            var match = regex.exec(text);
-            var idx = match ? match.index : 0;
-            var len = match ? match[0].length : 0;
-            var start = Math.max(0, idx - 40);
-            var end = Math.min(text.length, idx + len + 40);
-            var excerpt = (start > 0 ? '…' : '') + text.substring(start, end) + (end < text.length ? '…' : '');
-
-            var div = document.createElement('div');
-            div.className = 'search-result-item';
-            var heading = block.closest('h1, h2, h3, h4, h5, h6') || Search._findPrevHeading(block);
-            if (heading && heading !== block) {
-              div.innerHTML = '<div class="search-result-title">' + heading.textContent.trim() + '</div>' + excerpt.replace(new RegExp(esc, 'gi'), '<mark>$&</mark>');
-            } else {
-              div.innerHTML = excerpt.replace(new RegExp(esc, 'gi'), '<mark>$&</mark>');
-            }
-            div.addEventListener('click', function() {
-              Search.close();
-              block.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            });
-            DOM.searchResults.appendChild(div);
-          });
-
+        generateResults: function(kw) {
+          if (!DOM.searchResults) return; DOM.searchResults.innerHTML = ''; if (!kw || !kw.trim()) return;
+          var c = document.querySelector('.markdown-section'); if (!c) { DOM.searchResults.innerHTML = '<div class="search-no-results">暂无内容</div>'; return; }
+          var blocks = c.querySelectorAll('p,li,td,th,h1,h2,h3,h4,h5,h6'), esc = escapeRegex(kw), re = new RegExp(esc, 'gi'), seen = new Set(), count = 0;
+          blocks.forEach(function(b) { if (b.closest('pre') || b.closest('.code-block-wrapper') || b.closest('#toc-panel') || b.closest('.heading-anchor') || b.closest('.code-line-numbers')) return; if (seen.has(b)) return; var text = b.textContent || ''; re.lastIndex = 0; if (!re.test(text)) return; seen.add(b); count++; re.lastIndex = 0; var match = re.exec(text), idx = match ? match.index : 0, len = match ? match[0].length : 0, start = Math.max(0, idx - 40), end = Math.min(text.length, idx + len + 40), excerpt = (start > 0 ? '…' : '') + text.substring(start, end) + (end < text.length ? '…' : ''), div = document.createElement('div'); div.className = 'search-result-item'; var h = b.closest('h1,h2,h3,h4,h5,h6') || this._prevH(b); div.innerHTML = (h && h !== b) ? '<div class="search-result-title">' + h.textContent.trim() + '</div>' + excerpt.replace(new RegExp(esc, 'gi'), '<mark>$&</mark>') : excerpt.replace(new RegExp(esc, 'gi'), '<mark>$&</mark>'); div.addEventListener('click', function() { Search.close(); b.scrollIntoView({ behavior: 'smooth', block: 'center' }); }); DOM.searchResults.appendChild(div); });
           if (count === 0) DOM.searchResults.innerHTML = '<div class="search-no-results">未找到匹配内容</div>';
         },
-
-        _findPrevHeading: function(el) {
-          var prev = el.previousElementSibling;
-          while (prev) { if (/^H[1-6]$/.test(prev.tagName)) return prev; prev = prev.previousElementSibling; }
-          return null;
-        },
-
-        /** Keyboard navigation within search results */
-        handleKeyboard: function(e) {
-          var items = DOM.searchResults ? DOM.searchResults.querySelectorAll('.search-result-item') : [];
-          if (!items.length) return;
-          if (e.key === 'ArrowDown') {
-            e.preventDefault();
-            state.searchSelectedIdx = Math.min(state.searchSelectedIdx + 1, items.length - 1);
-            this._updateSelection(items);
-          } else if (e.key === 'ArrowUp') {
-            e.preventDefault();
-            state.searchSelectedIdx = Math.max(state.searchSelectedIdx - 1, 0);
-            this._updateSelection(items);
-          } else if (e.key === 'Enter') {
-            e.preventDefault();
-            if (state.searchSelectedIdx >= 0 && items[state.searchSelectedIdx]) {
-              items[state.searchSelectedIdx].click();
-            }
-          }
-        },
-
-        _updateSelection: function(items) {
-          items.forEach(function(item, i) {
-            item.classList.toggle('selected', i === state.searchSelectedIdx);
-            if (i === state.searchSelectedIdx) item.scrollIntoView({ block: 'nearest' });
-          });
-        }
+        _prevH: function(el) { var p = el.previousElementSibling; while (p) { if (/^H[1-6]$/.test(p.tagName)) return p; p = p.previousElementSibling; } return null; },
+        handleKeyboard: function(e) { var items = DOM.searchResults ? DOM.searchResults.querySelectorAll('.search-result-item') : []; if (!items.length) return; if (e.key === 'ArrowDown') { e.preventDefault(); state.searchSelectedIdx = Math.min(state.searchSelectedIdx + 1, items.length - 1); this._sel(items); } else if (e.key === 'ArrowUp') { e.preventDefault(); state.searchSelectedIdx = Math.max(state.searchSelectedIdx - 1, 0); this._sel(items); } else if (e.key === 'Enter') { e.preventDefault(); if (state.searchSelectedIdx >= 0 && items[state.searchSelectedIdx]) items[state.searchSelectedIdx].click(); } },
+        _sel: function(items) { items.forEach(function(item, i) { item.classList.toggle('selected', i === state.searchSelectedIdx); if (i === state.searchSelectedIdx) item.scrollIntoView({ block: 'nearest' }); }); }
       };
 
       /* ==========================================================
-         Module: Sidebar — Accordion Folders + Filtering
+         Module: Sidebar
          ========================================================== */
       var Sidebar = {
-        /** Inject sidebar header */
         injectHeader: function() {
-          var sb = document.querySelector('.sidebar');
-          if (!sb || sb.querySelector('.sidebar-header')) return;
-          var nav = sb.querySelector('.sidebar-nav');
-          if (!nav) return;
-
-          var h = document.createElement('div');
-          h.className = 'sidebar-header';
-          h.innerHTML =
-            '<span class="sidebar-brand" id="sidebarBrand">📚 知识库总览</span>' +
-            '<input type="text" class="sidebar-filter-input" id="sidebarFilterInput" placeholder="过滤…">' +
-            '<div class="sidebar-actions">' +
-              '<button class="icon-btn" id="sidebarSearchBtn" title="过滤"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg></button>' +
-              '<button class="icon-btn" id="sidebarCloseBtn" title="关闭"><svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>' +
-            '</div>';
+          var sb = document.querySelector('.sidebar'); if (!sb || sb.querySelector('.sidebar-header')) return;
+          var nav = sb.querySelector('.sidebar-nav'); if (!nav) return;
+          var h = document.createElement('div'); h.className = 'sidebar-header';
+          h.innerHTML = '<span class="sidebar-brand" id="sidebarBrand">📚 知识库总览</span><input type="text" class="sidebar-filter-input" id="sidebarFilterInput" placeholder="过滤…"><div class="sidebar-actions"><button class="icon-btn" id="sidebarSearchBtn" title="过滤"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg></button><button class="icon-btn" id="sidebarCloseBtn" title="关闭"><svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button></div>';
           sb.insertBefore(h, nav);
-
-          // Cache sidebar header elements
           DOM.sidebarSearchBtn = document.getElementById('sidebarSearchBtn');
           DOM.sidebarCloseBtn = document.getElementById('sidebarCloseBtn');
           DOM.sidebarFilterInput = document.getElementById('sidebarFilterInput');
           DOM.sidebarBrand = document.getElementById('sidebarBrand');
-
-          this._bindHeaderEvents();
+          this._bind();
         },
-
-        _bindHeaderEvents: function() {
-          if (DOM.sidebarCloseBtn) {
-            DOM.sidebarCloseBtn.addEventListener('click', function() { document.body.classList.add('close'); });
-          }
-          if (DOM.sidebarSearchBtn && DOM.sidebarFilterInput && DOM.sidebarBrand) {
-            DOM.sidebarSearchBtn.addEventListener('click', function() {
-              if (DOM.sidebarFilterInput.classList.contains('show')) {
-                DOM.sidebarFilterInput.classList.remove('show');
-                DOM.sidebarBrand.classList.remove('hidden');
-                DOM.sidebarFilterInput.value = '';
-                Sidebar.filter('');
-              } else {
-                DOM.sidebarFilterInput.classList.add('show');
-                DOM.sidebarBrand.classList.add('hidden');
-                DOM.sidebarFilterInput.focus();
-              }
-            });
-          }
-          if (DOM.sidebarFilterInput) {
-            DOM.sidebarFilterInput.addEventListener('input', function() { Sidebar.filter(this.value); });
-            DOM.sidebarFilterInput.addEventListener('keydown', function(e) {
-              if (e.key === 'Escape') {
-                this.value = '';
-                Sidebar.filter('');
-                this.classList.remove('show');
-                if (DOM.sidebarBrand) DOM.sidebarBrand.classList.remove('hidden');
-              }
-            });
-          }
+        _bind: function() {
+          if (DOM.sidebarCloseBtn) DOM.sidebarCloseBtn.addEventListener('click', function() { document.body.classList.add('close'); });
+          if (DOM.sidebarSearchBtn && DOM.sidebarFilterInput && DOM.sidebarBrand) { DOM.sidebarSearchBtn.addEventListener('click', function() { if (DOM.sidebarFilterInput.classList.contains('show')) { DOM.sidebarFilterInput.classList.remove('show'); DOM.sidebarBrand.classList.remove('hidden'); DOM.sidebarFilterInput.value = ''; Sidebar.filter(''); } else { DOM.sidebarFilterInput.classList.add('show'); DOM.sidebarBrand.classList.add('hidden'); DOM.sidebarFilterInput.focus(); } }); }
+          if (DOM.sidebarFilterInput) { DOM.sidebarFilterInput.addEventListener('input', function() { Sidebar.filter(this.value); }); DOM.sidebarFilterInput.addEventListener('keydown', function(e) { if (e.key === 'Escape') { this.value = ''; Sidebar.filter(''); this.classList.remove('show'); if (DOM.sidebarBrand) DOM.sidebarBrand.classList.remove('hidden'); } }); }
         },
-
-        /** Reset all expanded folders (quiet — no transitions) */
-        reset: function() {
-          var nav = document.querySelector('.sidebar-nav');
-          if (!nav) return;
-          var subs = nav.querySelectorAll('ul.sidebar-sub.expanded');
-          subs.forEach(function(ul) {
-            ul.classList.remove('expanded');
-            var parentLi = ul.parentNode;
-            if (parentLi) parentLi.classList.remove('expanded');
-          });
-          state.currentOpenFolderUl = null;
-        },
-
-        /** Initialize folder accordion (idempotent after first run) */
+        reset: function() { var nav = document.querySelector('.sidebar-nav'); if (!nav) return; nav.querySelectorAll('ul.sidebar-sub.expanded').forEach(function(ul) { ul.classList.remove('expanded'); var pl = ul.parentNode; if (pl) pl.classList.remove('expanded'); }); state.currentOpenFolderUl = null; },
         initFolders: function() {
-          var nav = document.querySelector('.sidebar-nav');
-          if (!nav) return;
-
-          // Already initialized — only re-order + auto-expand
+          var nav = document.querySelector('.sidebar-nav'); if (!nav) return;
           if (nav.querySelector('.folder-item')) {
-            var uls = nav.querySelectorAll('ul');
-            uls.forEach(function(ul) {
-              if (ul.parentNode === nav || ul.parentNode.classList.contains('sidebar-nav')) {
-                ul.classList.remove('sidebar-sub', 'expanded');
-              } else {
-                ul.classList.add('sidebar-sub');
-              }
-            });
-            this._sortAll(uls);
-            state.currentOpenFolderUl = null;
-            this._autoExpandActive();
-            return;
+            var uls = nav.querySelectorAll('ul'); uls.forEach(function(ul) { if (ul.parentNode === nav || ul.parentNode.classList.contains('sidebar-nav')) { ul.classList.remove('sidebar-sub', 'expanded'); } else { ul.classList.add('sidebar-sub'); } });
+            this._sort(uls); state.currentOpenFolderUl = null; this._autoExpand(); return;
           }
-
-          // First init
-          var allUls = nav.querySelectorAll('ul');
-          allUls.forEach(function(ul) {
-            if (ul.parentNode === nav || ul.parentNode.classList.contains('sidebar-nav')) {
-              ul.classList.remove('sidebar-sub', 'expanded');
-            } else {
-              ul.classList.add('sidebar-sub');
-            }
-          });
-          this._sortAll(allUls);
-          state.currentOpenFolderUl = null;
-
-          // Transform folder <li> entries
-          nav.querySelectorAll('li').forEach(function(li) {
-            var childUl = li.querySelector('ul');
-            if (!childUl) return;
-            li.classList.add('folder-item');
-
-            var label = li.querySelector(':scope > .folder-label');
-            if (!label) {
-              var link = li.querySelector(':scope > a');
-              if (link) {
-                label = link;
-                label.classList.add('folder-label');
-                label.setAttribute('href', 'javascript:void(0)');
-                label.removeAttribute('target');
-              } else {
-                // Collect text nodes, remove duplicates
-                var folderName = '', toRemove = [];
-                for (var i = 0; i < li.childNodes.length; i++) {
-                  var cn = li.childNodes[i];
-                  if (cn.nodeType === 3 && cn.textContent.trim()) {
-                    folderName += cn.textContent.trim();
-                    toRemove.push(cn);
-                  }
-                }
-                toRemove.forEach(function(n) { li.removeChild(n); });
-                label = document.createElement('span');
-                label.className = 'folder-label';
-                label.textContent = folderName || 'Folder';
-                li.insertBefore(label, li.firstChild);
-              }
-            }
-
-            var arrow = label.querySelector('.folder-arrow');
-            if (!arrow) {
-              arrow = document.createElement('span');
-              arrow.className = 'folder-arrow';
-              arrow.innerHTML = '<svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>';
-              label.appendChild(arrow);
-            }
-
-            label.onclick = function(e) {
-              e.preventDefault();
-              e.stopPropagation();
-              if (childUl.classList.contains('expanded')) {
-                Sidebar._collapse(li, childUl);
-              } else {
-                Sidebar._expand(li, childUl);
-              }
-            };
-          });
-
-          this._autoExpandActive();
+          var all = nav.querySelectorAll('ul'); all.forEach(function(ul) { if (ul.parentNode === nav || ul.parentNode.classList.contains('sidebar-nav')) { ul.classList.remove('sidebar-sub', 'expanded'); } else { ul.classList.add('sidebar-sub'); } });
+          this._sort(all); state.currentOpenFolderUl = null;
+          nav.querySelectorAll('li').forEach(function(li) { var cu = li.querySelector('ul'); if (!cu) return; li.classList.add('folder-item'); var label = li.querySelector(':scope > .folder-label'); if (!label) { var link = li.querySelector(':scope > a'); if (link) { label = link; label.classList.add('folder-label'); label.setAttribute('href', 'javascript:void(0)'); label.removeAttribute('target'); } else { var fn = '', tr = []; for (var i = 0; i < li.childNodes.length; i++) { var cn = li.childNodes[i]; if (cn.nodeType === 3 && cn.textContent.trim()) { fn += cn.textContent.trim(); tr.push(cn); } } tr.forEach(function(n) { li.removeChild(n); }); label = document.createElement('span'); label.className = 'folder-label'; label.textContent = fn || 'Folder'; li.insertBefore(label, li.firstChild); } } var arrow = label.querySelector('.folder-arrow'); if (!arrow) { arrow = document.createElement('span'); arrow.className = 'folder-arrow'; arrow.innerHTML = '<svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>'; label.appendChild(arrow); } label.onclick = function(e) { e.preventDefault(); e.stopPropagation(); if (cu.classList.contains('expanded')) { Sidebar._collapse(li, cu); } else { Sidebar._expand(li, cu); } }; });
+          this._autoExpand();
         },
-
-        _sortAll: function(uls) {
-          var sortFn = function(a, b) {
-            var aDir = !!a.querySelector('ul'), bDir = !!b.querySelector('ul');
-            if (aDir && !bDir) return -1;
-            if (!aDir && bDir) return 1;
-            return (a.textContent || '').trim().localeCompare((b.textContent || '').trim(), 'en');
-          };
-          uls.forEach(function(ul) {
-            var items = Array.from(ul.children).filter(function(c) { return c.tagName === 'LI'; });
-            items.sort(sortFn);
-            items.forEach(function(li) { ul.appendChild(li); });
-          });
-        },
-
-        _expand: function(li, childUl) {
-          if (state.currentOpenFolderUl && state.currentOpenFolderUl !== childUl) {
-            state.currentOpenFolderUl.classList.remove('expanded');
-            var prevLi = state.currentOpenFolderUl.parentNode;
-            if (prevLi) prevLi.classList.remove('expanded');
-          }
-          childUl.classList.add('expanded');
-          li.classList.add('expanded');
-          state.currentOpenFolderUl = childUl;
-        },
-
-        _collapse: function(li, childUl) {
-          childUl.classList.remove('expanded');
-          li.classList.remove('expanded');
-          if (state.currentOpenFolderUl === childUl) state.currentOpenFolderUl = null;
-        },
-
-        _autoExpandActive: function() {
-          var activeLink = document.querySelector('.sidebar-nav .active > a');
-          if (!activeLink) return;
-          var parent = activeLink.closest('.folder-item');
-          if (!parent) {
-            var pu = activeLink.closest('ul.sidebar-sub');
-            if (pu) parent = pu.closest('.folder-item');
-          }
-          if (parent) {
-            var childUl = parent.querySelector(':scope > ul');
-            if (childUl) this._expand(parent, childUl);
-          }
-        },
-
-        /** Filter sidebar items by keyword */
-        filter: function(keyword) {
-          var allLis = document.querySelectorAll('.sidebar-nav li');
-          if (!keyword || !keyword.trim()) {
-            allLis.forEach(function(l) { l.classList.remove('filtered-out'); });
-            return;
-          }
-          var kw = keyword.trim().toLowerCase();
-          allLis.forEach(function(li) {
-            var el = li.querySelector(':scope > a') || li.querySelector(':scope > .folder-label');
-            var text = (el ? el.textContent : li.textContent) || '';
-            var childUl = li.querySelector('ul');
-            var childMatch = false;
-            if (childUl) {
-              childUl.querySelectorAll('li').forEach(function(cli) {
-                if ((cli.textContent || '').toLowerCase().indexOf(kw) !== -1) childMatch = true;
-              });
-            }
-            if (text.toLowerCase().indexOf(kw) !== -1 || childMatch) {
-              li.classList.remove('filtered-out');
-              if (childMatch && childUl && !childUl.classList.contains('expanded')) {
-                Sidebar._expand(li, childUl);
-              }
-            } else {
-              li.classList.add('filtered-out');
-            }
-          });
-        }
+        _sort: function(uls) { var sf = function(a, b) { var aD = !!a.querySelector('ul'), bD = !!b.querySelector('ul'); if (aD && !bD) return -1; if (!aD && bD) return 1; return (a.textContent || '').trim().localeCompare((b.textContent || '').trim(), 'en'); }; uls.forEach(function(ul) { var its = Array.from(ul.children).filter(function(c) { return c.tagName === 'LI'; }); its.sort(sf); its.forEach(function(li) { ul.appendChild(li); }); }); },
+        _expand: function(li, cu) { if (state.currentOpenFolderUl && state.currentOpenFolderUl !== cu) { state.currentOpenFolderUl.classList.remove('expanded'); var pl = state.currentOpenFolderUl.parentNode; if (pl) pl.classList.remove('expanded'); } cu.classList.add('expanded'); li.classList.add('expanded'); state.currentOpenFolderUl = cu; },
+        _collapse: function(li, cu) { cu.classList.remove('expanded'); li.classList.remove('expanded'); if (state.currentOpenFolderUl === cu) state.currentOpenFolderUl = null; },
+        _autoExpand: function() { var al = document.querySelector('.sidebar-nav .active > a'); if (!al) return; var p = al.closest('.folder-item'); if (!p) { var pu = al.closest('ul.sidebar-sub'); if (pu) p = pu.closest('.folder-item'); } if (p) { var cu = p.querySelector(':scope > ul'); if (cu) this._expand(p, cu); } },
+        filter: function(kw) { var all = document.querySelectorAll('.sidebar-nav li'); if (!kw || !kw.trim()) { all.forEach(function(l) { l.classList.remove('filtered-out'); }); return; } var kwl = kw.trim().toLowerCase(); all.forEach(function(li) { var el = li.querySelector(':scope > a') || li.querySelector(':scope > .folder-label'), text = (el ? el.textContent : li.textContent) || '', cu = li.querySelector('ul'), cm = false; if (cu) { cu.querySelectorAll('li').forEach(function(cli) { if ((cli.textContent || '').toLowerCase().indexOf(kwl) !== -1) cm = true; }); } if (text.toLowerCase().indexOf(kwl) !== -1 || cm) { li.classList.remove('filtered-out'); if (cm && cu && !cu.classList.contains('expanded')) Sidebar._expand(li, cu); } else { li.classList.add('filtered-out'); } }); }
       };
 
       /* ==========================================================
-         Module: Keyboard Shortcuts
+         Module: Keyboard
          ========================================================== */
       var Keyboard = {
-        init: function() {
-          document.addEventListener('keydown', this._handler);
-        },
-
-        _handler: function(e) {
-          var tag = (e.target.tagName || '').toLowerCase();
-          var isInput = tag === 'input' || tag === 'textarea' || e.target.isContentEditable;
-
-          if (e.key === 'Escape') {
-            Search.close();
-            Keyboard._closeShortcuts();
-            if (DOM.tocPanel) DOM.tocPanel.classList.remove('visible');
-            if (DOM.tocToggleBtn) DOM.tocToggleBtn.classList.remove('active');
-          }
-          if ((e.ctrlKey || e.metaKey) && e.key === 'k') { e.preventDefault(); Search.open(); return; }
-          if ((e.ctrlKey || e.metaKey) && e.key === 'b') { e.preventDefault(); document.body.classList.toggle('close'); return; }
-          if ((e.ctrlKey || e.metaKey) && e.key === 'd') { e.preventDefault(); DarkMode.toggle(); return; }
-          if ((e.ctrlKey || e.metaKey) && e.key === 'ArrowUp') { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); return; }
-          if (e.key === '/' && !isInput) { e.preventDefault(); Search.open(); return; }
-          if (e.key === '?' && !isInput) { e.preventDefault(); Keyboard._openShortcuts(); return; }
-        },
-
-        _openShortcuts: function() {
-          if (DOM.shortcutsPanel) DOM.shortcutsPanel.classList.add('active');
-        },
-
-        _closeShortcuts: function() {
-          if (DOM.shortcutsPanel) DOM.shortcutsPanel.classList.remove('active');
-        }
+        init: function() { document.addEventListener('keydown', this._handler); },
+        _handler: function(e) { var tag = (e.target.tagName || '').toLowerCase(), isInput = tag === 'input' || tag === 'textarea' || e.target.isContentEditable; if (e.key === 'Escape') { Search.close(); Keyboard._cShortcuts(); if (DOM.tocPanel) DOM.tocPanel.classList.remove('visible'); if (DOM.tocToggleBtn) DOM.tocToggleBtn.classList.remove('active'); } if ((e.ctrlKey || e.metaKey) && e.key === 'k') { e.preventDefault(); Search.open(); return; } if ((e.ctrlKey || e.metaKey) && e.key === 'b') { e.preventDefault(); document.body.classList.toggle('close'); return; } if ((e.ctrlKey || e.metaKey) && e.key === 'd') { e.preventDefault(); DarkMode.toggle(); return; } if ((e.ctrlKey || e.metaKey) && e.key === 'ArrowUp') { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); return; } if (e.key === '/' && !isInput) { e.preventDefault(); Search.open(); return; } if (e.key === '?' && !isInput) { e.preventDefault(); Keyboard._oShortcuts(); return; } },
+        _oShortcuts: function() { if (DOM.shortcutsPanel) DOM.shortcutsPanel.classList.add('active'); },
+        _cShortcuts: function() { if (DOM.shortcutsPanel) DOM.shortcutsPanel.classList.remove('active'); }
       };
 
       /* ==========================================================
-         Global Scroll Handler (delegates to sub-modules)
+         Scroll Handler
          ========================================================== */
       function onScroll() {
         ProgressBar.update();
         BackToTop.update();
-
-        // Debounced position save
         clearTimeout(state.scrollTimer);
         state.scrollTimer = setTimeout(function() { ReadingPosition.save(); }, CFG.SCROLL_SAVE_DEBOUNCE);
-
         TOC.highlight();
       }
 
       /* ==========================================================
-         Docsify Plugin Hook
+         Docsify Hooks
          ========================================================== */
       function onPageReady() {
         cacheDOM();
@@ -1329,131 +1000,58 @@
         Sidebar.injectHeader();
         _bindGlobalEvents();
         Lightbox.init();
-
         document.body.classList.remove('close');
         DocTitle.update();
         ReadingTime.update();
-
-        // Defer heavy DOM operations
-        setTimeout(function() {
-          Sidebar.initFolders();
-          TOC.generate();
-          ProgressBar.update();
-          HeadingAnchors.add();
-          ReadingPosition.restore();
-          CodeBlock.addLineNumbers();
-        }, 250);
-
-        // Show error hint if loading takes too long (safety net)
+        setTimeout(function() { Sidebar.initFolders(); TOC.generate(); ProgressBar.update(); HeadingAnchors.add(); ReadingPosition.restore(); CodeBlock.addLineNumbers(); }, 250);
         setTimeout(function() { Loader.showError(); }, CFG.LOADING_ERROR_DELAY);
       }
 
       function onPageSwitch() {
-        // Freeze all transitions in one pass
         var nav = document.querySelector('.sidebar-nav');
         var unfreeze = nav ? freezeTransitions(nav) : function() {};
-
-        ReadingPosition.save();
-        DocTitle.update();
-        ReadingTime.update();
-        Search.close();
-        CodeBlock.enhance();
-        TOC.clear();
-        Sidebar.reset();
-
-        setTimeout(function() {
-          Sidebar.initFolders();
-          TOC.generate();
-          ProgressBar.update();
-          HeadingAnchors.add();
-          CodeBlock.addLineNumbers();
-          Lightbox.bindImages();
-          unfreeze();
-          setTimeout(function() { ReadingPosition.restore(); }, CFG.DOM_RESTORE_DELAY);
-        }, 150);
-
-        // MathJax re-render
-        if (window.MathJax && typeof window.MathJax.typesetPromise === 'function') {
-          window.MathJax.typesetPromise();
-        }
+        ReadingPosition.save(); DocTitle.update(); ReadingTime.update(); Search.close(); CodeBlock.enhance(); TOC.clear(); Sidebar.reset();
+        setTimeout(function() { Sidebar.initFolders(); TOC.generate(); ProgressBar.update(); HeadingAnchors.add(); CodeBlock.addLineNumbers(); Lightbox.bindImages(); unfreeze(); setTimeout(function() { ReadingPosition.restore(); }, CFG.DOM_RESTORE_DELAY); }, 150);
+        if (window.MathJax && typeof window.MathJax.typesetPromise === 'function') window.MathJax.typesetPromise();
       }
 
-      /* ==========================================================
-         Global Event Binding
-         ========================================================== */
       function _bindGlobalEvents() {
-        // Capsule buttons
         if (DOM.capsuleSidebarBtn) DOM.capsuleSidebarBtn.addEventListener('click', function() { document.body.classList.remove('close'); });
         if (DOM.capsuleSearchBtn) DOM.capsuleSearchBtn.addEventListener('click', Search.open);
-
-        // Dark mode toggle
         if (DOM.darkModeBtn) DOM.darkModeBtn.addEventListener('click', DarkMode.toggle);
-
-        // TOC toggle
-        if (DOM.tocToggleBtn && DOM.tocPanel) {
-          DOM.tocToggleBtn.addEventListener('click', TOC.toggle);
-        }
-
-        // Back to top
+        if (DOM.tocToggleBtn && DOM.tocPanel) DOM.tocToggleBtn.addEventListener('click', TOC.toggle);
         if (DOM.backToTop) DOM.backToTop.addEventListener('click', function() { window.scrollTo({ top: 0, behavior: 'smooth' }); });
-
-        // Scroll listener
         window.addEventListener('scroll', onScroll, { passive: true });
-
-        // Search modal close
         if (DOM.searchCloseBtn) DOM.searchCloseBtn.addEventListener('click', Search.close);
         if (DOM.searchOverlay) DOM.searchOverlay.addEventListener('click', function(e) { if (e.target === DOM.searchOverlay) Search.close(); });
-
-        // Search input
-        if (DOM.searchInput) {
-          DOM.searchInput.addEventListener('input', function() {
-            Search.highlightInDocument(this.value);
-            Search.generateResults(this.value);
-            state.searchSelectedIdx = -1;
-          });
-          DOM.searchInput.addEventListener('keydown', function(e) { Search.handleKeyboard(e); });
-        }
-
-        // Keyboard shortcuts
+        if (DOM.searchInput) { DOM.searchInput.addEventListener('input', function() { Search.highlightInDocument(this.value); Search.generateResults(this.value); state.searchSelectedIdx = -1; }); DOM.searchInput.addEventListener('keydown', function(e) { Search.handleKeyboard(e); }); }
         Keyboard.init();
+        // ★ 窗口 resize 时更新波浪画布尺寸（如果正在动画中）
+        window.addEventListener('resize', function() {
+          if (state.waveAnimId && DOM.waveCanvas) {
+            DOM.waveCanvas.width = window.innerWidth;
+            DOM.waveCanvas.height = window.innerHeight;
+          }
+        });
       }
 
       /* ==========================================================
-         Docsify Configuration (global, required by docsify)
+         Docsify Config
          ========================================================== */
       window.$docsify = {
-        name: 'Soren的知识库',
-        loadSidebar: '_sidebar.md',
-        subMaxLevel: 0,
-        basePath: CFG.BASE_PATH,
-        homepage: 'README.md',
-        notFoundPage: true,
-        plugins: [
-          function(hook) {
-            hook.ready(onPageReady);
-            hook.doneEach(onPageSwitch);
-          }
-        ]
+        name: 'Soren的知识库', loadSidebar: '_sidebar.md', subMaxLevel: 0,
+        basePath: CFG.BASE_PATH, homepage: 'README.md', notFoundPage: true,
+        plugins: [function(hook) { hook.ready(onPageReady); hook.doneEach(onPageSwitch); }]
       };
 
-      // MathJax config
       window.MathJax = {
-        tex: {
-          inlineMath: [['$', '$'], ['\\(', '\\)']],
-          displayMath: [['$$', '$$'], ['\\[', '\\]']],
-          processEscapes: true
-        },
-        options: {
-          skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
-          ignoreHtmlClass: 'tex2jax_ignore',
-          processHtmlClass: 'tex2jax_process'
-        }
+        tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']], processEscapes: true },
+        options: { skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'], ignoreHtmlClass: 'tex2jax_ignore', processHtmlClass: 'tex2jax_process' }
       };
 
     })();
   </script>
 
-  <!-- ========== External Dependencies ========== -->
   <script src="//cdn.jsdelivr.net/npm/docsify@4"></script>
   <script id="MathJax-script" async src="//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 </body>
