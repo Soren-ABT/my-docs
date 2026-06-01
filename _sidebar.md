@@ -3,6 +3,7 @@
   - [Chapter 2](files/complex-analysis/chapter2/U2.complex-analysis-review.md)
   - [Chapter 3](files/complex-analysis/chapter3/U3.complex-analysis-review.md)
   - [Chapter 4](files/complex-analysis/chapter4/U4.complex-analysis-review.md)
+  - [Chapter 5](files/complex-analysis/chapter5/U5.complex-analysis-review.md)
 - Research
   - [From 0 to 1 DL-Based AMC](files/research/From-0-to-1-Deep-Learning-Based-AMC.md)
 - Papers
