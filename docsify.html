@@ -72,7 +72,7 @@
     .no-transition,.no-transition *,.no-transition *::before,.no-transition *::after{transition:none!important;animation:none!important}
 
     /* ============================================================
-       Wave Transition Canvas (Apple‑style bidirectional)
+       Wave Transition Canvas
        ============================================================ */
     #theme-wave-canvas{position:fixed;inset:0;z-index:9998;pointer-events:none;display:none}
 
@@ -180,7 +180,7 @@
     #backToTop svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2.5}
     #backToTop::before{content:'';position:absolute;inset:-3px;border-radius:50%;background:conic-gradient(var(--progress-color) var(--scroll-pct,0%),transparent var(--scroll-pct,0%));mask:radial-gradient(farthest-side,transparent calc(100% - 3px),#fff calc(100% - 3px));-webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 3px),#fff calc(100% - 3px));opacity:.55}
 
-    /* TOC */
+    /* TOC Panel */
     #toc-panel{position:fixed;right:16px;top:80px;z-index:997;background:var(--toc-bg);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:1px solid var(--border);border-radius:12px;padding:12px 16px;max-width:240px;max-height:60vh;overflow-y:auto;font-size:.8rem;box-shadow:0 8px 24px var(--shadow);transition:opacity .3s,transform .3s;opacity:0;transform:translateX(20px);pointer-events:none}
     #toc-panel.visible{opacity:1;transform:translateX(0);pointer-events:auto}
     #toc-panel .toc-title{font-weight:600;color:var(--text);margin-bottom:8px;font-size:.76rem;text-transform:uppercase;letter-spacing:.5px}
@@ -357,14 +357,14 @@
   </script>
 
   <!-- ============================================================
-       Application Core
+       Application Core — Enterprise‑grade modular architecture
        ============================================================ -->
   <script>
     (function() {
       'use strict';
 
       /* ==========================================================
-         Configuration
+         Configuration (single source of truth)
          ========================================================== */
       var CFG = {
         BASE_PATH: '/my-docs/',
@@ -380,13 +380,18 @@
         BACK_TO_TOP_THRESHOLD: 400,
         TOC_MIN_HEADINGS: 2,
         TOC_SCROLL_OFFSET: 80,
-        WAVE_DURATION: 1000,       // 1 秒丝滑流动
-        WAVE_FREQ: 2.2,            // 波浪频率
-        WAVE_MAX_AMP: 65           // 最大振幅 (px)
+        WAVE_DURATION: 1000,
+        WAVE_FREQ: 2.2,
+        WAVE_MAX_AMP: 65,
+        WAVE_HARMONICS: [
+          { mult: 1.0, amp: 1.0  },
+          { mult: 2.3, amp: 0.25 },
+          { mult: 4.7, amp: 0.1  }
+        ]
       };
 
       /* ==========================================================
-         State
+         Application State (single state tree)
          ========================================================== */
       var state = {
         loading: false,
@@ -398,46 +403,47 @@
       };
 
       /* ==========================================================
-         DOM References
+         DOM Cache (populated once on ready)
          ========================================================== */
       var DOM = {};
 
       function cacheDOM() {
-        DOM.loading         = document.getElementById('loading');
-        DOM.docHeader       = document.getElementById('docHeader');
-        DOM.loaderWrapper   = document.getElementById('loaderWrapper');
-        DOM.loaderTriangle  = document.getElementById('loaderTriangle');
-        DOM.loadingError    = document.getElementById('loadingError');
-        DOM.readingProgress = document.getElementById('reading-progress');
-        DOM.toastContainer  = document.getElementById('toast-container');
-        DOM.docTitle        = document.getElementById('docTitle');
-        DOM.readingTime     = document.getElementById('readingTime');
-        DOM.tocPanel        = document.getElementById('toc-panel');
-        DOM.tocContent      = document.getElementById('toc-content');
-        DOM.tocToggleBtn    = document.getElementById('tocToggleBtn');
-        DOM.backToTop       = document.getElementById('backToTop');
-        DOM.searchOverlay   = document.getElementById('searchModalOverlay');
-        DOM.searchInput     = document.getElementById('searchModalInput');
-        DOM.searchResults   = document.getElementById('searchResults');
-        DOM.searchCloseBtn  = document.getElementById('searchModalClose');
-        DOM.shortcutsPanel  = document.getElementById('shortcuts-panel');
-        DOM.darkModeBtn     = document.getElementById('darkModeBtn');
-        DOM.lightbox        = document.getElementById('img-lightbox');
-        DOM.lightboxImg     = DOM.lightbox ? DOM.lightbox.querySelector('img') : null;
-        DOM.app             = document.getElementById('app');
+        DOM.loading           = document.getElementById('loading');
+        DOM.docHeader         = document.getElementById('docHeader');
+        DOM.loaderWrapper     = document.getElementById('loaderWrapper');
+        DOM.loaderTriangle    = document.getElementById('loaderTriangle');
+        DOM.loadingError      = document.getElementById('loadingError');
+        DOM.readingProgress   = document.getElementById('reading-progress');
+        DOM.toastContainer    = document.getElementById('toast-container');
+        DOM.docTitle          = document.getElementById('docTitle');
+        DOM.readingTime       = document.getElementById('readingTime');
+        DOM.tocPanel          = document.getElementById('toc-panel');
+        DOM.tocContent        = document.getElementById('toc-content');
+        DOM.tocToggleBtn      = document.getElementById('tocToggleBtn');
+        DOM.backToTop         = document.getElementById('backToTop');
+        DOM.searchOverlay     = document.getElementById('searchModalOverlay');
+        DOM.searchInput       = document.getElementById('searchModalInput');
+        DOM.searchResults     = document.getElementById('searchResults');
+        DOM.searchCloseBtn    = document.getElementById('searchModalClose');
+        DOM.shortcutsPanel    = document.getElementById('shortcuts-panel');
+        DOM.darkModeBtn       = document.getElementById('darkModeBtn');
+        DOM.lightbox          = document.getElementById('img-lightbox');
+        DOM.lightboxImg       = DOM.lightbox ? DOM.lightbox.querySelector('img') : null;
+        DOM.app               = document.getElementById('app');
         DOM.capsuleSidebarBtn = document.getElementById('capsuleSidebarBtn');
         DOM.capsuleSearchBtn  = document.getElementById('capsuleSearchBtn');
-        DOM.waveCanvas      = document.getElementById('theme-wave-canvas');
-        DOM.sidebarSearchBtn = null;
-        DOM.sidebarCloseBtn  = null;
+        DOM.waveCanvas        = document.getElementById('theme-wave-canvas');
+        DOM.sidebarSearchBtn  = null;
+        DOM.sidebarCloseBtn   = null;
         DOM.sidebarFilterInput = null;
-        DOM.sidebarBrand     = null;
+        DOM.sidebarBrand      = null;
       }
 
       /* ==========================================================
          Utility Functions
          ========================================================== */
 
+      /** Display a toast notification */
       function toast(msg, type) {
         type = type || 'info';
         if (!DOM.toastContainer) return;
@@ -448,6 +454,10 @@
         setTimeout(function() { if (el.parentNode) el.remove(); }, CFG.TOAST_DURATION);
       }
 
+      /**
+       * Freeze CSS transitions on an element and its descendants.
+       * Returns an unfreeze callback.
+       */
       function freezeTransitions(el) {
         el.classList.add('no-transition');
         return function unfreeze() {
@@ -457,6 +467,7 @@
         };
       }
 
+      /** Safe clipboard copy with fallback */
       function copyToClipboard(text, onSuccess) {
         var done = function() { if (onSuccess) onSuccess(); };
         if (navigator.clipboard && navigator.clipboard.writeText) {
@@ -475,7 +486,10 @@
         if (cb) cb();
       }
 
+      /** Escape regex special characters */
       function escapeRegex(str) { return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
+
+      /** Generate a short random ID */
       function randomId() { return Math.random().toString(36).substr(2, 8); }
 
       /* ==========================================================
@@ -483,6 +497,7 @@
          ========================================================== */
       var Loader = {
         _mouseHandler: null,
+
         init: function() {
           if (!DOM.loaderWrapper || !DOM.loaderTriangle) return;
           var self = this;
@@ -497,6 +512,7 @@
           };
           document.addEventListener('mousemove', this._mouseHandler);
         },
+
         hide: function() {
           if (state.loading) return;
           state.loading = true;
@@ -504,13 +520,14 @@
           if (DOM.docHeader) DOM.docHeader.style.display = 'flex';
           if (this._mouseHandler) { document.removeEventListener('mousemove', this._mouseHandler); this._mouseHandler = null; }
         },
+
         showError: function() {
           if (!state.loading && DOM.loadingError) DOM.loadingError.classList.add('show');
         }
       };
 
       /* ==========================================================
-         ★ Module: ThemeWave — bidirectional Apple‑style transition
+         ★ Module: ThemeWave — Apple‑style top‑down wave curtain
          ========================================================== */
       var ThemeWave = {
         _ctx: null,
@@ -521,16 +538,17 @@
         },
 
         /**
-         * @param {string} oldBgColor — CSS colour of the outgoing theme background
-         * @param {string} direction  — 'down' (light→dark, wave sweeps top→bottom)
-         *                              or 'up' (dark→light, wave sweeps bottom→top)
+         * Sweep a wave curtain from top to bottom.
+         * The wave is filled with `fillColor` (the OLD theme bg).
+         * The body underneath has already switched to the NEW theme.
+         * As the wave moves down, more of the new theme is revealed above.
+         *
+         * @param {string} fillColor — CSS colour for the outgoing theme (the wave colour)
          */
-        animate: function(oldBgColor, direction) {
+        animate: function(fillColor) {
           var canvas = DOM.waveCanvas;
           var ctx = this._ensureContext();
           if (!canvas || !ctx) return;
-
-          direction = direction || 'down';
 
           // Cancel any running animation
           if (state.waveAnimId) { cancelAnimationFrame(state.waveAnimId); state.waveAnimId = null; }
@@ -544,6 +562,7 @@
           var h = canvas.height;
           var freq = CFG.WAVE_FREQ;
           var maxAmp = CFG.WAVE_MAX_AMP;
+          var harmonics = CFG.WAVE_HARMONICS;
           var duration = CFG.WAVE_DURATION;
           var startTime = performance.now();
           var self = this;
@@ -552,105 +571,113 @@
             var elapsed = now - startTime;
             var raw = Math.min(elapsed / duration, 1);
 
-            // ★ Pure power‑ease‑out — silky smooth, no overshoot
-            var eased = 1 - Math.pow(1 - raw, 3.5);
+            // Pure ease‑out quartic — no overshoot, silk‑smooth deceleration
+            var eased = 1 - Math.pow(1 - raw, 4);
 
-            // ★ Wave vertical position (bidirectional)
-            var waveY;
-            if (direction === 'up') {
-              // Dark → Light : wave rises from bottom
-              waveY = (h + maxAmp) - eased * (h + maxAmp * 2);
-            } else {
-              // Light → Dark : wave falls from top
-              waveY = -maxAmp + eased * (h + maxAmp * 2);
-            }
+            // Wave Y position: starts at -maxAmp (above viewport), ends at h+maxAmp (below)
+            var waveY = -maxAmp + eased * (h + maxAmp * 2);
 
-            // Amplitude peaks mid‑animation, fades at start & end
-            var amp = maxAmp * Math.sin(eased * Math.PI) * (1 + 0.15 * Math.sin(eased * Math.PI * 2));
+            // Amplitude: peaks mid‑animation, fades near edges
+            var ampEnvelope = Math.sin(eased * Math.PI);
+            var amp = maxAmp * ampEnvelope;
 
             ctx.clearRect(0, 0, w, h);
 
-            // ---- Draw old‑theme mask ----
+            // ---- Build the wave path ----
+            var steps = Math.max(2, Math.floor(w / 1.5));
+            var phaseShift = eased * Math.PI * 1.8;
+
             ctx.beginPath();
-            if (direction === 'up') {
-              // Old (dark) theme fills **below** the wave crest
-              ctx.moveTo(0, h);
-              var steps = Math.max(2, Math.floor(w / 2));
-              var phaseBase = eased * Math.PI * 1.8;
-              for (var i = steps; i >= 0; i--) {
-                var x = (i / steps) * w;
-                var phase = (i / steps) * Math.PI * 2 * freq + phaseBase;
-                var y = waveY
-                      + Math.sin(phase) * amp
-                      + Math.sin(phase * 2.3) * amp * 0.25
-                      + Math.sin(phase * 4.7) * amp * 0.1;
-                ctx.lineTo(x, y);
-              }
-              ctx.lineTo(0, h);
-            } else {
-              // Old (light) theme fills **above** the wave crest
-              ctx.moveTo(0, 0);
-              var steps = Math.max(2, Math.floor(w / 2));
-              var phaseBase = eased * Math.PI * 1.8;
-              for (var i = 0; i <= steps; i++) {
-                var x = (i / steps) * w;
-                var phase = (i / steps) * Math.PI * 2 * freq + phaseBase;
-                var y = waveY
-                      + Math.sin(phase) * amp
-                      + Math.sin(phase * 2.3) * amp * 0.25
-                      + Math.sin(phase * 4.7) * amp * 0.1;
-                ctx.lineTo(x, y);
-              }
-              ctx.lineTo(w, 0);
-            }
+            ctx.moveTo(0, 0);
+
+            // Top edge is straight until the wave crest
+            ctx.lineTo(w, 0);
+            ctx.lineTo(w, h);
+            ctx.lineTo(0, h);
             ctx.closePath();
-            ctx.fillStyle = oldBgColor;
+            ctx.fillStyle = fillColor;
             ctx.fill();
 
-            // ---- Subtle shadow gradient below crest ----
+            // Now draw a second shape that reveals the new theme above the wave:
+            // Fill everything from the top down to the wave crest with transparent
+            // (revealing the already‑switched body), and keep everything below
+            // the wave crest filled with the old colour.
+
+            // Simpler approach: draw a single shape:
+            //   Top edge → wave crest (left to right) → bottom edges → back to top-left
+            //   This is the "old theme" remaining area (below the wave).
+
+            ctx.clearRect(0, 0, w, h);
+
+            ctx.beginPath();
+            // Start at top-left, go across the wave crest
+            ctx.moveTo(0, 0);
+
+            // Draw the wave crest from left to right
+            for (var i = 0; i <= steps; i++) {
+              var x = (i / steps) * w;
+              var phase = (i / steps) * Math.PI * 2 * freq + phaseShift;
+
+              var yOffset = 0;
+              for (var j = 0; j < harmonics.length; j++) {
+                yOffset += Math.sin(phase * harmonics[j].mult) * amp * harmonics[j].amp;
+              }
+
+              var y = waveY + yOffset;
+              ctx.lineTo(x, y);
+            }
+
+            // Close the shape: go to bottom-right, bottom-left, back to top
+            ctx.lineTo(w, h);
+            ctx.lineTo(0, h);
+            ctx.closePath();
+            ctx.fillStyle = fillColor;
+            ctx.fill();
+
+            // ---- Shadow gradient lightly below the wave crest ----
             ctx.save();
             ctx.clip();
-            var gY1 = waveY - amp - 18;
-            var gY2 = waveY + amp + 70;
-            var grad = ctx.createLinearGradient(0, gY1, 0, gY2);
+            var gradTop = waveY - amp - 10;
+            var gradBottom = waveY + amp + 80;
+            var grad = ctx.createLinearGradient(0, gradTop, 0, gradBottom);
             grad.addColorStop(0, 'rgba(0,0,0,0)');
-            grad.addColorStop(0.25, 'rgba(0,0,0,0)');
-            grad.addColorStop(0.55, 'rgba(0,0,0,0.10)');
+            grad.addColorStop(0.3, 'rgba(0,0,0,0)');
+            grad.addColorStop(0.6, 'rgba(0,0,0,0.10)');
             grad.addColorStop(1, 'rgba(0,0,0,0)');
             ctx.fillStyle = grad;
-            ctx.fillRect(0, gY1, w, gY2 - gY1);
+            ctx.fillRect(0, gradTop, w, gradBottom - gradTop);
             ctx.restore();
 
-            // ---- Luminous crest line (soft glow) ----
+            // ---- Luminous crest highlight ----
             ctx.beginPath();
-            var steps2 = Math.max(2, Math.floor(w / 2));
-            var phaseBase2 = eased * Math.PI * 1.8;
-            for (var i = 0; i <= steps2; i++) {
-              var x = (i / steps2) * w;
-              var phase = (i / steps2) * Math.PI * 2 * freq + phaseBase2;
-              var y = waveY
-                    + Math.sin(phase) * amp
-                    + Math.sin(phase * 2.3) * amp * 0.25
-                    + Math.sin(phase * 4.7) * amp * 0.1;
+            for (var i = 0; i <= steps; i++) {
+              var x = (i / steps) * w;
+              var phase = (i / steps) * Math.PI * 2 * freq + phaseShift;
+              var yOffset = 0;
+              for (var j = 0; j < harmonics.length; j++) {
+                yOffset += Math.sin(phase * harmonics[j].mult) * amp * harmonics[j].amp;
+              }
+              var y = waveY + yOffset;
               if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
             }
-            ctx.strokeStyle = 'rgba(255,255,255,0.22)';
-            ctx.lineWidth = 1.6;
+            ctx.strokeStyle = 'rgba(255,255,255,0.20)';
+            ctx.lineWidth = 1.4;
             ctx.stroke();
 
-            // ---- Fine highlight hairline ----
+            // ---- Fine highlight hairline (Apple crispness) ----
             ctx.beginPath();
-            for (var i = 0; i <= steps2; i++) {
-              var x = (i / steps2) * w;
-              var phase = (i / steps2) * Math.PI * 2 * freq + phaseBase2;
-              var y = waveY
-                    + Math.sin(phase) * amp
-                    + Math.sin(phase * 2.3) * amp * 0.25
-                    + Math.sin(phase * 4.7) * amp * 0.1 - 1.2;
+            for (var i = 0; i <= steps; i++) {
+              var x = (i / steps) * w;
+              var phase = (i / steps) * Math.PI * 2 * freq + phaseShift;
+              var yOffset = 0;
+              for (var j = 0; j < harmonics.length; j++) {
+                yOffset += Math.sin(phase * harmonics[j].mult) * amp * harmonics[j].amp;
+              }
+              var y = waveY + yOffset - 1.0;
               if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
             }
-            ctx.strokeStyle = 'rgba(255,255,255,0.40)';
-            ctx.lineWidth = 0.6;
+            ctx.strokeStyle = 'rgba(255,255,255,0.38)';
+            ctx.lineWidth = 0.5;
             ctx.stroke();
 
             if (raw < 1) {
@@ -667,21 +694,22 @@
       };
 
       /* ==========================================================
-         ★ Module: Dark Mode — with bidirectional wave
+         Module: Dark Mode — toggles body class then triggers wave
          ========================================================== */
       var DarkMode = {
         toggle: function() {
-          var isCurrentlyDark = document.body.classList.contains('dark');
-          // Capture old background BEFORE switching
-          var oldBg = getComputedStyle(document.body).getPropertyValue('--bg').trim() || (isCurrentlyDark ? '#0d1117' : '#fff');
-          // Switch theme class
-          var isDark = !isCurrentlyDark;
-          document.body.classList.toggle('dark', isDark);
-          try { localStorage.setItem(CFG.DARK_MODE_KEY, String(isDark)); } catch (e) {}
-          // ★ Directional wave: dark‑mode‑on → wave flows down; dark‑mode‑off → wave flows up
-          var direction = isDark ? 'down' : 'up';
-          ThemeWave.animate(oldBg, direction);
+          // Capture old background colour before switching
+          var oldBg = getComputedStyle(document.body).getPropertyValue('--bg').trim()
+                   || (document.body.classList.contains('dark') ? '#0d1117' : '#fff');
+
+          // Toggle the theme class
+          document.body.classList.toggle('dark');
+          try { localStorage.setItem(CFG.DARK_MODE_KEY, String(document.body.classList.contains('dark'))); } catch (e) {}
+
+          // ★ Always sweep top‑to‑bottom with the OLD colour as the wave curtain
+          ThemeWave.animate(oldBg);
         },
+
         restore: function() {
           try {
             if (localStorage.getItem(CFG.DARK_MODE_KEY) === 'true') document.body.classList.add('dark');
@@ -880,9 +908,9 @@
           sb.insertBefore(h, nav);
           DOM.sidebarSearchBtn = document.getElementById('sidebarSearchBtn'); DOM.sidebarCloseBtn = document.getElementById('sidebarCloseBtn');
           DOM.sidebarFilterInput = document.getElementById('sidebarFilterInput'); DOM.sidebarBrand = document.getElementById('sidebarBrand');
-          this._bind();
+          this._bindHeaderEvents();
         },
-        _bind: function() {
+        _bindHeaderEvents: function() {
           if (DOM.sidebarCloseBtn) DOM.sidebarCloseBtn.addEventListener('click', function() { document.body.classList.add('close'); });
           if (DOM.sidebarSearchBtn && DOM.sidebarFilterInput && DOM.sidebarBrand) { DOM.sidebarSearchBtn.addEventListener('click', function() { if (DOM.sidebarFilterInput.classList.contains('show')) { DOM.sidebarFilterInput.classList.remove('show'); DOM.sidebarBrand.classList.remove('hidden'); DOM.sidebarFilterInput.value = ''; Sidebar.filter(''); } else { DOM.sidebarFilterInput.classList.add('show'); DOM.sidebarBrand.classList.add('hidden'); DOM.sidebarFilterInput.focus(); } }); }
           if (DOM.sidebarFilterInput) { DOM.sidebarFilterInput.addEventListener('input', function() { Sidebar.filter(this.value); }); DOM.sidebarFilterInput.addEventListener('keydown', function(e) { if (e.key === 'Escape') { this.value = ''; Sidebar.filter(''); this.classList.remove('show'); if (DOM.sidebarBrand) DOM.sidebarBrand.classList.remove('hidden'); } }); }
@@ -900,18 +928,17 @@
           this._autoExpand();
         },
         _sort: function(uls) {
-          // ★ "首页" always first, then folders, then alphabetical
-          var pinned = '首页';
-          var sf = function(a, b) {
+          var PINNED = '首页';
+          var sorter = function(a, b) {
             var aT = (a.textContent || '').trim(), bT = (b.textContent || '').trim();
-            if (aT === pinned) return -1;
-            if (bT === pinned) return 1;
+            if (aT === PINNED) return -1;
+            if (bT === PINNED) return 1;
             var aD = !!a.querySelector('ul'), bD = !!b.querySelector('ul');
             if (aD && !bD) return -1;
             if (!aD && bD) return 1;
             return aT.localeCompare(bT, 'en');
           };
-          uls.forEach(function(ul) { var its = Array.from(ul.children).filter(function(c) { return c.tagName === 'LI'; }); its.sort(sf); its.forEach(function(li) { ul.appendChild(li); }); });
+          uls.forEach(function(ul) { var its = Array.from(ul.children).filter(function(c) { return c.tagName === 'LI'; }); its.sort(sorter); its.forEach(function(li) { ul.appendChild(li); }); });
         },
         _expand: function(li, cu) { if (state.currentOpenFolderUl && state.currentOpenFolderUl !== cu) { state.currentOpenFolderUl.classList.remove('expanded'); var pl = state.currentOpenFolderUl.parentNode; if (pl) pl.classList.remove('expanded'); } cu.classList.add('expanded'); li.classList.add('expanded'); state.currentOpenFolderUl = cu; },
         _collapse: function(li, cu) { cu.classList.remove('expanded'); li.classList.remove('expanded'); if (state.currentOpenFolderUl === cu) state.currentOpenFolderUl = null; },
@@ -920,17 +947,17 @@
       };
 
       /* ==========================================================
-         Module: Keyboard
+         Module: Keyboard Shortcuts
          ========================================================== */
       var Keyboard = {
         init: function() { document.addEventListener('keydown', this._handler); },
-        _handler: function(e) { var tag = (e.target.tagName || '').toLowerCase(), isInput = tag === 'input' || tag === 'textarea' || e.target.isContentEditable; if (e.key === 'Escape') { Search.close(); Keyboard._cShortcuts(); if (DOM.tocPanel) DOM.tocPanel.classList.remove('visible'); if (DOM.tocToggleBtn) DOM.tocToggleBtn.classList.remove('active'); } if ((e.ctrlKey || e.metaKey) && e.key === 'k') { e.preventDefault(); Search.open(); return; } if ((e.ctrlKey || e.metaKey) && e.key === 'b') { e.preventDefault(); document.body.classList.toggle('close'); return; } if ((e.ctrlKey || e.metaKey) && e.key === 'd') { e.preventDefault(); DarkMode.toggle(); return; } if ((e.ctrlKey || e.metaKey) && e.key === 'ArrowUp') { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); return; } if (e.key === '/' && !isInput) { e.preventDefault(); Search.open(); return; } if (e.key === '?' && !isInput) { e.preventDefault(); Keyboard._oShortcuts(); return; } },
-        _oShortcuts: function() { if (DOM.shortcutsPanel) DOM.shortcutsPanel.classList.add('active'); },
-        _cShortcuts: function() { if (DOM.shortcutsPanel) DOM.shortcutsPanel.classList.remove('active'); }
+        _handler: function(e) { var tag = (e.target.tagName || '').toLowerCase(), isInput = tag === 'input' || tag === 'textarea' || e.target.isContentEditable; if (e.key === 'Escape') { Search.close(); Keyboard._closeShortcuts(); if (DOM.tocPanel) DOM.tocPanel.classList.remove('visible'); if (DOM.tocToggleBtn) DOM.tocToggleBtn.classList.remove('active'); } if ((e.ctrlKey || e.metaKey) && e.key === 'k') { e.preventDefault(); Search.open(); return; } if ((e.ctrlKey || e.metaKey) && e.key === 'b') { e.preventDefault(); document.body.classList.toggle('close'); return; } if ((e.ctrlKey || e.metaKey) && e.key === 'd') { e.preventDefault(); DarkMode.toggle(); return; } if ((e.ctrlKey || e.metaKey) && e.key === 'ArrowUp') { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); return; } if (e.key === '/' && !isInput) { e.preventDefault(); Search.open(); return; } if (e.key === '?' && !isInput) { e.preventDefault(); Keyboard._openShortcuts(); return; } },
+        _openShortcuts: function() { if (DOM.shortcutsPanel) DOM.shortcutsPanel.classList.add('active'); },
+        _closeShortcuts: function() { if (DOM.shortcutsPanel) DOM.shortcutsPanel.classList.remove('active'); }
       };
 
       /* ==========================================================
-         Scroll Handler
+         Global Scroll Handler
          ========================================================== */
       function onScroll() { ProgressBar.update(); BackToTop.update(); clearTimeout(state.scrollTimer); state.scrollTimer = setTimeout(function() { ReadingPosition.save(); }, CFG.SCROLL_SAVE_DEBOUNCE); TOC.highlight(); }
 
@@ -943,12 +970,14 @@
         setTimeout(function() { Sidebar.initFolders(); TOC.generate(); ProgressBar.update(); HeadingAnchors.add(); ReadingPosition.restore(); CodeBlock.addLineNumbers(); }, 250);
         setTimeout(function() { Loader.showError(); }, CFG.LOADING_ERROR_DELAY);
       }
+
       function onPageSwitch() {
         var nav = document.querySelector('.sidebar-nav'); var unfreeze = nav ? freezeTransitions(nav) : function() {};
         ReadingPosition.save(); DocTitle.update(); ReadingTime.update(); Search.close(); CodeBlock.enhance(); TOC.clear(); Sidebar.reset();
         setTimeout(function() { Sidebar.initFolders(); TOC.generate(); ProgressBar.update(); HeadingAnchors.add(); CodeBlock.addLineNumbers(); Lightbox.bindImages(); unfreeze(); setTimeout(function() { ReadingPosition.restore(); }, CFG.DOM_RESTORE_DELAY); }, 150);
         if (window.MathJax && typeof window.MathJax.typesetPromise === 'function') window.MathJax.typesetPromise();
       }
+
       function _bindGlobalEvents() {
         if (DOM.capsuleSidebarBtn) DOM.capsuleSidebarBtn.addEventListener('click', function() { document.body.classList.remove('close'); });
         if (DOM.capsuleSearchBtn) DOM.capsuleSearchBtn.addEventListener('click', Search.open);
@@ -964,10 +993,18 @@
       }
 
       /* ==========================================================
-         Docsify Config
+         Docsify & MathJax Config
          ========================================================== */
-      window.$docsify = { name: 'Soren的知识库', loadSidebar: '_sidebar.md', subMaxLevel: 0, basePath: CFG.BASE_PATH, homepage: 'README.md', notFoundPage: true, plugins: [function(hook) { hook.ready(onPageReady); hook.doneEach(onPageSwitch); }] };
-      window.MathJax = { tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [['$$','$$'],['\\[','\\]']], processEscapes: true }, options: { skipHtmlTags: ['script','noscript','style','textarea','pre','code'], ignoreHtmlClass: 'tex2jax_ignore', processHtmlClass: 'tex2jax_process' } };
+      window.$docsify = {
+        name: 'Soren的知识库', loadSidebar: '_sidebar.md', subMaxLevel: 0,
+        basePath: CFG.BASE_PATH, homepage: 'README.md', notFoundPage: true,
+        plugins: [function(hook) { hook.ready(onPageReady); hook.doneEach(onPageSwitch); }]
+      };
+
+      window.MathJax = {
+        tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [['$$','$$'],['\\[','\\]']], processEscapes: true },
+        options: { skipHtmlTags: ['script','noscript','style','textarea','pre','code'], ignoreHtmlClass: 'tex2jax_ignore', processHtmlClass: 'tex2jax_process' }
+      };
     })();
   </script>
 
