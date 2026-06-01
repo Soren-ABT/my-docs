@@ -26,20 +26,28 @@
       --shadow: rgba(0,0,0,0.06);
       --shadow-lg: rgba(0,0,0,0.12);
       --accent: #c9a962;
-      --accent-light: rgba(201,169,98,0.15);
+      --accent-light: rgba(201,169,98,0.12);
       --code-bg: #f8f9fa;
       --code-border: rgba(0,0,0,0.06);
       --header-bg: rgba(255,255,255,0.85);
       --sidebar-bg: #f5f5f5;
       --sidebar-active: rgba(0,0,0,0.08);
+      --sidebar-hover: rgba(0,0,0,0.04);
+      --folder-expanded-bg: rgba(201,169,98,0.06);
       --progress-bg: #f1c40f;
       --modal-bg: #fff;
       --modal-overlay: rgba(0,0,0,0.3);
       --search-highlight: #b9f6ca;
+      --search-selected: #e8f5e9;
       --btn-hover: rgba(0,0,0,0.06);
       --toc-bg: rgba(255,255,255,0.95);
       --scrollbar-thumb: #c0c0c0;
       --scrollbar-track: transparent;
+      --toast-bg: #333;
+      --toast-text: #fff;
+      --loader-bg: rgba(255,255,255,0.15);
+      --loader-tri-stroke: #666;
+      --loader-tri-fill: #f1c40f;
     }
 
     body.dark {
@@ -54,20 +62,28 @@
       --shadow: rgba(0,0,0,0.3);
       --shadow-lg: rgba(0,0,0,0.5);
       --accent: #f1c40f;
-      --accent-light: rgba(241,196,15,0.15);
+      --accent-light: rgba(241,196,15,0.12);
       --code-bg: #0d1b2a;
       --code-border: #1b2838;
       --header-bg: rgba(26,26,46,0.88);
       --sidebar-bg: #16213e;
       --sidebar-active: rgba(255,255,255,0.08);
+      --sidebar-hover: rgba(255,255,255,0.04);
+      --folder-expanded-bg: rgba(241,196,15,0.06);
       --progress-bg: #f1c40f;
       --modal-bg: #16213e;
       --modal-overlay: rgba(0,0,0,0.6);
       --search-highlight: #3d5a1e;
+      --search-selected: #2a3a1e;
       --btn-hover: rgba(255,255,255,0.08);
       --toc-bg: rgba(26,26,46,0.95);
       --scrollbar-thumb: #3a3a5a;
       --scrollbar-track: #1a1a2e;
+      --toast-bg: #f0f0f0;
+      --toast-text: #1a1a2e;
+      --loader-bg: rgba(26,26,46,0.15);
+      --loader-tri-stroke: #888;
+      --loader-tri-fill: #f1c40f;
     }
 
     /* ============================================================
@@ -77,47 +93,59 @@
     body {
       background: var(--bg);
       color: var(--text);
+      margin: 0; padding: 0;
       transition: background 0.3s, color 0.3s;
       scroll-behavior: smooth;
     }
-
-    /* 自定义滚动条 */
     ::-webkit-scrollbar { width: 6px; }
     ::-webkit-scrollbar-track { background: var(--scrollbar-track); }
     ::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 3px; }
 
     /* ============================================================
-       毛玻璃加载遮罩
+       毛玻璃加载遮罩（三角形 + 3D 鼠标交互）
        ============================================================ */
     #loading {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: var(--header-bg);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
+      background: var(--loader-bg);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
       z-index: 99999; display: flex; flex-direction: column;
       align-items: center; justify-content: center;
-      transition: opacity 0.5s ease; perspective: 600px;
+      transition: opacity 0.5s ease; perspective: 800px;
     }
     #loading.fade-out { opacity: 0; pointer-events: none; }
     .loader-wrapper {
       display: flex; flex-direction: column; align-items: center; justify-content: center;
-      transform-style: preserve-3d; transition: transform 0.1s ease;
+      transform-style: preserve-3d;
+      transition: transform 0.12s ease-out;
     }
+    /* 三角形尺寸加大：100px → 比原来 80px 大 25% */
     .loader-triangle {
-      width: 80px; height: 80px; margin-bottom: 1.5rem;
-      filter: drop-shadow(0 0 8px rgba(255,255,255,0.1)) drop-shadow(0 0 2px rgba(0,0,0,0.2));
+      width: 100px; height: 100px; margin-bottom: 1.6rem;
+      transform-style: preserve-3d;
+      transition: filter 0.12s ease-out;
     }
     .loader-triangle svg { width: 100%; height: 100%; }
-    .loader-triangle .tri-bg { fill: none; stroke: var(--text-muted); stroke-width: 4; stroke-linejoin: round; }
+    .loader-triangle .tri-bg {
+      fill: none; stroke: var(--loader-tri-stroke);
+      stroke-width: 6;   /* 加粗：原来 4 → 6 */
+      stroke-linejoin: round;
+      opacity: 0.7;
+    }
     .loader-triangle .tri-progress {
-      fill: none; stroke: var(--progress-bg); stroke-width: 5;
+      fill: none; stroke: var(--loader-tri-fill);
+      stroke-width: 7;   /* 加粗：原来 5 → 7 */
       stroke-linecap: round; stroke-linejoin: round;
-      stroke-dasharray: 8 112; animation: dashRhythm 2s cubic-bezier(0.45,0.05,0.55,0.95) infinite;
+      stroke-dasharray: 10 110; animation: dashRhythm 2s cubic-bezier(0.45,0.05,0.55,0.95) infinite;
+      filter: drop-shadow(0 0 6px rgba(241,196,15,0.4));
     }
     @keyframes dashRhythm { 0% { stroke-dashoffset: 0; } 100% { stroke-dashoffset: -120; } }
-    .loading-text { color: var(--text-secondary); font-size: 0.9rem; letter-spacing: 1px; }
+    .loading-text {
+      color: #4a4a4a; font-size: 0.9rem; letter-spacing: 2px; font-weight: 300;
+    }
+    body.dark .loading-text { color: #aaa; }
     .loading-error {
-      display: none; margin-top: 1rem; font-size: 0.8rem; color: #c0392b;
+      display: none; margin-top: 1rem; font-size: 0.78rem; color: #e74c3c;
       text-align: center; max-width: 320px; line-height: 1.6;
     }
     .loading-error.show { display: block; }
@@ -133,6 +161,36 @@
     }
 
     /* ============================================================
+       Toast 通知容器
+       ============================================================ */
+    #toast-container {
+      position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%);
+      z-index: 10050; display: flex; flex-direction: column-reverse;
+      align-items: center; gap: 8px; pointer-events: none;
+    }
+    .toast {
+      padding: 10px 22px; border-radius: 20px;
+      background: var(--toast-bg); color: var(--toast-text);
+      font-size: 0.85rem; font-weight: 500; letter-spacing: 0.3px;
+      box-shadow: 0 8px 30px var(--shadow-lg);
+      pointer-events: auto;
+      animation: toastIn 0.35s cubic-bezier(0.22,0.61,0.36,1),
+                 toastOut 0.3s 2s cubic-bezier(0.55,0.06,0.68,0.19) forwards;
+      display: flex; align-items: center; gap: 8px;
+      white-space: nowrap;
+    }
+    .toast.success { border-left: 3px solid #27ae60; }
+    .toast.info { border-left: 3px solid var(--accent); }
+    @keyframes toastIn {
+      0% { opacity: 0; transform: translateY(20px) scale(0.9); }
+      100% { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    @keyframes toastOut {
+      0% { opacity: 1; transform: translateY(0) scale(1); }
+      100% { opacity: 0; transform: translateY(-10px) scale(0.9); }
+    }
+
+    /* ============================================================
        侧边栏
        ============================================================ */
     .sidebar {
@@ -145,7 +203,6 @@
     .sidebar.close { transform: translateX(-100%); }
     .sidebar-toggle { display: none !important; }
 
-    /* 侧边栏头部 */
     .sidebar-header {
       display: flex; align-items: center; padding: 12px 12px;
       border-bottom: 1px solid var(--border); gap: 6px;
@@ -153,20 +210,18 @@
     }
     .sidebar-brand {
       font-size: 1.05rem; font-weight: 600; color: var(--text);
-      white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1;
-      min-width: 0;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1; min-width: 0;
     }
     .sidebar-brand.hidden { display: none; }
     .sidebar-filter-input {
       flex: 1; padding: 5px 8px; border: 1px solid var(--border); border-radius: 6px;
       background: var(--bg); color: var(--text); font-size: 0.82rem; outline: none; display: none;
-      transition: border 0.2s; min-width: 0;
+      min-width: 0; transition: border 0.2s;
     }
     .sidebar-filter-input:focus { border-color: var(--accent); }
     .sidebar-filter-input.show { display: block; }
     .sidebar-actions { display: flex; align-items: center; gap: 2px; flex-shrink: 0; }
 
-    /* 图标按钮 */
     .icon-btn {
       background: none; border: none; cursor: pointer;
       width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;
@@ -176,7 +231,9 @@
     .icon-btn:hover { background: var(--btn-hover); color: var(--text); }
     .icon-btn svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; }
 
-    /* 侧边栏条目 */
+    /* ============================================================
+       侧边栏条目
+       ============================================================ */
     .sidebar-nav { padding: 4px 0; }
     .sidebar-nav li { list-style: none; margin: 1px 0; }
     .sidebar-nav a {
@@ -184,42 +241,68 @@
       color: var(--text); text-decoration: none; transition: background 0.15s;
       font-size: 0.9rem;
     }
-    .sidebar-nav a:hover { background: var(--btn-hover); }
+    .sidebar-nav a:hover { background: var(--sidebar-hover); }
     .sidebar-nav .active > a { background: var(--sidebar-active); font-weight: 500; color: var(--accent); }
     .sidebar-nav li.filtered-out { display: none !important; }
 
-    /* 文件夹条目 —— + 号紧挨文字右侧 */
+    /* 文件夹 —— 胶囊式手风琴 */
     .folder-item {
-      display: flex !important;
-      flex-wrap: wrap;
-      align-items: center;
+      display: flex !important; flex-wrap: wrap; align-items: center;
     }
-    .folder-item > a,
-    .folder-item > .folder-label {
-      flex: 0 1 auto;
-      max-width: calc(100% - 26px);
-      display: block; padding: 7px 0 7px 14px; border-radius: 8px;
+    .folder-label {
+      flex: 1 1 auto;
+      display: flex !important; align-items: center; gap: 8px;
+      padding: 7px 12px; border-radius: 8px;
       color: var(--text); cursor: pointer; font-size: 0.9rem;
-      text-decoration: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      text-decoration: none; transition: all 0.2s;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      user-select: none; min-width: 0;
     }
-    .folder-item > a:hover,
-    .folder-item > .folder-label:hover { background: var(--btn-hover); }
+    .folder-label:hover { background: var(--sidebar-hover); }
+    .folder-item.expanded > .folder-label {
+      background: var(--folder-expanded-bg);
+      color: var(--accent); font-weight: 500;
+    }
+    .folder-arrow {
+      flex-shrink: 0; width: 16px; height: 16px;
+      display: flex; align-items: center; justify-content: center;
+      transition: transform 0.3s cubic-bezier(0.45,0.05,0.55,0.95);
+      color: var(--text-muted);
+    }
+    .folder-item.expanded > .folder-label .folder-arrow {
+      transform: rotate(90deg); color: var(--accent);
+    }
+    .folder-arrow svg {
+      width: 14px; height: 14px; stroke: currentColor; fill: none;
+      stroke-width: 2.5; stroke-linecap: round;
+    }
     .folder-item > ul { flex-basis: 100%; width: 100%; }
-    .folder-toggle {
-      font-size: 13px; font-weight: 600; color: var(--text-muted);
-      user-select: none; min-width: 20px; height: 20px; text-align: center;
-      flex-shrink: 0; cursor: pointer; line-height: 20px;
-      border-radius: 4px; transition: background 0.15s, color 0.15s;
-      display: inline-flex; align-items: center; justify-content: center;
-    }
-    .folder-toggle:hover { background: var(--btn-hover); color: var(--accent); }
     .sidebar-nav ul.sidebar-sub {
-      padding-left: 1.5rem;
+      padding-left: 1.2rem;
       max-height: 0; overflow: hidden;
-      transition: max-height 0.3s ease;
+      transition: max-height 0.35s cubic-bezier(0.45,0.05,0.55,0.95);
+      border-left: 1px solid transparent;
     }
-    .sidebar-nav ul.sidebar-sub.expanded { max-height: 600px; }
-    .sidebar-nav ul.sidebar-sub li a { font-size: 0.85rem; }
+    .sidebar-nav ul.sidebar-sub.expanded {
+      max-height: 600px;
+      border-left-color: var(--border);
+    }
+    .sidebar-nav ul.sidebar-sub li a { font-size: 0.85rem; padding: 5px 12px; }
+
+    /* ============================================================
+       标题锚点按钮
+       ============================================================ */
+    .heading-anchor {
+      display: inline-block; opacity: 0; margin-left: 6px;
+      color: var(--accent); cursor: pointer; font-size: 1rem;
+      transition: opacity 0.2s; vertical-align: middle;
+      text-decoration: none; user-select: none;
+    }
+    .markdown-section h1:hover .heading-anchor,
+    .markdown-section h2:hover .heading-anchor,
+    .markdown-section h3:hover .heading-anchor,
+    .markdown-section h4:hover .heading-anchor { opacity: 1; }
+    .heading-anchor:hover { transform: scale(1.2); }
 
     /* ============================================================
        文档固定抬头
@@ -253,7 +336,6 @@
     body.close .doc-header-left { padding-left: 68px; }
     .capsule .icon-btn { width: 28px; height: 28px; border-radius: 50%; }
 
-    /* 暗色图标切换 */
     #darkModeBtn .sun-icon, #darkModeBtn .moon-icon { transition: transform 0.4s; }
     body:not(.dark) #darkModeBtn .moon-icon { display: none; }
     body.dark #darkModeBtn .sun-icon { display: none; }
@@ -262,36 +344,36 @@
        Markdown 文档区域 —— 居中浏览
        ============================================================ */
     .markdown-section {
-      padding-top: 56px !important;
-      padding-left: 24px !important;
-      padding-right: 24px !important;
-      max-width: 860px;
-      margin: 0 auto;
-    }
-    /* 代码块内边距不叠加 */
-    .markdown-section .code-block-wrapper pre {
-      padding: 1.2rem 1.5rem;
+      padding: 72px 28px 40px !important;
+      max-width: 860px; margin: 0 auto;
     }
 
     /* ============================================================
-       回到顶部按钮
+       回到顶部按钮（含进度环）
        ============================================================ */
     #backToTop {
       position: fixed; bottom: 28px; right: 28px; z-index: 998;
-      width: 40px; height: 40px; border-radius: 50%;
+      width: 44px; height: 44px; border-radius: 50%;
       background: var(--accent); color: #1a1a1a; border: none;
       cursor: pointer; display: flex; align-items: center; justify-content: center;
-      box-shadow: 0 4px 14px var(--shadow-lg);
+      box-shadow: 0 4px 16px var(--shadow-lg);
       opacity: 0; transform: translateY(20px);
       transition: opacity 0.3s, transform 0.3s;
-      pointer-events: none;
+      pointer-events: none; position: relative;
     }
     #backToTop.visible { opacity: 1; transform: translateY(0); pointer-events: auto; }
-    #backToTop:hover { transform: translateY(-3px); box-shadow: 0 6px 20px var(--shadow-lg); }
+    #backToTop:hover { transform: translateY(-3px); box-shadow: 0 6px 22px var(--shadow-lg); }
     #backToTop svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2.5; }
+    #backToTop::before {
+      content: ''; position: absolute; inset: -3px; border-radius: 50%;
+      background: conic-gradient(var(--progress-bg) var(--scroll-pct, 0%), transparent var(--scroll-pct, 0%));
+      mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #fff calc(100% - 3px));
+      -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #fff calc(100% - 3px));
+      opacity: 0.6; transition: opacity 0.3s;
+    }
 
     /* ============================================================
-       页面内目录 (TOC) 浮动面板
+       页面内目录 (TOC)
        ============================================================ */
     #toc-panel {
       position: fixed; right: 16px; top: 80px; z-index: 997;
@@ -319,7 +401,6 @@
     #toc-panel a.toc-h2 { padding-left: 8px; font-weight: 500; }
     #toc-panel a.toc-h3 { padding-left: 18px; font-size: 0.76rem; }
     #toc-panel a.toc-h4 { padding-left: 28px; font-size: 0.73rem; }
-
     #tocToggleBtn { position: relative; }
     #tocToggleBtn.active { color: var(--accent); }
 
@@ -358,11 +439,17 @@
     .search-result-item {
       padding: 12px 18px; cursor: pointer; border-bottom: 1px solid var(--border-light);
       color: var(--text); font-size: 0.9rem; line-height: 1.5;
+      transition: background 0.15s;
     }
     .search-result-item:hover { background: var(--btn-hover); }
+    .search-result-item.selected { background: var(--search-selected); border-left: 3px solid var(--accent); }
     .search-result-item mark { background: var(--search-highlight); border-radius: 2px; color: var(--text); }
     .search-no-results { padding: 28px; text-align: center; color: var(--text-muted); }
     .search-result-title { font-weight: 600; margin-bottom: 4px; color: var(--accent); }
+    .search-hint {
+      padding: 8px 18px; font-size: 0.75rem; color: var(--text-muted);
+      border-bottom: 1px solid var(--border-light);
+    }
 
     /* ============================================================
        键盘快捷键面板
@@ -392,7 +479,7 @@
     }
 
     /* ============================================================
-       代码块卡片 + 语法高亮
+       代码块卡片 + Prism 语法高亮
        ============================================================ */
     .code-block-wrapper {
       margin: 1.6rem 0; border-radius: 10px; overflow: hidden;
@@ -423,14 +510,11 @@
       font-size: 0.88rem; line-height: 1.7;
     }
 
-    /* ============================================================
-       Prism 语法高亮 —— 亮色主题
-       ============================================================ */
+    /* ---- Prism 亮色 ---- */
     .markdown-section .token.comment,
     .markdown-section .token.prolog,
     .markdown-section .token.doctype,
     .markdown-section .token.cdata { color: #6a737d; font-style: italic; }
-    .markdown-section .token.namespace { opacity: 0.7; }
     .markdown-section .token.punctuation { color: #393a34; }
     .markdown-section .token.property,
     .markdown-section .token.tag,
@@ -460,9 +544,7 @@
     .markdown-section .token.bold { font-weight: 600; }
     .markdown-section .token.italic { font-style: italic; }
 
-    /* ============================================================
-       Prism 语法高亮 —— 暗色主题
-       ============================================================ */
+    /* ---- Prism 暗色 ---- */
     body.dark .markdown-section .token.comment,
     body.dark .markdown-section .token.prolog,
     body.dark .markdown-section .token.doctype,
@@ -492,13 +574,8 @@
     body.dark .markdown-section .token.regex,
     body.dark .markdown-section .token.important,
     body.dark .markdown-section .token.variable { color: #e36209; }
-
-    /* 暗色下代码块文字颜色 */
     body.dark .code-block-wrapper pre code { color: #d4d4d4; }
 
-    /* ============================================================
-       链接颜色
-       ============================================================ */
     .markdown-section a { color: var(--accent); }
     body.dark .markdown-section a { color: #f1c40f; }
 
@@ -508,10 +585,11 @@
     @media (max-width: 768px) {
       .sidebar { width: 100% !important; }
       .doc-header { left: 0 !important; }
-      .markdown-section { padding-left: 16px !important; padding-right: 16px !important; }
+      .markdown-section { padding: 72px 16px 40px !important; }
       #toc-panel { display: none !important; }
       #backToTop { bottom: 16px; right: 16px; }
       .search-modal { max-height: 85vh; border-radius: 16px; }
+      .loader-triangle { width: 76px; height: 76px; }
     }
   </style>
 </head>
@@ -519,7 +597,12 @@
   <!-- ========== 阅读进度条 ========== -->
   <div id="reading-progress"></div>
 
-  <!-- ========== 毛玻璃加载遮罩 ========== -->
+  <!-- ========== Toast 容器 ========== -->
+  <div id="toast-container"></div>
+
+  <!-- ============================================================
+       毛玻璃加载遮罩（三角形 + 3D 鼠标交互）
+       ============================================================ -->
   <div id="loading">
     <div class="loader-wrapper" id="loaderWrapper">
       <div class="loader-triangle" id="loaderTriangle">
@@ -528,11 +611,10 @@
           <polygon class="tri-progress" points="50,10 91.7,80 8.3,80" pathLength="120"/>
         </svg>
       </div>
-      <div class="loading-text">正在加载文档</div>
+      <div class="loading-text">LOADING</div>
     </div>
     <div class="loading-error" id="loadingError">
-      ⚠ 加载时间较长<br>请检查目录结构及 basePath 配置<br>
-      <small>确认 _sidebar.md / README.md 在仓库根目录</small>
+      ⚠ 加载时间较长<br>请检查目录结构及 basePath 配置
     </div>
   </div>
 
@@ -561,7 +643,7 @@
     </div>
   </div>
 
-  <!-- ========== 页面目录浮动面板 ========== -->
+  <!-- ========== TOC 面板 ========== -->
   <div id="toc-panel">
     <div class="toc-title">📑 本页目录</div>
     <div id="toc-content"></div>
@@ -582,11 +664,12 @@
           <svg width="20" height="20" viewBox="0 0 24 24" stroke="currentColor" fill="none"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
       </div>
+      <div class="search-hint" id="searchHint">↑↓ 导航 &nbsp; Enter 跳转 &nbsp; Esc 关闭</div>
       <div class="search-results" id="searchResults"></div>
     </div>
   </div>
 
-  <!-- ========== 键盘快捷键面板 ========== -->
+  <!-- ========== 快捷键面板 ========== -->
   <div id="shortcuts-panel">
     <div class="shortcuts-modal">
       <h3>⌨ 键盘快捷键</h3>
@@ -631,7 +714,7 @@
     window.$docsify = {
       name: 'Soren的知识库',
       loadSidebar: '_sidebar.md',
-      subMaxLevel: 0,            // ★ 侧边栏不展开页面内标题层级
+      subMaxLevel: 0,
       basePath: DOCSIFY_BASE_PATH,
       homepage: 'README.md',
       notFoundPage: true,
@@ -648,6 +731,7 @@
               initSidebarFolders();
               generateTOC();
               updateProgressBar();
+              addHeadingAnchors();
             }, 250);
           });
 
@@ -661,6 +745,7 @@
               initSidebarFolders();
               generateTOC();
               updateProgressBar();
+              addHeadingAnchors();
             }, 200);
             if (window.MathJax && typeof MathJax.typesetPromise === 'function') {
               MathJax.typesetPromise();
@@ -671,7 +756,48 @@
     };
 
     // ============================================================
-    // 加载遮罩
+    // === Toast 通知系统 =========================================
+    // ============================================================
+    function showToast(msg, type) {
+      type = type || 'info';
+      var container = document.getElementById('toast-container');
+      if (!container) return;
+      var toast = document.createElement('div');
+      toast.className = 'toast ' + type;
+      toast.textContent = msg;
+      container.appendChild(toast);
+      setTimeout(function() { if (toast.parentNode) toast.remove(); }, 2400);
+    }
+
+    // ============================================================
+    // === 3D 鼠标交互（三角形） ===================================
+    // ============================================================
+    (function initLoader3D() {
+      var wrapper = document.getElementById('loaderWrapper');
+      var triangle = document.getElementById('loaderTriangle');
+      if (!wrapper || !triangle) return;
+
+      var maxAngle = 15; // 旋转幅度
+      var baseFilter = 'drop-shadow(0 0 8px rgba(255,255,255,0.1)) drop-shadow(0 0 2px rgba(0,0,0,0.2))';
+
+      function handleMouse(e) {
+        if (_loaded) return; // 已加载完成则忽略
+        var dx = (e.clientX - window.innerWidth / 2) / (window.innerWidth / 2);
+        var dy = (e.clientY - window.innerHeight / 2) / (window.innerHeight / 2);
+        // 三角形绕 X/Y 轴旋转，幅度 maxAngle
+        wrapper.style.transform = 'rotateX(' + (-dy * maxAngle) + 'deg) rotateY(' + (dx * maxAngle) + 'deg) translateZ(20px)';
+        // 阴影随光源偏移模拟光照
+        triangle.style.filter = baseFilter +
+          ' drop-shadow(' + (dx * 12) + 'px ' + (dy * 12) + 'px 14px rgba(0,0,0,0.35))' +
+          ' drop-shadow(' + (-dx * 4) + 'px ' + (-dy * 4) + 'px 8px rgba(241,196,15,0.25))';
+      }
+
+      document.addEventListener('mousemove', handleMouse);
+      window._loaderMouse = handleMouse;
+    })();
+
+    // ============================================================
+    // 加载遮罩关闭
     // ============================================================
     var _loaded = false;
     function hideLoading() {
@@ -681,15 +807,17 @@
       var dh = document.getElementById('docHeader');
       if (el) { el.classList.add('fade-out'); setTimeout(function() { if (el) el.style.display = 'none'; }, 500); }
       if (dh) dh.style.display = 'flex';
-      if (window._loaderMouse) { document.removeEventListener('mousemove', window._loaderMouse); window._loaderMouse = null; }
+      if (window._loaderMouse) {
+        document.removeEventListener('mousemove', window._loaderMouse);
+        window._loaderMouse = null;
+      }
     }
-    // 5 秒后显示排查提示（不强制关闭遮罩）
     setTimeout(function() {
       if (!_loaded) { var err = document.getElementById('loadingError'); if (err) err.classList.add('show'); }
     }, 5000);
 
     // ============================================================
-    // 侧边栏头部（仅两个按钮：搜索=过滤切换，关闭）
+    // 侧边栏头部
     // ============================================================
     function injectSidebarHeader() {
       var sidebar = document.querySelector('.sidebar');
@@ -716,8 +844,6 @@
       var brand = document.getElementById('sidebarBrand');
 
       if (closeBtn) closeBtn.addEventListener('click', function() { document.body.classList.add('close'); });
-
-      // ★ 搜索按钮 → 切换过滤输入框（不再是全局搜索）
       if (searchBtn && filterInput && brand) {
         searchBtn.addEventListener('click', function() {
           if (filterInput.classList.contains('show')) {
@@ -741,61 +867,58 @@
     }
 
     // ============================================================
-    // 全局事件绑定
+    // 全局事件
     // ============================================================
     function bindGlobalEvents() {
-      // 胶囊按钮
       var cb1 = document.getElementById('capsuleSidebarBtn');
       var cb2 = document.getElementById('capsuleSearchBtn');
       if (cb1) cb1.addEventListener('click', function() { document.body.classList.remove('close'); });
-      if (cb2) cb2.addEventListener('click', openSearchModal);  // ★ 全局搜索仅通过胶囊按钮或快捷键
+      if (cb2) cb2.addEventListener('click', openSearchModal);
 
-      // 暗色模式
       var dmBtn = document.getElementById('darkModeBtn');
       if (dmBtn) {
         dmBtn.addEventListener('click', toggleDarkMode);
         if (localStorage.getItem('darkMode') === 'true') document.body.classList.add('dark');
       }
 
-      // TOC 切换
       var tocBtn = document.getElementById('tocToggleBtn');
       var tocPanel = document.getElementById('toc-panel');
       if (tocBtn && tocPanel) {
         tocBtn.addEventListener('click', function() {
-          tocPanel.classList.toggle('visible');
-          tocBtn.classList.toggle('active');
+          tocPanel.classList.toggle('visible'); tocBtn.classList.toggle('active');
         });
       }
 
-      // 回到顶部
       var btt = document.getElementById('backToTop');
       if (btt) btt.addEventListener('click', function() { window.scrollTo({ top: 0, behavior: 'smooth' }); });
 
-      // 滚动监听
       window.addEventListener('scroll', function() {
         updateProgressBar();
-        if (btt) btt.classList.toggle('visible', window.scrollY > 400);
+        if (btt) {
+          btt.classList.toggle('visible', window.scrollY > 400);
+          var pct = document.documentElement.scrollHeight - window.innerHeight;
+          var scrolled = pct > 0 ? Math.min(100, Math.round((window.scrollY / pct) * 100)) : 0;
+          btt.style.setProperty('--scroll-pct', scrolled + '%');
+        }
         updateTOCHighlight();
       });
 
-      // 搜索模态关闭
       var closeBtn = document.getElementById('searchModalClose');
       var overlay = document.getElementById('searchModalOverlay');
       if (closeBtn) closeBtn.addEventListener('click', closeSearchModal);
       if (overlay) overlay.addEventListener('click', function(e) { if (e.target === overlay) closeSearchModal(); });
 
-      // 搜索输入
       var searchInput = document.getElementById('searchModalInput');
-      if (searchInput) searchInput.addEventListener('input', function() {
-        highlightInDocument(this.value);
-        generateSearchResults(this.value);
-      });
+      if (searchInput) {
+        searchInput.addEventListener('input', function() {
+          highlightInDocument(this.value);
+          generateSearchResults(this.value);
+          _searchSelectedIdx = -1;
+        });
+        searchInput.addEventListener('keydown', handleSearchKeyboard);
+      }
 
-      // 键盘快捷键
-      document.addEventListener('keydown', handleKeyboardShortcuts);
-
-      // 加载动画 3D 交互
-      initLoaderMouse();
+      document.addEventListener('keydown', handleGlobalShortcuts);
     }
 
     // ============================================================
@@ -807,19 +930,17 @@
     }
 
     // ============================================================
-    // 键盘快捷键
+    // 全局快捷键
     // ============================================================
-    function handleKeyboardShortcuts(e) {
+    function handleGlobalShortcuts(e) {
       var tag = (e.target.tagName || '').toLowerCase();
       var isInput = tag === 'input' || tag === 'textarea' || e.target.isContentEditable;
 
       if (e.key === 'Escape') {
-        closeSearchModal();
-        closeShortcutsPanel();
+        closeSearchModal(); closeShortcutsPanel();
         var tp = document.getElementById('toc-panel'); if (tp) tp.classList.remove('visible');
         var tb = document.getElementById('tocToggleBtn'); if (tb) tb.classList.remove('active');
       }
-
       if ((e.ctrlKey || e.metaKey) && e.key === 'k') { e.preventDefault(); openSearchModal(); return; }
       if ((e.ctrlKey || e.metaKey) && e.key === 'b') { e.preventDefault(); document.body.classList.toggle('close'); return; }
       if ((e.ctrlKey || e.metaKey) && e.key === 'd') { e.preventDefault(); toggleDarkMode(); return; }
@@ -829,6 +950,35 @@
 
     function openShortcutsPanel() { var p = document.getElementById('shortcuts-panel'); if (p) p.classList.add('active'); }
     function closeShortcutsPanel() { var p = document.getElementById('shortcuts-panel'); if (p) p.classList.remove('active'); }
+
+    // ============================================================
+    // 搜索键盘导航
+    // ============================================================
+    var _searchSelectedIdx = -1;
+    function handleSearchKeyboard(e) {
+      var items = document.querySelectorAll('.search-result-item');
+      if (!items.length) return;
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        _searchSelectedIdx = Math.min(_searchSelectedIdx + 1, items.length - 1);
+        updateSearchSelection(items);
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        _searchSelectedIdx = Math.max(_searchSelectedIdx - 1, 0);
+        updateSearchSelection(items);
+      } else if (e.key === 'Enter') {
+        e.preventDefault();
+        if (_searchSelectedIdx >= 0 && items[_searchSelectedIdx]) {
+          items[_searchSelectedIdx].click();
+        }
+      }
+    }
+    function updateSearchSelection(items) {
+      items.forEach(function(item, i) {
+        item.classList.toggle('selected', i === _searchSelectedIdx);
+        if (i === _searchSelectedIdx) item.scrollIntoView({ block: 'nearest' });
+      });
+    }
 
     // ============================================================
     // 阅读进度条
@@ -857,7 +1007,37 @@
     }
 
     // ============================================================
-    // 页面内目录 (TOC)
+    // 标题锚点复制
+    // ============================================================
+    function addHeadingAnchors() {
+      var container = document.querySelector('.markdown-section');
+      if (!container) return;
+      container.querySelectorAll('h1, h2, h3, h4').forEach(function(h) {
+        if (h.querySelector('.heading-anchor')) return;
+        if (!h.id) h.id = 'heading-' + Math.random().toString(36).substr(2, 8);
+        var a = document.createElement('a');
+        a.className = 'heading-anchor';
+        a.innerHTML = '🔗';
+        a.title = '复制此节链接';
+        a.href = 'javascript:void(0)';
+        a.addEventListener('click', function(e) {
+          e.preventDefault(); e.stopPropagation();
+          var url = window.location.origin + window.location.pathname + '?id=' + h.id + '#' + h.id;
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(url).then(function() { showToast('✓ 链接已复制', 'success'); });
+          } else {
+            var ta = document.createElement('textarea'); ta.value = url;
+            ta.style.cssText = 'position:fixed;left:-9999px';
+            document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+            showToast('✓ 链接已复制', 'success');
+          }
+        });
+        h.appendChild(a);
+      });
+    }
+
+    // ============================================================
+    // TOC
     // ============================================================
     function generateTOC() {
       var container = document.querySelector('.markdown-section');
@@ -877,11 +1057,9 @@
       var html = '';
       headings.forEach(function(h, i) {
         if (!h.id) h.id = 'toc-' + i;
-        var level = h.tagName.toLowerCase();
-        html += '<a href="#' + h.id + '" class="toc-' + level + '" data-target="' + h.id + '">' + h.textContent.trim() + '</a>';
+        html += '<a href="#' + h.id + '" class="toc-' + h.tagName.toLowerCase() + '" data-target="' + h.id + '">' + h.textContent.trim() + '</a>';
       });
       tocContent.innerHTML = html;
-
       tocContent.querySelectorAll('a').forEach(function(a) {
         a.addEventListener('click', function(e) {
           e.preventDefault();
@@ -943,17 +1121,17 @@
         if (text.toLowerCase().indexOf(kw) !== -1 || childMatch) {
           li.classList.remove('filtered-out');
           if (childMatch && childUl && !childUl.classList.contains('expanded')) {
-            childUl.classList.add('expanded');
-            var icon = li.querySelector('.folder-toggle');
-            if (icon) icon.textContent = '−';
+            expandFolder(li, childUl);
           }
         } else { li.classList.add('filtered-out'); }
       });
     }
 
     // ============================================================
-    // 文件夹树（默认折叠，+ 号紧挨文字右侧，点击文字或 + 号展开）
+    // === 侧边栏文件夹 —— 手风琴 =================================
     // ============================================================
+    var _currentOpenFolderUl = null;
+
     function initSidebarFolders() {
       var nav = document.querySelector('.sidebar-nav');
       if (!nav) return;
@@ -965,7 +1143,6 @@
         } else { ul.classList.add('sidebar-sub'); }
       });
 
-      // 排序：文件夹优先
       function sortList(ul) {
         var items = Array.from(ul.children).filter(function(c) { return c.tagName === 'LI'; });
         items.sort(function(a, b) {
@@ -977,51 +1154,92 @@
       }
       allUls.forEach(sortList);
 
-      // 给文件夹 li 添加折叠图标
+      _currentOpenFolderUl = null;
+
       nav.querySelectorAll('li').forEach(function(li) {
         var childUl = li.querySelector('ul');
         if (!childUl) return;
-        if (li.querySelector('.folder-toggle')) return;
 
         li.classList.add('folder-item');
 
-        var link = li.querySelector(':scope > a');
-        var label;
-        if (link) {
-          label = link;
-          label.classList.add('folder-label');
-        } else {
-          label = document.createElement('span');
-          label.className = 'folder-label';
-          var firstText = '';
-          for (var i = 0; i < li.childNodes.length; i++) {
-            if (li.childNodes[i].nodeType === 3 && li.childNodes[i].textContent.trim()) {
-              firstText = li.childNodes[i].textContent.trim(); break;
+        var label = li.querySelector(':scope > .folder-label');
+        if (!label) {
+          var link = li.querySelector(':scope > a');
+          if (link) {
+            label = link;
+            label.classList.add('folder-label');
+            label.setAttribute('href', 'javascript:void(0)');
+            label.removeAttribute('target');
+          } else {
+            label = document.createElement('span');
+            label.className = 'folder-label';
+            var ft = '';
+            for (var i = 0; i < li.childNodes.length; i++) {
+              if (li.childNodes[i].nodeType === 3 && li.childNodes[i].textContent.trim()) {
+                ft = li.childNodes[i].textContent.trim(); break;
+              }
             }
+            label.textContent = ft || 'Folder';
+            li.insertBefore(label, li.firstChild);
           }
-          label.textContent = firstText || 'Folder';
         }
 
-        var icon = document.createElement('span');
-        icon.className = 'folder-toggle';
-        icon.textContent = '+';  // ★ 默认折叠
-        li.appendChild(icon);
+        var arrow = label.querySelector('.folder-arrow');
+        if (!arrow) {
+          arrow = document.createElement('span');
+          arrow.className = 'folder-arrow';
+          arrow.innerHTML = '<svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>';
+          label.appendChild(arrow);
+        }
 
-        // ★ 点击文字或 + 号都能展开/折叠
-        function toggle(e) {
-          if (e.target.tagName === 'A' && e.target !== label && e.target.closest('ul') === childUl) return;
+        label.onclick = function(e) {
           e.preventDefault(); e.stopPropagation();
-          var expanded = childUl.classList.contains('expanded');
-          if (expanded) { childUl.classList.remove('expanded'); icon.textContent = '+'; }
-          else { childUl.classList.add('expanded'); icon.textContent = '−'; }
-        }
-        icon.addEventListener('click', toggle);
-        label.addEventListener('click', toggle);
+          if (childUl.classList.contains('expanded')) {
+            collapseFolder(li, childUl);
+          } else {
+            expandFolder(li, childUl);
+          }
+        };
       });
+
+      autoExpandActiveFolder();
+    }
+
+    function expandFolder(li, childUl) {
+      if (_currentOpenFolderUl && _currentOpenFolderUl !== childUl) {
+        var prevLi = _currentOpenFolderUl.parentNode;
+        if (prevLi) {
+          _currentOpenFolderUl.classList.remove('expanded');
+          prevLi.classList.remove('expanded');
+        }
+      }
+      childUl.classList.add('expanded');
+      li.classList.add('expanded');
+      _currentOpenFolderUl = childUl;
+    }
+
+    function collapseFolder(li, childUl) {
+      childUl.classList.remove('expanded');
+      li.classList.remove('expanded');
+      if (_currentOpenFolderUl === childUl) _currentOpenFolderUl = null;
+    }
+
+    function autoExpandActiveFolder() {
+      var activeLink = document.querySelector('.sidebar-nav .active > a');
+      if (!activeLink) return;
+      var parent = activeLink.closest('.folder-item');
+      if (!parent) {
+        var parentUl = activeLink.closest('ul.sidebar-sub');
+        if (parentUl) parent = parentUl.closest('.folder-item');
+      }
+      if (parent) {
+        var childUl = parent.querySelector(':scope > ul');
+        if (childUl) expandFolder(parent, childUl);
+      }
     }
 
     // ============================================================
-    // 代码块增强（卡片 + 复制 + 语法高亮保持）
+    // 代码块增强
     // ============================================================
     function enhanceCodeBlocks() {
       document.querySelectorAll('.markdown-section pre').forEach(function(pre) {
@@ -1040,6 +1258,7 @@
           var text = pre.textContent || '';
           var done = function() {
             btn.classList.add('copied'); btn.innerHTML = '✓ Copied';
+            showToast('✓ 代码已复制', 'success');
             setTimeout(function() {
               btn.classList.remove('copied');
               btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy';
@@ -1078,6 +1297,7 @@
       if (input) { input.value = ''; input.focus(); }
       if (results) results.innerHTML = '';
       clearHighlights();
+      _searchSelectedIdx = -1;
     }
 
     function closeSearchModal() {
@@ -1086,6 +1306,7 @@
       if (overlay) overlay.classList.remove('active');
       if (results) results.innerHTML = '';
       clearHighlights();
+      _searchSelectedIdx = -1;
     }
 
     function clearHighlights() {
@@ -1105,10 +1326,9 @@
       var walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT, {
         acceptNode: function(n) {
           if (!n.textContent || !n.textContent.trim()) return NodeFilter.FILTER_REJECT;
-          var p = n.parentNode;
-          if (!p) return NodeFilter.FILTER_REJECT;
+          var p = n.parentNode; if (!p) return NodeFilter.FILTER_REJECT;
           if (p.tagName === 'SCRIPT' || p.tagName === 'STYLE') return NodeFilter.FILTER_REJECT;
-          if (p.closest && (p.closest('.search-modal') || p.closest('.code-copy-btn') || p.closest('#toc-panel'))) return NodeFilter.FILTER_REJECT;
+          if (p.closest && (p.closest('.search-modal') || p.closest('.code-copy-btn') || p.closest('#toc-panel') || p.closest('.heading-anchor'))) return NodeFilter.FILTER_REJECT;
           return NodeFilter.FILTER_ACCEPT;
         }
       });
@@ -1145,7 +1365,7 @@
       var esc = keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), regex = new RegExp(esc, 'gi'), seen = new Set(), count = 0;
 
       blocks.forEach(function(block) {
-        if (block.closest('pre') || block.closest('.code-block-wrapper') || block.closest('#toc-panel')) return;
+        if (block.closest('pre') || block.closest('.code-block-wrapper') || block.closest('#toc-panel') || block.closest('.heading-anchor')) return;
         if (seen.has(block)) return;
         var text = block.textContent || ''; regex.lastIndex = 0;
         if (!regex.test(text)) return;
@@ -1172,24 +1392,6 @@
       var prev = el.previousElementSibling;
       while (prev) { if (/^H[1-6]$/.test(prev.tagName)) return prev; prev = prev.previousElementSibling; }
       return null;
-    }
-
-    // ============================================================
-    // 加载动画 3D 鼠标交互
-    // ============================================================
-    function initLoaderMouse() {
-      var wrapper = document.getElementById('loaderWrapper');
-      var triangle = document.getElementById('loaderTriangle');
-      if (!wrapper || !triangle) return;
-      var baseFilter = 'drop-shadow(0 0 8px rgba(255,255,255,0.1)) drop-shadow(0 0 2px rgba(0,0,0,0.2))';
-      function handleMouse(e) {
-        var dx = (e.clientX - window.innerWidth / 2) / (window.innerWidth / 2);
-        var dy = (e.clientY - window.innerHeight / 2) / (window.innerHeight / 2);
-        wrapper.style.transform = 'rotateX(' + (-dy * 8) + 'deg) rotateY(' + (dx * 8) + 'deg) translateZ(12px)';
-        triangle.style.filter = baseFilter + ' drop-shadow(' + (dx * 6) + 'px ' + (dy * 6) + 'px 6px rgba(0,0,0,0.3))';
-      }
-      document.addEventListener('mousemove', handleMouse);
-      window._loaderMouse = handleMouse;
     }
 
     // ============================================================
