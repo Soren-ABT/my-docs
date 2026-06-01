@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>全站搜索 - Soren的知识库</title>
+  <style>
+    :root {
+      --bg: #0d1117; --surface: #161b22; --surface-elevated: #21262d;
+      --text: #c9d1d9; --text-secondary: #8b949e; --text-muted: #6e7681;
+      --border: #30363d; --accent: #3fb950; --accent-dim: rgba(63,185,80,0.15);
+      --search-bg: rgba(22,27,34,0.85); --shadow: rgba(0,0,0,0.5);
+      --highlight: #3d5a1e; --overlay: rgba(0,0,0,0.55);
+      --kbd-bg: #21262d; --kbd-border: #30363d;
+    }
+    body.light {
+      --bg: #fff; --surface: #f5f5f5; --surface-elevated: #fafafa;
+      --text: #333; --text-secondary: #666; --text-muted: #999;
+      --border: #e0e0e0; --accent: #27ae60; --accent-dim: rgba(39,174,96,0.12);
+      --search-bg: rgba(255,255,255,0.88); --shadow: rgba(0,0,0,0.12);
+      --highlight: #c8e6c9; --overlay: rgba(255,255,255,0.55);
+      --kbd-bg: #f0f0f0; --kbd-border: #d0d0d0;
+    }
+
+    *,*::before,*::after{box-sizing:border-box}
+    body {
+      margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+      background:var(--bg);color:var(--text);min-height:100vh;
+      transition:background .35s,color .35s;
+    }
+
+    /* ---- Background Image Layer ---- */
+    #bg-layer {
+      position:fixed;inset:0;z-index:0;pointer-events:none;
+      background-size:cover;background-position:center;background-repeat:no-repeat;
+      opacity:0.28;filter:blur(2px) saturate(0.6);
+      transition:opacity .6s;
+    }
+    #bg-overlay {position:fixed;inset:0;z-index:1;pointer-events:none;background:var(--overlay)}
+
+    /* ---- Main Layout ---- */
+    #app {position:relative;z-index:2;min-height:100vh;display:flex;flex-direction:column;align-items:center}
+    .search-hero {width:100%;max-width:720px;padding:10vh 24px 0;display:flex;flex-direction:column;align-items:center}
+    .brand {font-size:1.8rem;font-weight:700;letter-spacing:1px;margin-bottom:.5rem;color:var(--text)}
+    .brand span {color:var(--accent)}
+    .subtitle {font-size:.85rem;color:var(--text-secondary);margin-bottom:2rem}
+
+    /* ---- Search Box ---- */
+    .search-box-wrapper {width:100%;position:relative;margin-bottom:1rem}
+    .search-box {
+      width:100%;padding:16px 56px 16px 22px;border-radius:16px;
+      border:2px solid var(--border);background:var(--search-bg);
+      backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+      font-size:1.1rem;color:var(--text);outline:none;
+      transition:border-color .25s,box-shadow .25s;
+      box-shadow:0 8px 32px var(--shadow);
+    }
+    .search-box:focus {border-color:var(--accent);box-shadow:0 8px 40px var(--shadow),0 0 0 4px var(--accent-dim)}
+    .search-box::placeholder {color:var(--text-muted)}
+    .search-clear {
+      position:absolute;right:16px;top:50%;transform:translateY(-50%);
+      background:none;border:none;cursor:pointer;color:var(--text-muted);
+      width:32px;height:32px;border-radius:50%;display:none;align-items:center;justify-content:center;
+      font-size:1.2rem;transition:background .15s;
+    }
+    .search-clear:hover {background:var(--kbd-bg);color:var(--text)}
+    .search-clear.visible {display:flex}
+
+    /* ---- Filter Bar ---- */
+    .filter-bar {display:flex;gap:8px;flex-wrap:wrap;width:100%;max-width:720px;padding:0 24px;margin-bottom:1.2rem;align-items:center;justify-content:center}
+    .filter-chip {
+      padding:6px 14px;border-radius:20px;border:1px solid var(--border);
+      background:var(--surface);color:var(--text-secondary);font-size:.78rem;
+      cursor:pointer;transition:all .2s;white-space:nowrap;
+    }
+    .filter-chip:hover {border-color:var(--accent);color:var(--text)}
+    .filter-chip.active {background:var(--accent-dim);border-color:var(--accent);color:var(--accent);font-weight:500}
+    .filter-chip .count {font-size:.7rem;opacity:.7;margin-left:4px}
+    .mode-label {font-size:.72rem;color:var(--text-muted);margin-right:4px}
+    .mode-chip {
+      padding:5px 10px;border-radius:16px;border:1px solid var(--border);
+      background:var(--surface);color:var(--text-muted);font-size:.72rem;
+      cursor:pointer;transition:all .2s;
+    }
+    .mode-chip:hover {border-color:var(--accent);color:var(--text)}
+    .mode-chip.active {background:var(--accent-dim);border-color:var(--accent);color:var(--accent)}
+
+    /* ---- Results ---- */
+    .results-container {width:100%;max-width:720px;padding:0 24px 60px;flex:1}
+    .results-meta {font-size:.75rem;color:var(--text-muted);margin-bottom:1rem;display:flex;justify-content:space-between;align-items:center}
+    .result-card {
+      background:var(--surface);border:1px solid var(--border);border-radius:12px;
+      padding:16px 20px;margin-bottom:10px;cursor:pointer;
+      transition:border-color .2s,box-shadow .2s,transform .15s;
+      position:relative;
+    }
+    .result-card:hover {border-color:var(--accent);box-shadow:0 4px 20px var(--shadow);transform:translateY(-1px)}
+    .result-card .rc-path {font-size:.7rem;color:var(--text-muted);margin-bottom:4px;display:flex;align-items:center;gap:6px}
+    .result-card .rc-path .folder-tag {background:var(--accent-dim);color:var(--accent);padding:1px 8px;border-radius:10px;font-size:.68rem}
+    .result-card .rc-title {font-size:1rem;font-weight:600;color:var(--accent);margin-bottom:6px}
+    .result-card .rc-excerpt {font-size:.84rem;color:var(--text-secondary);line-height:1.55;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+    .result-card .rc-excerpt mark {background:var(--highlight);border-radius:2px;color:var(--text);padding:0 2px}
+    .result-card .rc-score {position:absolute;right:14px;top:14px;font-size:.65rem;color:var(--text-muted);font-family:'JetBrains Mono',monospace}
+
+    /* ---- Status Bar ---- */
+    .status-bar {width:100%;max-width:720px;padding:8px 24px;display:flex;justify-content:center;gap:16px;font-size:.7rem;color:var(--text-muted)}
+    .status-bar button {background:none;border:1px solid var(--border);color:var(--text-muted);padding:4px 12px;border-radius:6px;cursor:pointer;font-size:.7rem;transition:all .15s}
+    .status-bar button:hover {border-color:var(--accent);color:var(--accent)}
+    .progress-bar {width:180px;height:4px;background:var(--border);border-radius:2px;overflow:hidden}
+    .progress-bar .fill {height:100%;background:var(--accent);border-radius:2px;transition:width .3s}
+    .theme-toggle {position:fixed;top:18px;right:18px;z-index:10;background:var(--surface);border:1px solid var(--border);color:var(--text-secondary);width:38px;height:38px;border-radius:50%;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;transition:all .2s}
+    .theme-toggle:hover {border-color:var(--accent);color:var(--text)}
+
+    /* ---- Loading ---- */
+    .spinner {width:20px;height:20px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .6s linear infinite;display:inline-block}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .empty-state {text-align:center;padding:40px 20px;color:var(--text-muted)}
+    .empty-state svg {width:48px;height:48px;margin-bottom:12px;opacity:.4}
+    .empty-state .es-title {font-size:1rem;color:var(--text);margin-bottom:6px}
+    .empty-state .es-hint {font-size:.8rem}
+
+    @media(max-width:600px){
+      .search-hero{padding:6vh 16px 0}.brand{font-size:1.4rem}.search-box{padding:14px 46px 14px 16px;font-size:1rem}.result-card{padding:12px 14px}
+    }
+  </style>
+</head>
+<body>
+
+  <div id="bg-layer"></div>
+  <div id="bg-overlay"></div>
+  <button class="theme-toggle" id="themeToggle" title="切换主题" aria-label="切换亮暗主题">☀</button>
+
+  <div id="app">
+    <div class="search-hero">
+      <div class="brand">Soren的<span>知识库</span></div>
+      <div class="subtitle">全站离线搜索引擎 · TF‑IDF 索引</div>
+      <div class="search-box-wrapper">
+        <input type="text" class="search-box" id="searchInput" placeholder="输入关键词、/正则/ 或 ?模糊词…" autofocus aria-label="搜索">
+        <button class="search-clear" id="searchClear" aria-label="清除">&times;</button>
+      </div>
+    </div>
+
+    <div class="filter-bar" id="filterBar"></div>
+    <div class="status-bar" id="statusBar">
+      <span id="statusText">正在初始化索引…</span>
+      <div class="progress-bar" id="progressBar"><div class="fill" style="width:0%"></div></div>
+      <button id="rebuildBtn" style="display:none">重建索引</button>
+    </div>
+    <div class="results-container" id="resultsContainer">
+      <div class="results-meta" id="resultsMeta" style="display:none"></div>
+      <div id="resultsList"></div>
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      'use strict';
+
+      /* ==========================================================
+         Configuration
+         ========================================================== */
+      var CFG = {
+        INDEX_VERSION: 2,
+        STORAGE_KEY: 'kb_search_index',
+        DOC_LIST_CACHE_KEY: 'kb_doc_list',
+        SIDEBAR_FILE: '_sidebar.md',
+        README_FILE: 'README.md',
+        BASE_PATH_CANDIDATES: ['', '/my-docs/', '/'],
+        MAX_RESULTS: 30,
+        FUZZY_MIN_RESULTS: 3,
+        FUZZY_MAX_EDIT: 2,
+        MIN_WORD_LEN: 2,
+        CHINESE_NGRAM: 2,
+        DEBOUNCE_MS: 220,
+        FETCH_CONCURRENCY: 8,
+        FETCH_TIMEOUT: 12000,
+        STOP_WORDS_CN: new Set(['的','了','在','是','我','有','和','就','不','人','都','一','一个','上','也','很','到','说','要','去','你','会','着','没有','看','好','自己','这','他','她','它','们','那','些','什么','吗','被','把','让','从','因为','所以','但是','可以','这个','那个','如果','虽然','而且','或者','还是','已经','之后','之前','然后','等','等等','与','及','对','向','用','能','能够','不能','应该','需要','可能','会','不会','知道','想','觉得','认为','希望','喜欢','开始','结束','进行','通过','其他','每个','所有','任何','不同','一样','如何','怎么','为什么','哪','哪里','哪个','谁','多少','时候','时间','现在','今天','明天','昨天']),
+        STOP_WORDS_EN: new Set(['the','a','an','is','are','was','were','be','been','being','have','has','had','having','do','does','did','doing','will','would','shall','should','may','might','must','can','could','i','me','my','we','our','you','your','he','him','his','she','her','it','its','they','them','their','this','that','these','those','am','no','not','nor','too','very','of','in','to','for','with','on','at','from','by','about','as','into','through','during','before','after','above','below','up','down','out','off','over','under','again','further','then','once','here','there','when','where','why','how','all','both','each','few','more','most','other','some','such','only','own','same','so','than','just','but','and','or','if','while','because','until','although','etc','eg','ie','vs','per','via'])
+      };
+
+      /* ==========================================================
+         State
+         ========================================================== */
+      var state = {
+        indexReady: false,
+        indexBuilding: false,
+        indexVersion: 0,
+        docs: [],
+        invIndex: {},
+        idf: {},
+        folderMap: {},
+        totalWords: 0,
+        activeFolder: '',
+        searchMode: 'smart',
+        queryTimer: null,
+        currentQuery: ''
+      };
+
+      /* ==========================================================
+         DOM References
+         ========================================================== */
+      var DOM = {};
+      function cacheDOM() {
+        DOM.bgLayer=document.getElementById('bg-layer');DOM.searchInput=document.getElementById('searchInput');
+        DOM.searchClear=document.getElementById('searchClear');DOM.filterBar=document.getElementById('filterBar');
+        DOM.statusText=document.getElementById('statusText');DOM.progressBar=document.getElementById('progressBar');
+        DOM.rebuildBtn=document.getElementById('rebuildBtn');DOM.resultsMeta=document.getElementById('resultsMeta');
+        DOM.resultsList=document.getElementById('resultsList');DOM.themeToggle=document.getElementById('themeToggle');
+        DOM.resultsContainer=document.getElementById('resultsContainer');DOM.statusBar=document.getElementById('statusBar');
+        DOM.progressFill=DOM.progressBar?DOM.progressBar.querySelector('.fill'):null;
+      }
+
+      /* ==========================================================
+         Utility Functions
+         ========================================================== */
+      function escHTML(str) {var d=document.createElement('div');d.textContent=str;return d.innerHTML;}
+      function normalize(s){return(s||'').toLowerCase().replace(/\s+/g,' ').trim();}
+      function isChinese(c){var code=c.charCodeAt(0);return code>=0x4e00&&code<=0x9fff;}
+
+      /* Detect basePath by probing README.md */
+      function detectBasePath(cb) {
+        var idx=0;
+        function tryNext() {
+          if (idx>=CFG.BASE_PATH_CANDIDATES.length) {cb(CFG.BASE_PATH_CANDIDATES[CFG.BASE_PATH_CANDIDATES.length-1]);return;}
+          var bp=CFG.BASE_PATH_CANDIDATES[idx];var url=bp+CFG.README_FILE;
+          fetch(url,{method:'HEAD'}).then(function(r){if(r.ok){cb(bp);return;}idx++;tryNext();}).catch(function(){idx++;tryNext();});
+        }
+        tryNext();
+      }
+
+      /* Levenshtein distance (capped) */
+      function levenshtein(a,b,max){
+        if(Math.abs(a.length-b.length)>max)return max+1;
+        if(a===b)return 0;
+        var v0=[],v1=[],i,j;
+        for(i=0;i<=b.length;i++)v0[i]=i;
+        for(i=0;i<a.length;i++){v1[0]=i+1;var minInRow=v1[0];
+          for(j=0;j<b.length;j++){var cost=a[i]===b[j]?0:1;v1[j+1]=Math.min(v1[j]+1,v0[j+1]+1,v0[j]+cost);if(v1[j+1]<minInRow)minInRow=v1[j+1];}
+          if(minInRow>max)return max+1;var tmp=v0;v0=v1;v1=tmp;
+        }
+        return v0[b.length];
+      }
+
+      /* ==========================================================
+         Tokeniser (Chinese 2-gram + English word split)
+         ========================================================== */
+      function tokenise(text) {
+        var tokens=[],s=text||'';
+        var enWords=s.match(/[a-zA-Z0-9]+/g)||[];
+        for(var i=0;i<enWords.length;i++){var w=enWords[i].toLowerCase();if(w.length>=CFG.MIN_WORD_LEN&&!CFG.STOP_WORDS_EN.has(w))tokens.push(w);}
+        var cnSegments=s.match(/[\u4e00-\u9fff]+/g)||[];
+        for(var i=0;i<cnSegments.length;i++){var seg=cnSegments[i];
+          if(seg.length<=CFG.CHINESE_NGRAM){if(!CFG.STOP_WORDS_CN.has(seg))tokens.push(seg);continue;}
+          for(var j=0;j<=seg.length-CFG.CHINESE_NGRAM;j++){var gram=seg.substring(j,j+CFG.CHINESE_NGRAM);if(!CFG.STOP_WORDS_CN.has(gram))tokens.push(gram);}
+          for(var j=0;j<seg.length;j++){var ch=seg[j];if(!CFG.STOP_WORDS_CN.has(ch))tokens.push(ch);}
+        }
+        return tokens;
+      }
+
+      function tokeniseForQuery(text) {
+        var tokens=[],s=text||'';
+        if(/^\/.*\/[a-z]*$/.test(s.trim()))return null;
+        var enWords=s.match(/[a-zA-Z0-9]+/g)||[];
+        for(var i=0;i<enWords.length;i++){var w=enWords[i].toLowerCase();if(w.length>=1)tokens.push(w);}
+        var cnSegments=s.match(/[\u4e00-\u9fff]+/g)||[];
+        for(var i=0;i<cnSegments.length;i++){var seg=cnSegments[i];
+          for(var j=0;j<=seg.length-CFG.CHINESE_NGRAM;j++)tokens.push(seg.substring(j,j+CFG.CHINESE_NGRAM));
+          for(var j=0;j<seg.length;j++)tokens.push(seg[j]);
+        }
+        if(tokens.length===0&&s.trim())tokens.push(s.trim().toLowerCase());
+        return tokens;
+      }
+
+      /* ==========================================================
+         Index Construction
+         ========================================================== */
+      function buildIndex(docList, onProgress, onDone) {
+        state.indexBuilding=true;state.docs=[];state.invIndex={};state.idf={};state.folderMap={};state.totalWords=0;
+        var total=docList.length,completed=0,failed=[];
+        if(total===0){onDone([]);return;}
+
+        var fetchedDocs=[];
+        function processNextBatch(startIdx) {
+          var endIdx=Math.min(startIdx+CFG.FETCH_CONCURRENCY,total);
+          var promises=[];
+          for(var i=startIdx;i<endIdx;i++){(function(docIdx){
+            var doc=docList[docIdx],url=doc.path;
+            promises.push(
+              fetch(url,{signal:AbortSignal.timeout?AbortSignal.timeout(CFG.FETCH_TIMEOUT):null})
+                .then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.text();})
+                .then(function(text){fetchedDocs[docIdx]={path:doc.path,title:doc.title,folder:doc.folder,text:text};})
+                .catch(function(err){failed.push({path:doc.path,error:err.message});fetchedDocs[docIdx]=null;})
+            );
+          })(i);}
+          return Promise.allSettled(promises).then(function(){
+            completed+=endIdx-startIdx;
+            if(onProgress)onProgress(Math.round(completed/total*100));
+            if(endIdx<total)return processNextBatch(endIdx);
+          });
+        }
+
+        processNextBatch(0).then(function(){
+          for(var i=0;i<fetchedDocs.length;i++){var d=fetchedDocs[i];if(!d)continue;var docId=state.docs.length;
+            var tokens=tokenise(d.text),tfMap={};
+            for(var j=0;j<tokens.length;j++){var t=tokens[j];tfMap[t]=(tfMap[t]||0)+1;}
+            state.totalWords+=tokens.length;
+            var folder=d.folder||'root';
+            if(!state.folderMap[folder])state.folderMap[folder]={count:0,docIds:[]};
+            state.folderMap[folder].count++;state.folderMap[folder].docIds.push(docId);
+            state.docs.push({id:docId,path:d.path,title:d.title,folder:folder,wordCount:tokens.length,terms:tfMap});
+            for(var t in tfMap){if(!state.invIndex[t])state.invIndex[t]=[];state.invIndex[t].push(docId);}
+          }
+          var N=state.docs.length;
+          for(var t in state.invIndex){state.idf[t]=Math.log((N-state.invIndex[t].length+0.5)/(state.invIndex[t].length+0.5)+1);}
+          state.indexVersion=CFG.INDEX_VERSION;state.indexReady=true;state.indexBuilding=false;
+          saveIndexToStorage();
+          if(onDone)onDone(failed);
+        }).catch(function(err){console.error('Index build error:',err);state.indexBuilding=false;if(onDone)onDone(failed);});
+      }
+
+      /* ==========================================================
+         Storage
+         ========================================================== */
+      function saveIndexToStorage() {
+        try {
+          var data={version:CFG.INDEX_VERSION,timestamp:Date.now(),docs:[],idf:state.idf,folderMap:{}};
+          for(var i=0;i<state.docs.length;i++){data.docs.push({id:state.docs[i].id,path:state.docs[i].path,title:state.docs[i].title,folder:state.docs[i].folder,wordCount:state.docs[i].wordCount,terms:state.docs[i].terms});}
+          for(var f in state.folderMap){data.folderMap[f]={count:state.folderMap[f].count};}
+          var json=JSON.stringify(data);
+          localStorage.setItem(CFG.STORAGE_KEY,json);
+        } catch(e) {console.warn('Failed to save index to localStorage:',e.message);}
+      }
+
+      function loadIndexFromStorage() {
+        try {
+          var raw=localStorage.getItem(CFG.STORAGE_KEY);if(!raw)return null;
+          var data=JSON.parse(raw);if(data.version!==CFG.INDEX_VERSION)return null;
+          return data;
+        } catch(e) {return null;}
+      }
+
+      function restoreIndexFromData(data) {
+        state.docs=data.docs;state.idf=data.idf;state.invIndex={};state.folderMap={};state.totalWords=0;
+        for(var i=0;i<state.docs.length;i++){var d=state.docs[i];state.totalWords+=d.wordCount||0;
+          var folder=d.folder||'root';if(!state.folderMap[folder])state.folderMap[folder]={count:0,docIds:[]};
+          state.folderMap[folder].count++;state.folderMap[folder].docIds.push(d.id);
+          for(var t in d.terms){if(!state.invIndex[t])state.invIndex[t]=[];state.invIndex[t].push(d.id);}
+        }
+        state.indexVersion=CFG.INDEX_VERSION;state.indexReady=true;
+      }
+
+      /* ==========================================================
+         Document List Discovery
+         ========================================================== */
+      function discoverDocs(basePath, cb) {
+        var sidebarUrl=basePath+CFG.SIDEBAR_FILE;
+        fetch(sidebarUrl).then(function(r){if(!r.ok)throw new Error('Sidebar not found');return r.text();}).then(function(text){
+          var docs=parseSidebar(text,basePath);
+          if(docs.length===0)docs=parseSidebarFallback(basePath);
+          cb(docs);
+        }).catch(function(){
+          cb(parseSidebarFallback(basePath));
+        });
+      }
+
+      function parseSidebar(text, basePath) {
+        var docs=[],lines=text.split('\n'),currentFolder='';
+        for(var i=0;i<lines.length;i++){
+          var line=lines[i].trim();if(!line)continue;
+          var linkMatch=line.match(/\[([^\]]+)\]\(([^)]+)\)/);
+          if(linkMatch){
+            var title=linkMatch[1],path=linkMatch[2];
+            if(path.startsWith('http://')||path.startsWith('https://')||path.startsWith('#')||path==='javascript:void(0)')continue;
+            var resolvedPath=resolvePath(path,basePath);
+            if(/\.(md|markdown|html|pdf|txt)$/i.test(resolvedPath)||resolvedPath.indexOf('#')===-1){
+              docs.push({path:adjustedFetchPath(resolvedPath,basePath),title:title,folder:currentFolder||'root'});
+            }
+            continue;
+          }
+          var headingMatch=line.match(/^[-*]\s+(.+)$/);
+          if(headingMatch&&!line.includes('[')&&!line.includes('(')){
+            var heading=headingMatch[1].trim();
+            if(!/^[-*]\s/.test(lines[i+1]||''))currentFolder=heading;
+          }
+        }
+        return docs;
+      }
+
+      function parseSidebarFallback(basePath) {
+        return [
+          {path:'README.md',title:'首页',folder:'root'},
+          {path:'files/complex-analysis/chapter2/U2.complex-analysis-review.md',title:'Chapter 2',folder:'Complex Analysis'},
+          {path:'files/research/From-0-to-1-Deep-Learning-Based-AMC.md',title:'From 0 to 1 DL-Based AMC',folder:'Research'},
+          {path:'files/papers/sample.pdf',title:'AMC Paper 1',folder:'Papers'},
+          {path:'files/notes/reading-notes.md',title:'Reading Notes',folder:'Notes'}
+        ];
+      }
+
+      function resolvePath(path, basePath) {
+        if(path.startsWith('/'))return path;
+        return basePath+path;
+      }
+
+      function adjustedFetchPath(resolvedPath, basePath) {
+        var cleanBase=basePath.replace(/\/+$/,'');
+        var cleanPath=resolvedPath.replace(/^\/+/,'');
+        return cleanBase+'/'+cleanPath;
+      }
+
+      /* ==========================================================
+         Search Engine
+         ========================================================== */
+      function search(query, folder, mode) {
+        if(!state.indexReady||!query.trim())return[];
+        var isRegex=false,isFuzzy=false;
+        var trimmed=query.trim();
+        if(/^\/.+\/[a-z]*$/.test(trimmed)){isRegex=true;
+          try{var regexParts=trimmed.match(/^\/(.+)\/([a-z]*)$/);return regexSearch(regexParts[1],regexParts[2]||'',folder);}
+          catch(e){return[];}
+        }
+        if(trimmed.startsWith('?')){isFuzzy=true;trimmed=trimmed.substring(1).trim();}
+        if(mode==='regex'){isRegex=true;try{return regexSearch(trimmed,'',folder);}catch(e){return[];}}
+        if(mode==='fuzzy'){isFuzzy=true;}
+
+        var queryTokens=tokeniseForQuery(trimmed);if(!queryTokens||queryTokens.length===0)return[];
+        return tfidfSearch(queryTokens,folder,isFuzzy||mode==='fuzzy');
+      }
+
+      function tfidfSearch(queryTokens, folder, fuzzy) {
+        var scores={},N=state.docs.length;
+        for(var i=0;i<queryTokens.length;i++){var qt=queryTokens[i];
+          var matchingTerms=[qt];
+          if(fuzzy){var candidates=findFuzzyTerms(qt,CFG.FUZZY_MAX_EDIT);for(var j=0;j<candidates.length;j++)matchingTerms.push(candidates[j]);}
+          for(var j=0;j<matchingTerms.length;j++){var term=matchingTerms[j],docIds=state.invIndex[term]||[];var idf=state.idf[term]||0;
+            for(var k=0;k<docIds.length;k++){var docId=docIds[k];if(folder&&state.docs[docId].folder!==folder)continue;
+              var tf=(state.docs[docId].terms[term]||0)/Math.max(1,state.docs[docId].wordCount);
+              if(!scores[docId])scores[docId]=0;scores[docId]+=tf*idf;
+            }
+          }
+        }
+        var ranked=[];for(var id in scores)ranked.push({docId:parseInt(id),score:scores[id]});
+        ranked.sort(function(a,b){return b.score-a.score;});var top=ranked.slice(0,CFG.MAX_RESULTS);
+        var results=[];
+        for(var i=0;i<top.length;i++){var d=state.docs[top[i].docId];results.push({doc:d,score:top[i].score.toFixed(4)});}
+        return results;
+      }
+
+      function findFuzzyTerms(term, maxEdit) {
+        var candidates=[],seen=new Set();seen.add(term);
+        for(var t in state.invIndex){if(seen.has(t))continue;if(levenshtein(term,t,maxEdit)<=maxEdit){candidates.push(t);seen.add(t);if(candidates.length>=8)break;}}
+        return candidates;
+      }
+
+      function regexSearch(pattern, flags, folder) {
+        var results=[],re;
+        try{re=new RegExp(pattern,flags||'gi');}catch(e){return[];}
+        for(var i=0;i<state.docs.length;i++){var d=state.docs[i];if(folder&&d.folder!==folder)continue;
+          re.lastIndex=0;var match=re.exec(d.text||'');if(match){results.push({doc:d,score:'regex',matchPos:match.index});}
+        }
+        return results;
+      }
+
+      /* ==========================================================
+         UI Rendering
+         ========================================================== */
+      function renderFilters() {
+        if(!DOM.filterBar)return;var folders=Object.keys(state.folderMap).sort();
+        var html='<span class="mode-label">模式:</span>';
+        var modes=[{k:'smart',l:'智能'},{k:'fuzzy',l:'模糊'},{k:'regex',l:'正则'}];
+        for(var i=0;i<modes.length;i++){html+='<button class="mode-chip'+(state.searchMode===modes[i].k?' active':'')+'" data-mode="'+modes[i].k+'">'+modes[i].l+'</button>';}
+        html+='<span style="margin-left:8px"></span>';
+        html+='<button class="filter-chip'+(state.activeFolder===''?' active':'')+'" data-folder="">全部 <span class="count">'+state.docs.length+'</span></button>';
+        for(var i=0;i<folders.length;i++){var f=folders[i],c=state.folderMap[f].count;
+          html+='<button class="filter-chip'+(state.activeFolder===f?' active':'')+'" data-folder="'+escHTML(f)+'">'+escHTML(f)+' <span class="count">'+c+'</span></button>';
+        }
+        DOM.filterBar.innerHTML=html;
+        DOM.filterBar.querySelectorAll('.filter-chip').forEach(function(btn){btn.addEventListener('click',function(){state.activeFolder=this.dataset.folder;renderFilters();doSearch();});});
+        DOM.filterBar.querySelectorAll('.mode-chip').forEach(function(btn){btn.addEventListener('click',function(){state.searchMode=this.dataset.mode;renderFilters();doSearch();});});
+      }
+
+      function renderStatus(text, progress) {
+        if(DOM.statusText)DOM.statusText.textContent=text;
+        if(DOM.progressFill)DOM.progressFill.style.width=(progress||0)+'%';
+      }
+
+      function doSearch() {
+        var q=DOM.searchInput.value;state.currentQuery=q;
+        clearTimeout(state.queryTimer);
+        state.queryTimer=setTimeout(function(){
+          var results=search(q,state.activeFolder,state.searchMode);
+          renderResults(results,q);
+        },CFG.DEBOUNCE_MS);
+      }
+
+      function renderResults(results, query) {
+        if(!DOM.resultsList||!DOM.resultsMeta)return;
+        if(results.length===0&&query.trim()){
+          DOM.resultsMeta.style.display='block';DOM.resultsMeta.innerHTML='<span>未找到匹配结果</span><span style="font-size:.7rem">尝试使用模糊搜索模式 (?关键词)</span>';
+          DOM.resultsList.innerHTML='<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg><div class="es-title">未找到结果</div><div class="es-hint">试试简化关键词，或在前面加 ? 启用模糊搜索</div></div>';return;
+        }
+        if(results.length===0){DOM.resultsMeta.style.display='none';DOM.resultsList.innerHTML='';return;}
+        DOM.resultsMeta.style.display='flex';DOM.resultsMeta.innerHTML='<span>'+results.length+' 个结果</span><span style="font-size:.7rem">TF‑IDF 排序</span>';
+        var html='';
+        for(var i=0;i<results.length;i++){var r=results[i],d=r.doc,excerpt=generateExcerpt(d,query);
+          html+='<div class="result-card" data-path="'+escHTML(d.path)+'" onclick="window.location.href=\''+escHTML(d.path)+'\'">';
+          html+='<div class="rc-path"><span class="folder-tag">'+escHTML(d.folder||'root')+'</span>'+escHTML(d.path)+'</div>';
+          html+='<div class="rc-title">'+escHTML(d.title||d.path)+'</div>';
+          html+='<div class="rc-excerpt">'+excerpt+'</div>';
+          if(r.score!=='regex')html+='<div class="rc-score">'+r.score+'</div>';
+          html+='</div>';
+        }
+        DOM.resultsList.innerHTML=html;
+      }
+
+      function generateExcerpt(doc, query) {
+        var text=doc.text||'';if(!text||!query.trim())return escHTML((text||'').substring(0,150)+'…');
+        var ql=query.trim().toLowerCase(),idx=text.toLowerCase().indexOf(ql);
+        if(idx===-1){
+          var tokens=tokeniseForQuery(ql)||[ql];
+          for(var i=0;i<tokens.length;i++){idx=text.toLowerCase().indexOf(tokens[i]);if(idx!==-1)break;}
+        }
+        if(idx===-1)idx=0;
+        var start=Math.max(0,idx-60),end=Math.min(text.length,idx+ql.length+120);
+        var excerpt=text.substring(start,end);
+        if(start>0)excerpt='…'+excerpt;if(end<text.length)excerpt=excerpt+'…';
+        excerpt=escHTML(excerpt);
+        var escQ=escHTML(ql);
+        try{excerpt=excerpt.replace(new RegExp('('+escQ.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','gi'),'<mark>$1</mark>');}catch(e){}
+        return excerpt;
+      }
+
+      /* ==========================================================
+         Background Image
+         ========================================================== */
+      function setBackground() {
+        var params=new URLSearchParams(window.location.search);
+        var bgUrl=params.get('bg')||'';
+        if(bgUrl){DOM.bgLayer.style.backgroundImage='url('+bgUrl+')';DOM.bgLayer.style.opacity='0.32';}
+      }
+
+      /* ==========================================================
+         Theme Toggle
+         ========================================================== */
+      function initTheme() {
+        var saved=localStorage.getItem('kb_search_theme');
+        if(saved==='light')document.body.classList.add('light');
+        if(DOM.themeToggle){DOM.themeToggle.textContent=document.body.classList.contains('light')?'☾':'☀';
+          DOM.themeToggle.addEventListener('click',function(){document.body.classList.toggle('light');var isLight=document.body.classList.contains('light');localStorage.setItem('kb_search_theme',isLight?'light':'dark');DOM.themeToggle.textContent=isLight?'☾':'☀';});
+        }
+      }
+
+      /* ==========================================================
+         Initialisation
+         ========================================================== */
+      function init() {
+        cacheDOM();setBackground();initTheme();
+        DOM.searchInput.addEventListener('input',function(){
+          DOM.searchClear.classList.toggle('visible',this.value.length>0);doSearch();
+        });
+        DOM.searchClear.addEventListener('click',function(){DOM.searchInput.value='';DOM.searchClear.classList.remove('visible');DOM.resultsList.innerHTML='';DOM.resultsMeta.style.display='none';});
+        DOM.rebuildBtn.addEventListener('click',function(){startIndexBuild();});
+        DOM.rebuildBtn.style.display='inline-block';
+
+        // Load cached index or build
+        var cached=loadIndexFromStorage();
+        if(cached){restoreIndexFromData(cached);renderStatus('已加载缓存索引 · '+state.docs.length+' 篇文档',100);renderFilters();
+          if(DOM.searchInput.value)doSearch();
+        }
+
+        detectBasePath(function(basePath){
+          renderStatus('正在获取文档列表…',10);
+          discoverDocs(basePath,function(docList){
+            if(!docList.length){renderStatus('未找到任何文档',0);return;}
+            // Check if cached index is still valid (same doc count & version)
+            var cachedNow=loadIndexFromStorage();
+            if(cachedNow&&cachedNow.docs.length===docList.length&&cachedNow.version===CFG.INDEX_VERSION){
+              restoreIndexFromData(cachedNow);renderStatus('索引就绪 · '+state.docs.length+' 篇文档',100);renderFilters();
+              if(!state.indexReady)startIndexBuildFromList(docList);
+              else if(DOM.searchInput.value)doSearch();
+              return;
+            }
+            startIndexBuildFromList(docList);
+          });
+        });
+      }
+
+      function startIndexBuildFromList(docList) {
+        renderStatus('正在构建索引 (0/'+docList.length+')…',0);
+        buildIndex(docList,function(progress){
+          renderStatus('正在构建索引 ('+Math.round(progress/100*docList.length)+'/'+docList.length+')…',progress);
+        },function(failed){
+          if(failed.length>0)console.warn('Failed to fetch some docs:',failed);
+          renderStatus('索引就绪 · '+state.docs.length+' 篇文档'+(failed.length?' ('+failed.length+' 失败)':''),100);
+          renderFilters();
+          if(DOM.searchInput.value)doSearch();
+        });
+      }
+
+      function startIndexBuild() {
+        detectBasePath(function(basePath){
+          renderStatus('正在获取文档列表…',5);
+          discoverDocs(basePath,function(docList){startIndexBuildFromList(docList);});
+        });
+      }
+
+      // Start
+      if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+    })();
+  </script>
+</body>
+</html>
