@@ -12,81 +12,54 @@
 
   <style>
     /* ============================================================
-       CSS 变量 —— 亮色 / 暗色双主题
+       CSS 变量
        ============================================================ */
     :root {
-      --bg: #fff;
-      --bg-secondary: #f5f5f5;
-      --bg-tertiary: #fafafa;
-      --text: #333;
-      --text-secondary: #666;
-      --text-muted: #999;
-      --border: #e0e0e0;
-      --border-light: rgba(0,0,0,0.06);
-      --shadow: rgba(0,0,0,0.06);
-      --shadow-lg: rgba(0,0,0,0.12);
-      --accent: #666;
-      --accent-light: rgba(0,0,0,0.06);
-      --code-bg: #f8f9fa;
-      --code-border: rgba(0,0,0,0.06);
+      --bg: #fff; --bg-secondary: #f5f5f5; --bg-tertiary: #fafafa;
+      --text: #333; --text-secondary: #666; --text-muted: #999;
+      --border: #e0e0e0; --border-light: rgba(0,0,0,0.06);
+      --shadow: rgba(0,0,0,0.06); --shadow-lg: rgba(0,0,0,0.12);
+      --accent: #666; --accent-light: rgba(0,0,0,0.06);
+      --code-bg: #f8f9fa; --code-border: rgba(0,0,0,0.06);
       --header-bg: rgba(255,255,255,0.88);
-      --sidebar-bg: #f7f7f7;
-      --sidebar-active: rgba(0,0,0,0.07);
-      --sidebar-hover: rgba(0,0,0,0.04);
-      --folder-open-bg: rgba(0,0,0,0.03);
+      --sidebar-bg: #f7f7f7; --sidebar-active: rgba(0,0,0,0.07);
+      --sidebar-hover: rgba(0,0,0,0.04); --folder-open-bg: rgba(0,0,0,0.03);
       --folder-open-border: #bbb;
-      --progress-bg: #888;
-      --modal-bg: #fff;
-      --modal-overlay: rgba(0,0,0,0.25);
-      --search-highlight: #c8e6c9;
-      --search-selected: #e8f5e9;
-      --btn-hover: rgba(0,0,0,0.06);
-      --toc-bg: rgba(255,255,255,0.95);
-      --scrollbar-thumb: #c0c0c0;
-      --scrollbar-track: transparent;
-      --toast-bg: #333;
-      --toast-text: #fff;
+      /* ★ 进度条改回绿色 */
+      --progress-color: #27ae60;
+      --progress-color-end: #2ecc71;
+      --modal-bg: #fff; --modal-overlay: rgba(0,0,0,0.25);
+      --search-highlight: #c8e6c9; --search-selected: #e8f5e9;
+      --btn-hover: rgba(0,0,0,0.06); --toc-bg: rgba(255,255,255,0.95);
+      --scrollbar-thumb: #c0c0c0; --scrollbar-track: transparent;
+      --toast-bg: #333; --toast-text: #fff;
       --loader-blur-bg: rgba(255,255,255,0.15);
       --loader-tri-stroke: #888;
-      --loader-tri-fill: #bbb;
+      /* ★ 三角形进度条改回黄色 */
+      --loader-tri-fill: #f1c40f;
       --loader-text: #888;
     }
-
     body.dark {
-      --bg: #1a1a2e;
-      --bg-secondary: #16213e;
-      --bg-tertiary: #0f3460;
-      --text: #e0e0e0;
-      --text-secondary: #b0b0b0;
-      --text-muted: #777;
-      --border: #2a2a4a;
-      --border-light: rgba(255,255,255,0.06);
-      --shadow: rgba(0,0,0,0.3);
-      --shadow-lg: rgba(0,0,0,0.5);
-      --accent: #aaa;
-      --accent-light: rgba(255,255,255,0.06);
-      --code-bg: #0d1b2a;
-      --code-border: #1b2838;
+      --bg: #1a1a2e; --bg-secondary: #16213e; --bg-tertiary: #0f3460;
+      --text: #e0e0e0; --text-secondary: #b0b0b0; --text-muted: #777;
+      --border: #2a2a4a; --border-light: rgba(255,255,255,0.06);
+      --shadow: rgba(0,0,0,0.3); --shadow-lg: rgba(0,0,0,0.5);
+      --accent: #aaa; --accent-light: rgba(255,255,255,0.06);
+      --code-bg: #0d1b2a; --code-border: #1b2838;
       --header-bg: rgba(26,26,46,0.9);
-      --sidebar-bg: #141d2b;
-      --sidebar-active: rgba(255,255,255,0.07);
-      --sidebar-hover: rgba(255,255,255,0.04);
-      --folder-open-bg: rgba(255,255,255,0.03);
+      --sidebar-bg: #141d2b; --sidebar-active: rgba(255,255,255,0.07);
+      --sidebar-hover: rgba(255,255,255,0.04); --folder-open-bg: rgba(255,255,255,0.03);
       --folder-open-border: #555;
-      --progress-bg: #888;
-      --modal-bg: #16213e;
-      --modal-overlay: rgba(0,0,0,0.6);
-      --search-highlight: #3d5a1e;
-      --search-selected: #2a3a1e;
-      --btn-hover: rgba(255,255,255,0.08);
-      --toc-bg: rgba(26,26,46,0.95);
-      --scrollbar-thumb: #3a3a5a;
-      --scrollbar-track: #1a1a2e;
-      --toast-bg: #e0e0e0;
-      --toast-text: #1a1a2e;
+      --progress-color: #27ae60;
+      --progress-color-end: #2ecc71;
+      --modal-bg: #16213e; --modal-overlay: rgba(0,0,0,0.6);
+      --search-highlight: #3d5a1e; --search-selected: #2a3a1e;
+      --btn-hover: rgba(255,255,255,0.08); --toc-bg: rgba(26,26,46,0.95);
+      --scrollbar-thumb: #3a3a5a; --scrollbar-track: #1a1a2e;
+      --toast-bg: #e0e0e0; --toast-text: #1a1a2e;
       --loader-blur-bg: rgba(26,26,46,0.15);
       --loader-tri-stroke: #999;
-      --loader-tri-fill: #ccc;
+      --loader-tri-fill: #f1c40f;
       --loader-text: #999;
     }
 
@@ -94,22 +67,18 @@
        全局
        ============================================================ */
     * { box-sizing: border-box; }
-    body {
-      background: var(--bg); color: var(--text); margin: 0; padding: 0;
-      transition: background 0.3s, color 0.3s; scroll-behavior: smooth;
-    }
+    body { background: var(--bg); color: var(--text); margin: 0; padding: 0; transition: background 0.3s, color 0.3s; scroll-behavior: smooth; }
     ::-webkit-scrollbar { width: 6px; }
     ::-webkit-scrollbar-track { background: var(--scrollbar-track); }
     ::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 3px; }
 
     /* ============================================================
-       毛玻璃加载遮罩 —— 硬朗 3D 三角形
+       毛玻璃加载遮罩 —— 黄色三角 + 硬朗 3D
        ============================================================ */
     #loading {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: var(--loader-blur-bg);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
+      backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
       z-index: 99999; display: flex; flex-direction: column;
       align-items: center; justify-content: center;
       transition: opacity 0.45s ease; perspective: 700px;
@@ -118,41 +87,31 @@
     .loader-wrapper {
       display: flex; flex-direction: column; align-items: center; justify-content: center;
       transform-style: preserve-3d;
-      /* ★ 去掉缓动 → 硬朗即时响应 */
     }
     .loader-triangle {
       width: 100px; height: 100px; margin-bottom: 1.6rem;
       transform-style: preserve-3d;
       filter: drop-shadow(0 0 4px rgba(0,0,0,0.15)) drop-shadow(0 0 1px rgba(0,0,0,0.3));
-      /* ★ 仅保留暗色阴影，无金色高光 */
     }
     .loader-triangle svg { width: 100%; height: 100%; }
-    .loader-triangle .tri-bg {
-      fill: none; stroke: var(--loader-tri-stroke); stroke-width: 6; stroke-linejoin: round; opacity: 0.65;
-    }
+    .loader-triangle .tri-bg { fill: none; stroke: var(--loader-tri-stroke); stroke-width: 6; stroke-linejoin: round; opacity: 0.65; }
     .loader-triangle .tri-progress {
       fill: none; stroke: var(--loader-tri-fill); stroke-width: 7;
       stroke-linecap: round; stroke-linejoin: round;
       stroke-dasharray: 10 110;
       animation: dashRhythm 2s cubic-bezier(0.45,0.05,0.55,0.95) infinite;
-      /* ★ 无发光滤镜 */
     }
     @keyframes dashRhythm { 0% { stroke-dashoffset: 0; } 100% { stroke-dashoffset: -120; } }
-    .loading-text {
-      color: var(--loader-text); font-size: 0.85rem; letter-spacing: 2.5px; font-weight: 400;
-    }
-    .loading-error {
-      display: none; margin-top: 1rem; font-size: 0.76rem; color: #c0392b;
-      text-align: center; max-width: 300px; line-height: 1.6;
-    }
+    .loading-text { color: var(--loader-text); font-size: 0.85rem; letter-spacing: 2.5px; font-weight: 400; }
+    .loading-error { display: none; margin-top: 1rem; font-size: 0.76rem; color: #c0392b; text-align: center; max-width: 300px; line-height: 1.6; }
     .loading-error.show { display: block; }
 
     /* ============================================================
-       阅读进度条
+       阅读进度条 —— 绿色
        ============================================================ */
     #reading-progress {
       position: fixed; top: 0; left: 0; height: 3px;
-      background: linear-gradient(90deg, #999, #bbb);
+      background: linear-gradient(90deg, var(--progress-color), var(--progress-color-end));
       z-index: 10000; transition: width 0.12s linear;
       border-radius: 0 2px 2px 0; pointer-events: none;
     }
@@ -195,10 +154,7 @@
       display: flex; align-items: center; padding: 12px 12px;
       border-bottom: 1px solid var(--border); gap: 6px; background: var(--sidebar-bg);
     }
-    .sidebar-brand {
-      font-size: 1rem; font-weight: 600; color: var(--text);
-      white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1; min-width: 0;
-    }
+    .sidebar-brand { font-size: 1rem; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1; min-width: 0; }
     .sidebar-brand.hidden { display: none; }
     .sidebar-filter-input {
       flex: 1; padding: 5px 8px; border: 1px solid var(--border); border-radius: 6px;
@@ -218,30 +174,21 @@
     .icon-btn svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; }
 
     /* ============================================================
-       侧边栏导航 —— 全面重构版
+       侧边栏导航
        ============================================================ */
     .sidebar-nav { padding: 6px 0; }
     .sidebar-nav > ul { padding-left: 0; }
     .sidebar-nav li { list-style: none; margin: 0; }
-
-    /* —— 文件链接 —— */
     .sidebar-nav a {
       display: block; padding: 7px 14px; border-radius: 7px; margin: 1px 6px;
       color: var(--text); text-decoration: none; font-size: 0.88rem;
       transition: background 0.15s, color 0.15s, padding-left 0.2s;
     }
     .sidebar-nav a:hover { background: var(--sidebar-hover); }
-    /* active 状态：微左移 + 左侧细线暗示 */
-    .sidebar-nav .active > a {
-      background: var(--sidebar-active); font-weight: 500; color: var(--text);
-      padding-left: 18px;
-    }
+    .sidebar-nav .active > a { background: var(--sidebar-active); font-weight: 500; color: var(--text); padding-left: 18px; }
     .sidebar-nav li.filtered-out { display: none !important; }
 
-    /* —— 文件夹条目 —— */
-    .folder-item {
-      display: flex !important; flex-wrap: wrap; align-items: center; margin: 1px 6px;
-    }
+    .folder-item { display: flex !important; flex-wrap: wrap; align-items: center; margin: 1px 6px; }
     .folder-label {
       flex: 1 1 auto; display: flex !important; align-items: center; gap: 7px;
       padding: 7px 12px; border-radius: 7px;
@@ -251,11 +198,7 @@
       white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
     .folder-label:hover { background: var(--sidebar-hover); }
-    /* 展开态 */
-    .folder-item.expanded > .folder-label {
-      background: var(--folder-open-bg); color: var(--text); font-weight: 500;
-    }
-    /* 箭头图标 */
+    .folder-item.expanded > .folder-label { background: var(--folder-open-bg); color: var(--text); font-weight: 500; }
     .folder-arrow {
       flex-shrink: 0; width: 16px; height: 16px; display: flex; align-items: center; justify-content: center;
       transition: transform 0.28s cubic-bezier(0.45,0.05,0.55,0.95); color: var(--text-muted);
@@ -263,7 +206,6 @@
     .folder-item.expanded > .folder-label .folder-arrow { transform: rotate(90deg); }
     .folder-arrow svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2.5; stroke-linecap: round; }
 
-    /* —— 子列表容器 —— */
     .folder-item > ul { flex-basis: 100%; width: 100%; }
     .sidebar-nav ul.sidebar-sub {
       padding-left: 6px; margin-left: 12px;
@@ -271,25 +213,18 @@
       transition: max-height 0.32s cubic-bezier(0.45,0.05,0.55,0.95);
       border-left: 1px solid transparent;
     }
-    .sidebar-nav ul.sidebar-sub.expanded {
-      max-height: 500px;
-      border-left-color: var(--folder-open-border);
-    }
-    /* 子条目滑入动画 */
+    .sidebar-nav ul.sidebar-sub.expanded { max-height: 500px; border-left-color: var(--folder-open-border); }
     .sidebar-nav ul.sidebar-sub > li {
       opacity: 0; transform: translateX(-6px);
       transition: opacity 0.22s ease, transform 0.22s ease;
     }
-    .sidebar-nav ul.sidebar-sub.expanded > li {
-      opacity: 1; transform: translateX(0);
-    }
+    .sidebar-nav ul.sidebar-sub.expanded > li { opacity: 1; transform: translateX(0); }
     .sidebar-nav ul.sidebar-sub.expanded > li:nth-child(1) { transition-delay: 0.04s; }
     .sidebar-nav ul.sidebar-sub.expanded > li:nth-child(2) { transition-delay: 0.08s; }
     .sidebar-nav ul.sidebar-sub.expanded > li:nth-child(3) { transition-delay: 0.12s; }
     .sidebar-nav ul.sidebar-sub.expanded > li:nth-child(4) { transition-delay: 0.16s; }
     .sidebar-nav ul.sidebar-sub.expanded > li:nth-child(5) { transition-delay: 0.20s; }
     .sidebar-nav ul.sidebar-sub.expanded > li:nth-child(n+6) { transition-delay: 0.22s; }
-
     .sidebar-nav ul.sidebar-sub li a { font-size: 0.84rem; padding: 5px 11px; margin: 1px 4px; }
 
     /* ============================================================
@@ -342,7 +277,7 @@
     .markdown-section { padding: 72px 28px 40px !important; max-width: 860px; margin: 0 auto; }
 
     /* ============================================================
-       回到顶部（含进度环）
+       回到顶部（含绿色进度环）
        ============================================================ */
     #backToTop {
       position: fixed; bottom: 28px; right: 28px; z-index: 998;
@@ -357,9 +292,10 @@
     #backToTop.visible { opacity: 1; transform: translateY(0); pointer-events: auto; }
     #backToTop:hover { transform: translateY(-3px); box-shadow: 0 6px 20px var(--shadow-lg); }
     #backToTop svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2.5; }
+    /* ★ 进度环绿色 */
     #backToTop::before {
       content: ''; position: absolute; inset: -3px; border-radius: 50%;
-      background: conic-gradient(#888 var(--scroll-pct, 0%), transparent var(--scroll-pct, 0%));
+      background: conic-gradient(var(--progress-color) var(--scroll-pct, 0%), transparent var(--scroll-pct, 0%));
       mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #fff calc(100% - 3px));
       -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #fff calc(100% - 3px));
       opacity: 0.55;
@@ -452,7 +388,7 @@
     }
 
     /* ============================================================
-       代码块卡片 + 完整 Prism 语法高亮
+       代码块卡片 + Prism 语法高亮
        ============================================================ */
     .code-block-wrapper {
       margin: 1.6rem 0; border-radius: 10px; overflow: hidden;
@@ -620,8 +556,7 @@
           injectSidebarHeader();
           bindGlobalEvents();
           document.body.classList.remove('close');
-          updateDocTitle();
-          updateReadingTime();
+          updateDocTitle(); updateReadingTime();
           setTimeout(function() { initSidebarFolders(); generateTOC(); updateProgressBar(); addHeadingAnchors(); }, 250);
         });
         hook.doneEach(function() {
@@ -632,9 +567,7 @@
       }]
     };
 
-    // ============================================================
-    // Toast
-    // ============================================================
+    // ========== Toast ==========
     function showToast(msg, type) {
       type = type || 'info';
       var c = document.getElementById('toast-container'); if (!c) return;
@@ -642,34 +575,26 @@
       c.appendChild(t); setTimeout(function() { if (t.parentNode) t.remove(); }, 2400);
     }
 
-    // ============================================================
-    // ★ 硬朗 3D 三角形 —— 即时响应，仅阴影，无金色
-    // ============================================================
+    // ========== 硬朗 3D 三角形（黄色进度线） ==========
     (function initLoader3D() {
       var wrapper = document.getElementById('loaderWrapper');
       var triangle = document.getElementById('loaderTriangle');
       if (!wrapper || !triangle) return;
-      var maxAngle = 9;   // 克制的旋转角度
+      var maxAngle = 9;
       var baseShadow = 'drop-shadow(0 0 4px rgba(0,0,0,0.15)) drop-shadow(0 0 1px rgba(0,0,0,0.3))';
 
       function handleMouse(e) {
         if (_loaded) return;
         var dx = (e.clientX - window.innerWidth/2) / (window.innerWidth/2);
         var dy = (e.clientY - window.innerHeight/2) / (window.innerHeight/2);
-        // ★ 无 transition —— 即时响应
         wrapper.style.transform = 'rotateX(' + (-dy * maxAngle) + 'deg) rotateY(' + (dx * maxAngle) + 'deg) translateZ(14px)';
-        // ★ 仅黑色阴影，随角度偏移
-        triangle.style.filter = baseShadow +
-          ' drop-shadow(' + (dx * 10) + 'px ' + (dy * 10) + 'px 12px rgba(0,0,0,0.35))';
+        triangle.style.filter = baseShadow + ' drop-shadow(' + (dx * 10) + 'px ' + (dy * 10) + 'px 12px rgba(0,0,0,0.35))';
       }
-
       document.addEventListener('mousemove', handleMouse);
       window._loaderMouse = handleMouse;
     })();
 
-    // ============================================================
-    // 加载遮罩
-    // ============================================================
+    // ========== 加载遮罩 ==========
     var _loaded = false;
     function hideLoading() {
       if (_loaded) return; _loaded = true;
@@ -680,9 +605,7 @@
     }
     setTimeout(function() { if (!_loaded) { var e = document.getElementById('loadingError'); if (e) e.classList.add('show'); } }, 5000);
 
-    // ============================================================
-    // 侧边栏头部
-    // ============================================================
+    // ========== 侧边栏头部 ==========
     function injectSidebarHeader() {
       var sb = document.querySelector('.sidebar'); if (!sb || sb.querySelector('.sidebar-header')) return;
       var nav = sb.querySelector('.sidebar-nav'); if (!nav) return;
@@ -716,9 +639,7 @@
       }
     }
 
-    // ============================================================
-    // 全局事件
-    // ============================================================
+    // ========== 全局事件 ==========
     function bindGlobalEvents() {
       var cb1 = document.getElementById('capsuleSidebarBtn'), cb2 = document.getElementById('capsuleSearchBtn');
       if (cb1) cb1.addEventListener('click', function() { document.body.classList.remove('close'); });
@@ -749,14 +670,10 @@
       document.addEventListener('keydown', handleGlobalShortcuts);
     }
 
-    // ============================================================
-    // 暗色模式
-    // ============================================================
+    // ========== 暗色模式 ==========
     function toggleDarkMode() { document.body.classList.toggle('dark'); localStorage.setItem('darkMode', document.body.classList.contains('dark')); }
 
-    // ============================================================
-    // 快捷键
-    // ============================================================
+    // ========== 快捷键 ==========
     function handleGlobalShortcuts(e) {
       var tag = (e.target.tagName || '').toLowerCase(), isInput = tag === 'input' || tag === 'textarea' || e.target.isContentEditable;
       if (e.key === 'Escape') { closeSearchModal(); closeShortcutsPanel(); var tp = document.getElementById('toc-panel'); if (tp) tp.classList.remove('visible'); var tb = document.getElementById('tocToggleBtn'); if (tb) tb.classList.remove('active'); }
@@ -769,9 +686,7 @@
     function openShortcutsPanel() { var p = document.getElementById('shortcuts-panel'); if (p) p.classList.add('active'); }
     function closeShortcutsPanel() { var p = document.getElementById('shortcuts-panel'); if (p) p.classList.remove('active'); }
 
-    // ============================================================
-    // 搜索键盘导航
-    // ============================================================
+    // ========== 搜索键盘导航 ==========
     var _searchSelectedIdx = -1;
     function handleSearchKeyboard(e) {
       var items = document.querySelectorAll('.search-result-item'); if (!items.length) return;
@@ -781,18 +696,14 @@
     }
     function updateSearchSelection(items) { items.forEach(function(item, i) { item.classList.toggle('selected', i === _searchSelectedIdx); if (i === _searchSelectedIdx) item.scrollIntoView({ block: 'nearest' }); }); }
 
-    // ============================================================
-    // 进度条
-    // ============================================================
+    // ========== 进度条 ==========
     function updateProgressBar() {
       var bar = document.getElementById('reading-progress'); if (!bar) return;
       var dh = document.documentElement.scrollHeight - window.innerHeight;
       bar.style.width = dh <= 0 ? '0%' : Math.min(100, Math.max(0, (window.scrollY / dh) * 100)) + '%';
     }
 
-    // ============================================================
-    // 阅读时间
-    // ============================================================
+    // ========== 阅读时间 ==========
     function updateReadingTime() {
       var el = document.getElementById('readingTime'); if (!el) return;
       var container = document.querySelector('.markdown-section'); if (!container) { el.textContent = ''; return; }
@@ -802,9 +713,7 @@
       el.textContent = '⏱ ~' + Math.max(1, Math.ceil((words / 200) + (chinese / 400))) + ' min';
     }
 
-    // ============================================================
-    // 标题锚点
-    // ============================================================
+    // ========== 标题锚点 ==========
     function addHeadingAnchors() {
       var container = document.querySelector('.markdown-section'); if (!container) return;
       container.querySelectorAll('h1, h2, h3, h4').forEach(function(h) {
@@ -820,9 +729,7 @@
       });
     }
 
-    // ============================================================
-    // TOC
-    // ============================================================
+    // ========== TOC ==========
     function generateTOC() {
       var container = document.querySelector('.markdown-section'), tocContent = document.getElementById('toc-content'), tocPanel = document.getElementById('toc-panel'), tocBtn = document.getElementById('tocToggleBtn');
       if (!container || !tocContent) return;
@@ -843,9 +750,7 @@
     }
     function clearTOC() { var tc = document.getElementById('toc-content'); if (tc) tc.innerHTML = ''; var tp = document.getElementById('toc-panel'); if (tp) tp.classList.remove('visible'); }
 
-    // ============================================================
-    // 文档抬头标题
-    // ============================================================
+    // ========== 文档抬头标题 ==========
     function updateDocTitle() {
       var active = document.querySelector('.sidebar-nav .active'); var title = '';
       if (active) { var link = active.querySelector(':scope > a'); title = (link || active).textContent.trim(); }
@@ -854,9 +759,7 @@
       var el = document.getElementById('docTitle'); if (el) el.textContent = title || '文档';
     }
 
-    // ============================================================
-    // 侧边栏过滤
-    // ============================================================
+    // ========== 侧边栏过滤 ==========
     function filterSidebarItems(keyword) {
       var allLis = document.querySelectorAll('.sidebar-nav li'); if (!keyword || !keyword.trim()) { allLis.forEach(function(l) { l.classList.remove('filtered-out'); }); return; }
       var kw = keyword.trim().toLowerCase();
@@ -871,14 +774,13 @@
     }
 
     // ============================================================
-    // ★ 侧边栏文件夹 —— 全面重构：手风琴 + 子条目滑入
+    // ★ 侧边栏文件夹 —— 修复胶囊外重复文本
     // ============================================================
     var _currentOpenFolderUl = null;
 
     function initSidebarFolders() {
       var nav = document.querySelector('.sidebar-nav'); if (!nav) return;
 
-      // 标记子列表
       var allUls = nav.querySelectorAll('ul');
       allUls.forEach(function(ul) {
         if (ul.parentNode === nav || ul.parentNode.classList.contains('sidebar-nav')) {
@@ -886,7 +788,6 @@
         } else { ul.classList.add('sidebar-sub'); }
       });
 
-      // 排序
       function sortList(ul) {
         var items = Array.from(ul.children).filter(function(c) { return c.tagName === 'LI'; });
         items.sort(function(a, b) {
@@ -900,7 +801,6 @@
 
       _currentOpenFolderUl = null;
 
-      // 处理文件夹 li
       nav.querySelectorAll('li').forEach(function(li) {
         var childUl = li.querySelector('ul'); if (!childUl) return;
         li.classList.add('folder-item');
@@ -908,19 +808,40 @@
         var label = li.querySelector(':scope > .folder-label');
         if (!label) {
           var link = li.querySelector(':scope > a');
-          if (link) { label = link; label.classList.add('folder-label'); label.setAttribute('href', 'javascript:void(0)'); label.removeAttribute('target'); }
-          else {
-            label = document.createElement('span'); label.className = 'folder-label';
-            var ft = '';
-            for (var i = 0; i < li.childNodes.length; i++) { if (li.childNodes[i].nodeType === 3 && li.childNodes[i].textContent.trim()) { ft = li.childNodes[i].textContent.trim(); break; } }
-            label.textContent = ft || 'Folder'; li.insertBefore(label, li.firstChild);
+          if (link) {
+            label = link;
+            label.classList.add('folder-label');
+            label.setAttribute('href', 'javascript:void(0)');
+            label.removeAttribute('target');
+          } else {
+            // ★ 收集 li 的直接文本内容
+            var folderName = '';
+            var nodesToRemove = [];
+            for (var i = 0; i < li.childNodes.length; i++) {
+              var cn = li.childNodes[i];
+              if (cn.nodeType === 3 && cn.textContent.trim()) {
+                folderName += cn.textContent.trim();
+                nodesToRemove.push(cn);
+              }
+            }
+            // ★ 删除原始文本节点，避免胶囊外重复
+            nodesToRemove.forEach(function(n) { li.removeChild(n); });
+
+            label = document.createElement('span');
+            label.className = 'folder-label';
+            label.textContent = folderName || 'Folder';
+            li.insertBefore(label, li.firstChild);
           }
         }
 
         var arrow = label.querySelector('.folder-arrow');
-        if (!arrow) { arrow = document.createElement('span'); arrow.className = 'folder-arrow'; arrow.innerHTML = '<svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>'; label.appendChild(arrow); }
+        if (!arrow) {
+          arrow = document.createElement('span');
+          arrow.className = 'folder-arrow';
+          arrow.innerHTML = '<svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>';
+          label.appendChild(arrow);
+        }
 
-        // 点击整个胶囊区域 → 手风琴展开/折叠
         label.onclick = function(e) {
           e.preventDefault(); e.stopPropagation();
           if (childUl.classList.contains('expanded')) { collapseFolder(li, childUl); }
@@ -928,12 +849,10 @@
         };
       });
 
-      // 自动展开含 active 的文件夹
       autoExpandActiveFolder();
     }
 
     function expandFolder(li, childUl) {
-      // 先折叠之前打开的
       if (_currentOpenFolderUl && _currentOpenFolderUl !== childUl) {
         _currentOpenFolderUl.classList.remove('expanded');
         var prevLi = _currentOpenFolderUl.parentNode;
@@ -957,9 +876,7 @@
       if (parent) { var childUl = parent.querySelector(':scope > ul'); if (childUl) expandFolder(parent, childUl); }
     }
 
-    // ============================================================
-    // 代码块增强
-    // ============================================================
+    // ========== 代码块增强 ==========
     function enhanceCodeBlocks() {
       document.querySelectorAll('.markdown-section pre').forEach(function(pre) {
         if (pre.parentNode.classList.contains('code-block-wrapper')) return;
@@ -982,9 +899,7 @@
       function fallbackCopy(text, cb) { var ta = document.createElement('textarea'); ta.value = text; ta.style.cssText = 'position:fixed;left:-9999px'; document.body.appendChild(ta); ta.select(); try { document.execCommand('copy'); } catch(e) {} document.body.removeChild(ta); if (cb) cb(); }
     }
 
-    // ============================================================
-    // 全文搜索
-    // ============================================================
+    // ========== 全文搜索 ==========
     var currentHighlights = [];
     function openSearchModal() {
       var overlay = document.getElementById('searchModalOverlay'), input = document.getElementById('searchModalInput'), results = document.getElementById('searchResults');

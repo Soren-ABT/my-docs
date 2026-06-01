@@ -5,227 +5,136 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>欢迎来到Soren的知识库</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        :root {
+            --bg-start: #f5f5f0;
+            --bg-end: #e8e4df;
+            --text: #2c2c2c;
+            --sub: #666;
+            --btn-border: #999;
+            --btn-text: #2c2c2c;
+            --btn-primary-bg: #2c2c2c;
+            --btn-primary-text: #fff;
+            --dot-color: rgba(0,0,0,0.25);
+            --grid-color: rgba(0,0,0,0.04);
         }
+        body.night {
+            --bg-start: #0a0a14;
+            --bg-end: #0d0d20;
+            --text: #e0e0e0;
+            --sub: #999;
+            --btn-border: #666;
+            --btn-text: #e0e0e0;
+            --btn-primary-bg: #f1c40f;
+            --btn-primary-text: #1a1a1a;
+            --dot-color: rgba(255,255,255,0.3);
+            --grid-color: rgba(255,255,255,0.025);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
-            background: #1a1a1a;
-            color: #e0e0e0;
+            background: linear-gradient(140deg, var(--bg-start), var(--bg-end));
+            color: var(--text);
             font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            overflow: hidden;
+            height: 100vh; display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            text-align: center; overflow: hidden;
             user-select: none;
-            transition: opacity 0.4s ease;
-            cursor: none;
+            transition: background 0.8s, color 0.8s;
         }
 
-        body.fade-out {
-            opacity: 0;
-            pointer-events: none; /* 防止淡出期间误触 */
-        }
-
-        /* 网格背景纹理 */
+        /* 网格纹理 */
         body::before {
             content: "";
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
+            position: fixed; inset: 0;
             background-image:
-                linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
-            background-size: 40px 40px;
-            pointer-events: none;
-            z-index: 0;
+                linear-gradient(var(--grid-color) 1px, transparent 1px),
+                linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
+            background-size: 50px 50px;
+            pointer-events: none; z-index: 0;
         }
 
-        /* 自定义光标 - 呼吸原点 */
-        #cursor {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 10px;
-            height: 10px;
-            margin-left: -5px;   /* 修正：真正居中 (width/2) */
-            margin-top: -5px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.8);
-            box-shadow: 0 0 15px rgba(255,255,255,0.5);
-            pointer-events: none;
-            z-index: 9999;
-            transition: transform 0.1s ease;
-            animation: cursorBreathe 2s ease-in-out infinite;
-        }
-
-        /* 悬停可交互元素时光标放大 */
-        #cursor.hovering {
-            transform: scale(2.5);
-            background: rgba(201, 169, 98, 0.9);
-            box-shadow: 0 0 20px rgba(201, 169, 98, 0.7);
-            animation: none;
-        }
-
-        @keyframes cursorBreathe {
-            0%, 100% { transform: scale(1); opacity: 0.9; }
-            50% { transform: scale(1.4); opacity: 0.6; }
-        }
-
-        /* 波纹扩散元素 */
-        .ripple {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 20px;
-            height: 20px;
-            margin-left: -10px;
-            margin-top: -10px;
-            border-radius: 50%;
-            border: 1px solid rgba(255,255,255,0.6);
-            pointer-events: none;
-            z-index: 9998;
-            animation: rippleExpand 0.6s ease-out forwards;
-        }
-
-        @keyframes rippleExpand {
-            0% { transform: scale(1); opacity: 1; }
-            100% { transform: scale(8); opacity: 0; }
+        /* Three.js 画布 */
+        #bg-canvas {
+            position: fixed; inset: 0;
+            z-index: 1; pointer-events: none;
         }
 
         /* 内容层 */
         .content {
-            position: relative;
-            z-index: 2;
+            position: relative; z-index: 3;
             animation: fadeInUp 0.8s ease-out;
         }
 
         h1 {
-            font-size: 3.2rem;
-            font-weight: 700;
-            letter-spacing: 2px;
-            margin-bottom: 0.5rem;
-            color: #ffffff;
-            background: linear-gradient(135deg, #ffffff 0%, #c9a962 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            text-shadow: 0 0 10px rgba(201, 169, 98, 0.3), 0 0 2px rgba(255,255,255,0.5);
+            font-size: 3rem; font-weight: 700; letter-spacing: 3px; margin-bottom: 0.4rem;
+            color: var(--text);
         }
-
-        h1 span {
-            display: inline-block;
-            opacity: 0;
-            transform: translateY(30px);
-            animation: letterRise 0.6s ease forwards;
-        }
+        h1 span { display: inline-block; opacity: 0; transform: translateY(30px);
+            animation: letterRise 0.6s ease forwards; }
 
         .subtitle {
-            font-size: 1.2rem;
-            color: #b0b0b0;
-            margin: 1rem auto 2.5rem;
-            opacity: 0;
-            transform: translateY(20px);
+            font-size: 1.1rem; color: var(--sub); margin: 0.8rem auto 2.2rem;
+            opacity: 0; transform: translateY(20px);
             animation: fadeInUp 0.8s 0.3s ease forwards;
         }
-
-        .buttons {
-            opacity: 0;
-            transform: translateY(20px);
-            animation: fadeInUp 0.8s 0.5s ease forwards;
-        }
+        .buttons { opacity: 0; transform: translateY(20px); animation: fadeInUp 0.8s 0.5s ease forwards; }
 
         .btn {
-            display: inline-block;
-            padding: 0.75rem 2.2rem;
-            margin: 0.5rem;
-            border-radius: 4px;
-            font-size: 1rem;
-            font-weight: 500;
-            text-decoration: none;
-            transition: all 0.3s ease;
-            border: 1.5px solid #888;
-            color: #e0e0e0;
-            background: transparent;
-            letter-spacing: 0.5px;
-            cursor: none; /* 使用自定义光标 */
+            display: inline-block; padding: 0.7rem 2rem; margin: 0.4rem; border-radius: 4px;
+            font-size: 0.95rem; font-weight: 500; text-decoration: none;
+            transition: all 0.3s ease; border: 1.5px solid var(--btn-border);
+            color: var(--btn-text); background: transparent; letter-spacing: 0.5px;
+            position: relative; z-index: 4; cursor: pointer;
         }
+        .btn-primary { background: var(--btn-primary-bg); color: var(--btn-primary-text); border-color: var(--btn-primary-bg); font-weight: 600; }
+        .btn:hover { transform: translateY(-3px); box-shadow: 0 12px 28px rgba(0,0,0,0.15); }
+        .btn:active { transform: translateY(-1px); }
 
-        .btn-primary {
-            background: #ffffff;
-            color: #1a1a1a;
-            border-color: #ffffff;
-            font-weight: 600;
-        }
-
-        .btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 12px 28px rgba(255,255,255,0.12);
-        }
-
-        .btn:active {
-            transform: translateY(-1px);
-        }
-
-        /* 滚动提示 - 三个呼吸灯点 */
-        .scroll-hint {
-            position: absolute;
-            bottom: 2rem;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 2;
-            display: flex;
-            gap: 8px;
-        }
-
-        .dot {
-            width: 8px;
-            height: 8px;
-            background: rgba(255,255,255,0.4);
-            border-radius: 50%;
-            animation: dotBounce 1.4s infinite ease-in-out;
-        }
-
+        /* 滚动提示 */
+        .scroll-hint { position: absolute; bottom: 2rem; left: 50%; transform: translateX(-50%); z-index: 3; display: flex; gap: 8px; }
+        .dot { width: 8px; height: 8px; background: var(--dot-color); border-radius: 50%;
+            animation: dotBounce 1.4s infinite ease-in-out; }
         .dot:nth-child(2) { animation-delay: 0.2s; }
         .dot:nth-child(3) { animation-delay: 0.4s; }
 
-        @keyframes dotBounce {
-            0%, 80%, 100% { transform: scale(0.6); opacity: 0.3; }
-            40% { transform: scale(1.2); opacity: 1; }
+        /* 昼夜切换按钮 */
+        .mode-toggle {
+            position: fixed; top: 20px; right: 20px; z-index: 10;
+            width: 42px; height: 42px; border-radius: 50%;
+            background: rgba(128,128,128,0.15); backdrop-filter: blur(8px);
+            border: 1px solid rgba(128,128,128,0.25);
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+            transition: all 0.4s; color: var(--text);
         }
+        .mode-toggle:hover { background: rgba(128,128,128,0.3); }
+        .mode-toggle svg { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 2; }
+        body:not(.night) .mode-toggle .moon { display: none; }
+        body.night .mode-toggle .sun { display: none; }
 
-        /* 粒子画布 */
-        #particles-canvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            z-index: 1;
-        }
+        @keyframes fadeInUp { from{opacity:0;transform:translateY(30px)} to{opacity:1;transform:translateY(0)} }
+        @keyframes letterRise { to{opacity:1;transform:translateY(0)} }
+        @keyframes dotBounce { 0%,80%,100%{transform:scale(0.6);opacity:0.3} 40%{transform:scale(1.2);opacity:1} }
 
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        @keyframes letterRise {
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        @media (max-width: 600px) {
-            h1 { font-size: 2rem; letter-spacing: 1px; }
-            .subtitle { font-size: 1rem; margin: 1rem auto 2rem; }
-            .btn { padding: 0.6rem 1.5rem; font-size: 0.9rem; }
+        @media (max-width:600px) {
+            h1 { font-size: 1.8rem; letter-spacing: 1px; }
+            .subtitle { font-size: 0.9rem; }
+            .btn { padding: 0.5rem 1.3rem; font-size: 0.85rem; }
         }
     </style>
 </head>
 <body>
-    <!-- 自定义光标元素 -->
-    <div id="cursor"></div>
 
+    <!-- 昼夜切换 -->
+    <button class="mode-toggle" id="modeToggle" title="切换昼夜">
+        <svg class="sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+        <svg class="moon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    </button>
+
+    <!-- 3D 画布 -->
+    <canvas id="bg-canvas"></canvas>
+
+    <!-- 内容 -->
     <div class="content">
         <h1 id="cover-title">Soren的知识库</h1>
         <div class="subtitle" id="greeting">记录思考 · 沉淀技术 · 无限突破</div>
@@ -235,209 +144,279 @@
         </div>
     </div>
 
-    <div class="scroll-hint">
-        <span class="dot"></span>
-        <span class="dot"></span>
-        <span class="dot"></span>
-    </div>
+    <div class="scroll-hint"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
 
-    <canvas id="particles-canvas"></canvas>
+    <!-- Three.js -->
+    <script type="importmap">
+        { "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.160/build/three.module.js" } }
+    </script>
 
-    <script>
-        // ========== 自定义光标 ==========
-        (function() {
-            var cursor = document.getElementById('cursor');
-            if (!cursor) return;
+    <script type="module">
+        import * as THREE from 'three';
 
-            // 鼠标移动更新位置
-            document.addEventListener('mousemove', function(e) {
-                cursor.style.left = e.clientX + 'px';
-                cursor.style.top = e.clientY + 'px';
-            });
+        // ========== 场景初始化 ==========
+        const canvas = document.getElementById('bg-canvas');
+        const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        renderer.toneMappingExposure = 1.0;
 
-            // 鼠标悬停可交互元素时光标变大
-            var interactiveSelectors = 'a, button, .btn, input, [onclick]';
-            document.addEventListener('mouseover', function(e) {
-                var target = e.target;
-                if (target.closest && target.closest(interactiveSelectors)) {
-                    cursor.classList.add('hovering');
-                }
-            });
-            document.addEventListener('mouseout', function(e) {
-                var target = e.target;
-                if (target.closest && target.closest(interactiveSelectors)) {
-                    // 检查是否移到了另一个交互元素
-                    var related = e.relatedTarget;
-                    if (!related || !related.closest || !related.closest(interactiveSelectors)) {
-                        cursor.classList.remove('hovering');
-                    }
-                }
-            });
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 100);
+        camera.position.set(0, 0, 8);
 
-            // 点击创建波纹
-            document.addEventListener('click', function(e) {
-                var ripple = document.createElement('div');
-                ripple.className = 'ripple';
-                ripple.style.left = e.clientX + 'px';
-                ripple.style.top = e.clientY + 'px';
-                document.body.appendChild(ripple);
+        // ========== 昼夜状态 ==========
+        let isNight = false;
+        const hour = new Date().getHours();
+        if (hour < 6 || hour >= 18) isNight = true;
+        if (isNight) document.body.classList.add('night');
 
-                ripple.addEventListener('animationend', function() {
-                    ripple.remove();
-                });
-            });
+        // ========== 灯光系统 ==========
+        const ambientLight = new THREE.AmbientLight(isNight ? 0x334466 : 0x888899, isNight ? 0.8 : 1.2);
+        scene.add(ambientLight);
 
-            // 移动端隐藏自定义光标
-            if ('ontouchstart' in window) {
-                cursor.style.display = 'none';
+        const keyLight = new THREE.DirectionalLight(isNight ? 0x8899cc : 0xffffff, isNight ? 1.5 : 2.5);
+        keyLight.position.set(5, 5, 5);
+        keyLight.castShadow = true;
+        keyLight.shadow.mapSize.set(1024, 1024);
+        keyLight.shadow.camera.near = 0.5;
+        keyLight.shadow.camera.far = 50;
+        keyLight.shadow.camera.left = -10;
+        keyLight.shadow.camera.right = 10;
+        keyLight.shadow.camera.top = 10;
+        keyLight.shadow.camera.bottom = -10;
+        scene.add(keyLight);
+
+        const fillLight = new THREE.DirectionalLight(isNight ? 0x446688 : 0xccddff, 0.6);
+        fillLight.position.set(-3, -1, -2);
+        scene.add(fillLight);
+
+        const rimLight = new THREE.DirectionalLight(isNight ? 0x88aacc : 0xffffff, isNight ? 1.0 : 0.8);
+        rimLight.position.set(0, -2, 4);
+        scene.add(rimLight);
+
+        // ========== 主几何体：环面结 ==========
+        const torusKnotGeo = new THREE.TorusKnotGeometry(1.1, 0.28, 180, 24);
+        const torusKnotMat = new THREE.MeshStandardMaterial({
+            color: isNight ? 0x334466 : 0xd5cfc6,
+            roughness: isNight ? 0.25 : 0.35,
+            metalness: isNight ? 0.6 : 0.15,
+        });
+        const torusKnot = new THREE.Mesh(torusKnotGeo, torusKnotMat);
+        torusKnot.castShadow = true;
+        torusKnot.receiveShadow = true;
+        scene.add(torusKnot);
+
+        // 线框覆层（夜晚更明显）
+        const wireframeGeo = new THREE.TorusKnotGeometry(1.12, 0.29, 180, 24);
+        const wireframeMat = new THREE.MeshBasicMaterial({
+            color: isNight ? 0x88aacc : 0xcccccc,
+            wireframe: true,
+            transparent: true,
+            opacity: isNight ? 0.18 : 0.06,
+        });
+        const wireframe = new THREE.Mesh(wireframeGeo, wireframeMat);
+        torusKnot.add(wireframe);
+
+        // ========== 粒子环 ==========
+        const particlesGroup = new THREE.Group();
+        const ringCount = 3;
+        const rings = [];
+        for (let r = 0; r < ringCount; r++) {
+            const count = 200 + r * 80;
+            const radius = 1.5 + r * 0.35;
+            const positions = new Float32Array(count * 3);
+            const colors = new Float32Array(count * 3);
+            for (let i = 0; i < count; i++) {
+                const angle = (i / count) * Math.PI * 2;
+                const tilt = (r - 1) * 0.5;
+                const x = Math.cos(angle) * radius;
+                const y = Math.sin(angle) * Math.cos(tilt) * radius * 0.4;
+                const z = Math.sin(angle) * Math.sin(tilt) * radius * 0.7;
+                positions[i * 3] = x;
+                positions[i * 3 + 1] = y;
+                positions[i * 3 + 2] = z;
+                const c = new THREE.Color();
+                c.setHSL((r * 0.15 + 0.55) % 1, 0.3, isNight ? 0.7 : 0.45);
+                colors[i * 3] = c.r;
+                colors[i * 3 + 1] = c.g;
+                colors[i * 3 + 2] = c.b;
             }
-        })();
+            const geo = new THREE.BufferGeometry();
+            geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            geo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+            const mat = new THREE.PointsMaterial({
+                size: 0.03,
+                vertexColors: true,
+                blending: THREE.AdditiveBlending,
+                depthWrite: false,
+                transparent: true,
+                opacity: isNight ? 0.9 : 0.5,
+            });
+            const ring = new THREE.Points(geo, mat);
+            rings.push(ring);
+            particlesGroup.add(ring);
+        }
+        scene.add(particlesGroup);
 
-        // ========== 动态问候语 ==========
+        // ========== 背景星空粒子（夜晚更密） ==========
+        const starsCount = isNight ? 600 : 200;
+        const starsGeo = new THREE.BufferGeometry();
+        const starsPositions = new Float32Array(starsCount * 3);
+        for (let i = 0; i < starsCount; i++) {
+            starsPositions[i * 3] = (Math.random() - 0.5) * 20;
+            starsPositions[i * 3 + 1] = (Math.random() - 0.5) * 16;
+            starsPositions[i * 3 + 2] = (Math.random() - 0.5) * 10 - 3;
+        }
+        starsGeo.setAttribute('position', new THREE.BufferAttribute(starsPositions, 3));
+        const starsMat = new THREE.PointsMaterial({
+            size: 0.025,
+            color: isNight ? 0x8899cc : 0x999999,
+            blending: THREE.AdditiveBlending,
+            depthWrite: false,
+            transparent: true,
+            opacity: isNight ? 0.7 : 0.3,
+        });
+        const stars = new THREE.Points(starsGeo, starsMat);
+        scene.add(stars);
+
+        // ========== 地面反射平面（白天有，夜晚无） ==========
+        const floorGeo = new THREE.PlaneGeometry(12, 12);
+        const floorMat = new THREE.MeshStandardMaterial({
+            color: isNight ? 0x111122 : 0xeeeeee,
+            roughness: 0.9,
+            metalness: 0.0,
+            transparent: true,
+            opacity: isNight ? 0.0 : 0.5,
+        });
+        const floor = new THREE.Mesh(floorGeo, floorMat);
+        floor.position.z = -2.5;
+        floor.receiveShadow = true;
+        scene.add(floor);
+
+        // ========== 鼠标状态 ==========
+        let mouseX = 0, mouseY = 0, targetX = 0, targetY = 0;
+
+        document.addEventListener('mousemove', (e) => {
+            targetX = (e.clientX / window.innerWidth) * 2 - 1;
+            targetY = -(e.clientY / window.innerHeight) * 2 + 1;
+        });
+
+        // ========== 动画循环 ==========
+        const clock = new THREE.Clock();
+        function animate() {
+            requestAnimationFrame(animate);
+            const dt = Math.min(clock.getDelta(), 0.1);
+            const t = performance.now() * 0.001;
+
+            // 鼠标平滑跟随
+            mouseX += (targetX - mouseX) * 3 * dt;
+            mouseY += (targetY - mouseY) * 3 * dt;
+
+            // 主几何体旋转
+            torusKnot.rotation.x += 0.002;
+            torusKnot.rotation.y += 0.003;
+            // 微随鼠标倾斜
+            torusKnot.rotation.x += mouseY * 0.004;
+            torusKnot.rotation.y += mouseX * 0.004;
+
+            // 线框层独立微旋转
+            wireframe.rotation.x += 0.001;
+            wireframe.rotation.y -= 0.0015;
+
+            // 粒子环旋转
+            particlesGroup.rotation.x = Math.sin(t * 0.3) * 0.2;
+            particlesGroup.rotation.y += 0.0015;
+            particlesGroup.rotation.z += 0.001;
+
+            // 星空微动
+            stars.rotation.y += 0.0003;
+            stars.rotation.x += mouseY * 0.0005;
+
+            // 相机微动
+            camera.position.x += (mouseX * 0.6 - camera.position.x) * 2 * dt;
+            camera.position.y += (-mouseY * 0.4 - camera.position.y) * 2 * dt;
+            camera.lookAt(0, 0, 0);
+
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        // ========== 响应式 ==========
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        // ========== 昼夜切换 ==========
+        window.toggleDayNight = function() {
+            isNight = !isNight;
+            document.body.classList.toggle('night', isNight);
+
+            // 更新灯光
+            ambientLight.color.set(isNight ? 0x334466 : 0x888899);
+            ambientLight.intensity = isNight ? 0.8 : 1.2;
+            keyLight.color.set(isNight ? 0x8899cc : 0xffffff);
+            keyLight.intensity = isNight ? 1.5 : 2.5;
+            rimLight.color.set(isNight ? 0x88aacc : 0xffffff);
+            rimLight.intensity = isNight ? 1.0 : 0.8;
+
+            // 更新材质
+            torusKnotMat.color.set(isNight ? 0x334466 : 0xd5cfc6);
+            torusKnotMat.roughness = isNight ? 0.25 : 0.35;
+            torusKnotMat.metalness = isNight ? 0.6 : 0.15;
+            wireframeMat.color.set(isNight ? 0x88aacc : 0xcccccc);
+            wireframeMat.opacity = isNight ? 0.18 : 0.06;
+            starsMat.opacity = isNight ? 0.7 : 0.3;
+            starsMat.color.set(isNight ? 0x8899cc : 0x999999);
+            floorMat.opacity = isNight ? 0.0 : 0.5;
+
+            // 更新粒子
+            rings.forEach((r, i) => {
+                r.material.opacity = isNight ? 0.9 : 0.5;
+            });
+        };
+
+        document.getElementById('modeToggle').addEventListener('click', toggleDayNight);
+    </script>
+
+    <!-- ========== 原有逻辑 ========== -->
+    <script>
+        // 问候语
         (function() {
             var hour = new Date().getHours();
-            var baseText = '记录思考 · 沉淀技术 · 无限突破';
-            if (hour < 6) baseText = '夜深了，' + baseText;
-            else if (hour < 12) baseText = '上午好，' + baseText;
-            else if (hour < 18) baseText = '下午好，' + baseText;
-            else baseText = '晚上好，' + baseText;
+            var base = '记录思考 · 沉淀技术 · 无限突破';
+            if (hour < 6) base = '夜深了，' + base;
+            else if (hour < 12) base = '上午好，' + base;
+            else if (hour < 18) base = '下午好，' + base;
+            else base = '晚上好，' + base;
             var el = document.getElementById('greeting');
-            if (el) el.textContent = baseText;
+            if (el) el.textContent = base;
         })();
 
-        // ========== 页面淡出跳转 ==========
-        function goToDocs() {
-            document.body.classList.add('fade-out');
-            setTimeout(function() {
-                window.location.href = '/my-docs/docsify.html';
-            }, 400);
-        }
-
-        // ========== 标题逐字动画 ==========
+        // 标题逐字动画
         (function() {
             var titleEl = document.getElementById('cover-title');
             if (titleEl) {
                 var text = titleEl.textContent.trim();
                 var html = '';
                 for (var i = 0; i < text.length; i++) {
-                    var char = text[i] === ' ' ? '&nbsp;' : text[i];
-                    html += '<span style="animation-delay:' + (i * 0.05) + 's">' + char + '</span>';
+                    html += '<span style="animation-delay:' + (i * 0.05) + 's">' + (text[i] === ' ' ? '&nbsp;' : text[i]) + '</span>';
                 }
                 titleEl.innerHTML = html;
             }
         })();
 
-        // ========== 粒子动画 ==========
-        (function() {
-            var canvas = document.getElementById('particles-canvas');
-            if (!canvas) return;
-            var ctx = canvas.getContext('2d');
-            var w, h;
-            var particles = [];
-            var animationId = null;
-
-            function resize() {
-                w = canvas.width = window.innerWidth;
-                h = canvas.height = window.innerHeight;
-            }
-            resize();
-            window.addEventListener('resize', resize);
-
-            var mouseX = -1000, mouseY = -1000;
-            document.addEventListener('mousemove', function(e) {
-                mouseX = e.clientX;
-                mouseY = e.clientY;
-            });
-            document.addEventListener('mouseleave', function() {
-                mouseX = -1000;
-                mouseY = -1000;
-            });
-
-            function Particle() {
-                this.x = Math.random() * w;
-                this.y = Math.random() * h;
-                this.vx = (Math.random() - 0.5) * 1.2;
-                this.vy = (Math.random() - 0.5) * 1.2;
-                this.radius = Math.random() * 2.5 + 0.8;
-                this.opacity = Math.random() * 0.6 + 0.2;
-                this.color = Math.random() < 0.15 ? '201,169,98' : '255,255,255';
-            }
-
-            Particle.prototype.update = function() {
-                this.x += this.vx;
-                this.y += this.vy;
-
-                if (this.x < 0 || this.x > w) this.vx *= -1;
-                if (this.y < 0 || this.y > h) this.vy *= -1;
-
-                // 鼠标排斥
-                var dx = this.x - mouseX;
-                var dy = this.y - mouseY;
-                var dist = Math.sqrt(dx * dx + dy * dy);
-                if (dist < 150 && dist > 0) {
-                    var force = (150 - dist) / 150;
-                    this.x += (dx / dist) * force * 5;
-                    this.y += (dy / dist) * force * 5;
-                }
-            };
-
-            Particle.prototype.draw = function() {
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-                ctx.fillStyle = 'rgba(' + this.color + ', ' + this.opacity + ')';
-                ctx.fill();
-            };
-
-            var particleCount = 180;
-            for (var i = 0; i < particleCount; i++) {
-                particles.push(new Particle());
-            }
-
-            function animate() {
-                ctx.clearRect(0, 0, w, h);
-                ctx.fillStyle = '#1a1a1a';
-                ctx.fillRect(0, 0, w, h);
-
-                for (var i = 0; i < particles.length; i++) {
-                    particles[i].update();
-                    particles[i].draw();
-                }
-
-                for (var i = 0; i < particles.length; i++) {
-                    for (var j = i + 1; j < particles.length; j++) {
-                        var dx = particles[i].x - particles[j].x;
-                        var dy = particles[i].y - particles[j].y;
-                        var dist = Math.sqrt(dx * dx + dy * dy);
-                        if (dist < 100) {
-                            var alpha = (0.15 * (1 - dist / 100));
-                            var color = particles[i].color === '201,169,98' ? '201,169,98' : '255,255,255';
-                            ctx.beginPath();
-                            ctx.moveTo(particles[i].x, particles[i].y);
-                            ctx.lineTo(particles[j].x, particles[j].y);
-                            ctx.strokeStyle = 'rgba(' + color + ', ' + alpha + ')';
-                            ctx.lineWidth = 0.5;
-                            ctx.stroke();
-                        }
-                    }
-                }
-                animationId = requestAnimationFrame(animate);
-            }
-            animate();
-
-            // 页面隐藏时暂停动画（节省资源）
-            document.addEventListener('visibilitychange', function() {
-                if (document.hidden) {
-                    if (animationId) {
-                        cancelAnimationFrame(animationId);
-                        animationId = null;
-                    }
-                } else {
-                    if (!animationId) {
-                        animate();
-                    }
-                }
-            });
-        })();
+        // 跳转
+        function goToDocs() {
+            document.body.style.opacity = '0';
+            document.body.style.transition = 'opacity 0.4s';
+            setTimeout(function() { window.location.href = '/my-docs/docsify.html'; }, 400);
+        }
     </script>
 </body>
 </html>
