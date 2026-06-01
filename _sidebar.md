@@ -1,5 +1,4 @@
 - [首页](README.md)
-- [全站搜索](search.html)
 - Complex Analysis
   - [Chapter 2](files/complex-analysis/chapter2/U2.complex-analysis-review.md)
 - Research
