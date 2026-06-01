@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>欢迎来到Soren的知识库</title>
     <style>
         :root {
@@ -18,9 +18,11 @@
             --panel-bg: rgba(255,255,255,0.78);
             --panel-border: rgba(0,0,0,0.10);
             --accent: #1c1c1e;
-            --cursor-color: rgba(255,255,255,0.85);
-            --cursor-glow: rgba(0,0,0,0.15);
+            --cursor-color: rgba(0,0,0,0.62);
+            --cursor-glow: rgba(0,0,0,0.10);
             --ripple-color: rgba(0,0,0,0.38);
+            --hud-bg: rgba(0,0,0,0.45);
+            --hud-text: #fff;
         }
         body.night {
             --bg: #08080f; --bg2: #0c0c18;
@@ -35,9 +37,11 @@
             --panel-bg: rgba(20,20,30,0.82);
             --panel-border: rgba(255,255,255,0.08);
             --accent: #0a84ff;
-            --cursor-color: rgba(255,255,255,0.88);
-            --cursor-glow: rgba(255,255,255,0.18);
+            --cursor-color: rgba(255,255,255,0.82);
+            --cursor-glow: rgba(255,255,255,0.15);
             --ripple-color: rgba(255,255,255,0.42);
+            --hud-bg: rgba(255,255,255,0.25);
+            --hud-text: #fff;
         }
         * { margin:0; padding:0; box-sizing:border-box; }
         body {
@@ -62,9 +66,9 @@
             background:var(--cursor-color);
             box-shadow: 0 0 12px var(--cursor-glow), 0 0 3px var(--cursor-glow);
             pointer-events:none; z-index:9999;
-            transition: transform 0.10s ease-out, width 0.2s, height 0.2s, margin 0.2s;
+            transition: transform 0.10s ease-out;
         }
-        #custom-cursor.hovering { transform:scale(2.0); background:var(--accent); }
+        #custom-cursor.hovering { transform:scale(2.2); background:var(--accent); }
         .ripple {
             position:fixed; border-radius:50%;
             border:1.8px solid var(--ripple-color);
@@ -76,6 +80,17 @@
             0%{width:0;height:0;margin-left:0;margin-top:0;opacity:0.55}
             100%{width:140px;height:140px;margin-left:-70px;margin-top:-70px;opacity:0}
         }
+        /* 缩放 HUD 指示器 */
+        #zoom-hud {
+            position:fixed; bottom:100px; left:50%; transform:translateX(-50%);
+            z-index:10; background:var(--hud-bg); color:var(--hud-text);
+            backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
+            padding:6px 16px; border-radius:20px; font-size:0.78rem;
+            font-weight:500; letter-spacing:0.5px;
+            opacity:0; transition:opacity 0.35s ease;
+            pointer-events:none;
+        }
+        #zoom-hud.visible { opacity:1; }
         .content { position:relative; z-index:3; animation: fadeInUp 0.8s ease-out; pointer-events: none; }
         .content > * { pointer-events: auto; }
         h1 { font-size:3rem; font-weight:700; letter-spacing:3px; margin-bottom:0.4rem; color:var(--text); }
@@ -128,6 +143,7 @@
 
 <div id="custom-cursor"></div>
 <canvas id="bg-canvas"></canvas>
+<div id="zoom-hud">1.0×</div>
 
 <div class="top-right-group">
     <button class="glass-btn" id="modeToggle" title="切换昼夜" aria-label="切换昼夜模式">
@@ -155,7 +171,7 @@
 </div>
 
 <div class="scroll-hint"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
-<div class="hint-text" id="hintText">Click a wireframe body · Scroll to zoom · Drag to rotate</div>
+<div class="hint-text" id="hintText">Click a wireframe body · Scroll to zoom · Pinch to zoom</div>
 
 <script type="importmap">
 { "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.160/build/three.module.js" } }
@@ -165,8 +181,8 @@
 import * as THREE from 'three';
 
 // ==================== 昼夜自动检测 ====================
-const hour = new Date().getHours();
-let isNight = (hour < 6 || hour >= 18);
+const currentHour = new Date().getHours();
+let isNight = (currentHour < 6 || currentHour >= 18);
 if (isNight) document.body.classList.add('night');
 
 // ==================== 场景初始化 ====================
@@ -190,9 +206,10 @@ const mouse = new THREE.Vector2();
 const mainGroup = new THREE.Group();
 scene.add(mainGroup);
 
-// ==================== ★ 可复用向量池（内存优化） ====================
-const _v1 = new THREE.Vector3(), _v2 = new THREE.Vector3(), _v3 = new THREE.Vector3();
-const _v4 = new THREE.Vector3(), _v5 = new THREE.Vector3(), _v6 = new THREE.Vector3();
+// ==================== ★ 可复用向量池（内存零分配） ====================
+const V = [];
+for (let i = 0; i < 12; i++) V.push(new THREE.Vector3());
+function v(i) { return V[i]; }
 
 // ==================== 颜色配置 ====================
 function col() { return isNight
@@ -218,7 +235,7 @@ const starsMat = new THREE.PointsMaterial({ size:0.04, vertexColors:true, blendi
 const stars = new THREE.Points(starsGeo, starsMat);
 scene.add(stars);
 
-// ==================== ★ 统一交互体列表（含所有行星 + 卫星 + 太阳） ====================
+// ==================== ★ 统一交互体列表 ====================
 const allInteractiveBodies = [];
 
 function makeBody(geometry, faceColor, edgeColor, metadata) {
@@ -286,13 +303,12 @@ const orbitDefs = [
       meta:{name:'Icosahedron VIII',type:'Icosahedron (d4)',faces:5120,edges:7680,vertices:2562,orbit:'5.65 AU',period:'dynamic'} },
 ];
 
-orbitDefs.forEach((def, idx) => {
+orbitDefs.forEach((def) => {
     const ringGeo = new THREE.TorusGeometry(def.r, 0.016, 16, 180);
     const ringMat = new THREE.MeshBasicMaterial({ color:c.orbit, transparent:true, opacity:0.28, depthWrite:false });
     const ring = new THREE.Mesh(ringGeo, ringMat);
     ring.rotation.x = Math.PI/2 + def.tiltX;
     ring.rotation.y = def.tiltY;
-    ring.name = 'orbitRing'+idx;
     mainGroup.add(ring);
 
     const body = makeBody(def.geo, c.face, c.edge, def.meta);
@@ -300,16 +316,16 @@ orbitDefs.forEach((def, idx) => {
     mainGroup.add(body);
 
     const vMag = Math.sqrt(G * SUN_MASS / def.r);
-    const velDir = new THREE.Vector3(0, 1, 0);
-    velDir.applyAxisAngle(_v1.set(1,0,0), def.tiltX);
-    velDir.applyAxisAngle(_v2.set(0,1,0), def.tiltY);
+    const velDir = v(0).set(0, 1, 0);
+    velDir.applyAxisAngle(v(1).set(1,0,0), def.tiltX);
+    velDir.applyAxisAngle(v(2).set(0,1,0), def.tiltY);
     velDir.normalize();
-    const vel = velDir.multiplyScalar(vMag);
 
     physicsBodies.push({
         group: body, mass: def.mass,
         pos: new THREE.Vector3(def.r, 0, 0),
-        vel: vel.clone(), moonAngle: 0
+        vel: velDir.clone().multiplyScalar(vMag),
+        moonAngle: 0
     });
 
     if (def.meta.hasRing) {
@@ -348,15 +364,28 @@ for (let i=0; i<50; i++) {
 let mouseX=0, mouseY=0, targetX=0, targetY=0;
 let hoveredBody = null;
 let selectedPhysicsBody = null;
-// ★ 太阳摄像机模式：false=标准, true=海报俯瞰
 let sunPosterMode = false;
 let cameraDistance = 2.5, targetCameraDistance = 2.5;
-// ★ 弹簧摄像机状态
+// 弹簧摄像机
 const camVel = new THREE.Vector3();
 const lookVel = new THREE.Vector3();
 const currentLookTarget = new THREE.Vector3(0,0,0);
 const targetLookTarget = new THREE.Vector3(0,0,0);
+// 帧率自适应
+let avgDt = 0.016;
+// 缩放 HUD
+let zoomHudTimer = null;
+const zoomHud = document.getElementById('zoom-hud');
 
+function showZoomHud() {
+    const level = (cameraDistance / 2.5).toFixed(1);
+    zoomHud.textContent = level + '×';
+    zoomHud.classList.add('visible');
+    clearTimeout(zoomHudTimer);
+    zoomHudTimer = setTimeout(() => zoomHud.classList.remove('visible'), 1800);
+}
+
+// ==================== 事件监听 ====================
 document.addEventListener('mousemove', (e) => {
     targetX = (e.clientX/window.innerWidth)*2-1;
     targetY = -(e.clientY/window.innerHeight)*2+1;
@@ -376,45 +405,83 @@ document.addEventListener('click', (e) => {
     } else { deselectBody(); }
 });
 
+// ★ 滚轮缩放
 document.addEventListener('wheel', (e) => {
     e.preventDefault();
     targetCameraDistance += e.deltaY * 0.005;
-    targetCameraDistance = Math.max(1.0, Math.min(7.0, targetCameraDistance));
+    targetCameraDistance = Math.max(0.8, Math.min(8.0, targetCameraDistance));
+    showZoomHud();
 }, { passive: false });
 
+// ★ 触摸双指缩放
+let lastPinchDist = 0;
+document.addEventListener('touchstart', (e) => {
+    if (e.touches.length === 2) {
+        lastPinchDist = Math.hypot(
+            e.touches[0].clientX - e.touches[1].clientX,
+            e.touches[0].clientY - e.touches[1].clientY
+        );
+    }
+}, { passive: true });
+
 document.addEventListener('touchmove', (e) => {
-    if (e.touches.length===1) { targetX=(e.touches[0].clientX/window.innerWidth)*2-1; targetY=-(e.touches[0].clientY/window.innerHeight)*2+1; mouse.x=targetX; mouse.y=targetY; }
-}, {passive:true});
+    if (e.touches.length === 2) {
+        const dist = Math.hypot(
+            e.touches[0].clientX - e.touches[1].clientX,
+            e.touches[0].clientY - e.touches[1].clientY
+        );
+        const delta = lastPinchDist - dist;
+        targetCameraDistance += delta * 0.012;
+        targetCameraDistance = Math.max(0.8, Math.min(8.0, targetCameraDistance));
+        lastPinchDist = dist;
+        showZoomHud();
+    }
+    if (e.touches.length === 1) {
+        targetX=(e.touches[0].clientX/window.innerWidth)*2-1;
+        targetY=-(e.touches[0].clientY/window.innerHeight)*2+1;
+        mouse.x=targetX; mouse.y=targetY;
+    }
+}, { passive: true });
+
 document.addEventListener('touchend', (e) => {
-    const tx = e.changedTouches[0].clientX, ty = e.changedTouches[0].clientY;
-    spawnRipple(tx, ty);
-    raycaster.setFromCamera(mouse, camera);
-    const targets = allInteractiveBodies.map(b=>b.userData.faceMesh).filter(m=>m);
-    const intersects = raycaster.intersectObjects(targets, false);
-    if (intersects.length>0) { const parent = intersects[0].object.parent; if (parent && parent.userData.isBody) selectBody(parent); }
-    else deselectBody();
+    if (e.touches.length === 0 && e.changedTouches.length === 1) {
+        const tx = e.changedTouches[0].clientX, ty = e.changedTouches[0].clientY;
+        spawnRipple(tx, ty);
+        raycaster.setFromCamera(mouse, camera);
+        const targets = allInteractiveBodies.map(b=>b.userData.faceMesh).filter(m=>m);
+        const intersects = raycaster.intersectObjects(targets, false);
+        if (intersects.length>0) {
+            const parent = intersects[0].object.parent;
+            if (parent && parent.userData.isBody) selectBody(parent);
+        } else deselectBody();
+    }
 });
 
 function spawnRipple(x, y) {
-    const ripple = document.createElement('div'); ripple.className = 'ripple'; ripple.style.left = x + 'px'; ripple.style.top = y + 'px';
-    document.body.appendChild(ripple); ripple.addEventListener('animationend', () => ripple.remove());
+    const ripple = document.createElement('div'); ripple.className = 'ripple';
+    ripple.style.left = x + 'px'; ripple.style.top = y + 'px';
+    document.body.appendChild(ripple);
+    ripple.addEventListener('animationend', () => ripple.remove());
 }
 
 // ==================== 选中逻辑 ====================
 function selectBody(body) {
     deselectBody();
-    for (const pb of physicsBodies) { if (pb.group === body) { selectedPhysicsBody = pb; break; } }
-    if (!selectedPhysicsBody && body === sunBody) {
+    let targetBody = body;
+    // 如果点击的是卫星，选中其母行星
+    if (body.parent && body.parent !== mainGroup && body.parent.userData && body.parent.userData.isBody) {
+        targetBody = body.parent;
+    }
+    for (const pb of physicsBodies) { if (pb.group === targetBody) { selectedPhysicsBody = pb; break; } }
+    if (!selectedPhysicsBody && targetBody === sunBody) {
         selectedPhysicsBody = { group: sunBody, mass: SUN_MASS, pos: new THREE.Vector3(0,0,0), vel: new THREE.Vector3(0,0,0), meta: sunBody.userData.metadata, isSun: true };
-        // ★ 太阳：50% 概率切换海报模式
         sunPosterMode = Math.random() < 0.5;
     }
     if (!selectedPhysicsBody) return;
-    const ud = body.userData;
+    const ud = targetBody.userData;
     ud.faceMat.opacity = 0.48; ud.edgeMat.opacity = 1;
     ud.edgeMat.color.set(isNight?0xddeeff:0x111111); ud.faceMat.color.set(isNight?0x334466:0xffffff);
     cameraDistance = 2.5; targetCameraDistance = 2.5;
-    // 重置弹簧速度
     camVel.set(0,0,0); lookVel.set(0,0,0);
     showInfoPanel(ud.metadata || selectedPhysicsBody.meta);
 }
@@ -431,7 +498,9 @@ function deselectBody() {
 }
 
 // ==================== 信息面板 ====================
-const infoPanel = document.getElementById('infoPanel'), ipName = document.getElementById('ipName'), ipStats = document.getElementById('ipStats'), ipIcon = document.getElementById('ipIcon'), ipClose = document.getElementById('ipClose'), hintText = document.getElementById('hintText');
+const infoPanel = document.getElementById('infoPanel'), ipName = document.getElementById('ipName');
+const ipStats = document.getElementById('ipStats'), ipIcon = document.getElementById('ipIcon');
+const ipClose = document.getElementById('ipClose'), hintText = document.getElementById('hintText');
 ipClose.addEventListener('click', (e) => { e.stopPropagation(); deselectBody(); });
 function showInfoPanel(meta) {
     if (!meta) return; ipName.textContent = meta.name || 'Unknown';
@@ -445,13 +514,18 @@ function hideInfoPanel() { infoPanel.classList.remove('visible'); if (hintText) 
 const cursorEl = document.getElementById('custom-cursor');
 document.addEventListener('mousemove', (e) => { cursorEl.style.left = e.clientX + 'px'; cursorEl.style.top = e.clientY + 'px'; });
 document.addEventListener('mouseover', (e) => { if (e.target.closest('a, button, .btn, [onclick]')) cursorEl.classList.add('hovering'); });
-document.addEventListener('mouseout', (e) => { if (e.target.closest('a, button, .btn, [onclick]')) { const rel = e.relatedTarget; if (!rel || !rel.closest('a, button, .btn, [onclick]')) cursorEl.classList.remove('hovering'); } });
+document.addEventListener('mouseout', (e) => {
+    if (e.target.closest('a, button, .btn, [onclick]')) {
+        const rel = e.relatedTarget;
+        if (!rel || !rel.closest('a, button, .btn, [onclick]')) cursorEl.classList.remove('hovering');
+    }
+});
 
-// ==================== ★ 物理更新 — 子步进积分 ====================
+// ==================== ★ 物理更新 — 帧率自适应子步 ====================
 function updatePhysics(dt) {
-    const subSteps = 3, h = dt / subSteps;
+    const subSteps = avgDt > 0.045 ? 1 : avgDt > 0.028 ? 2 : 3;
+    const h = dt / subSteps;
     for (let s = 0; s < subSteps; s++) {
-        // 太阳引力
         for (const pb of physicsBodies) {
             const dx = -pb.pos.x, dy = -pb.pos.y, dz = -pb.pos.z;
             const distSq = dx*dx + dy*dy + dz*dz;
@@ -463,7 +537,6 @@ function updatePhysics(dt) {
             pb.vel.z += fm * dz / (dc * pb.mass) * h;
             pb.pos.x += pb.vel.x * h; pb.pos.y += pb.vel.y * h; pb.pos.z += pb.vel.z * h;
         }
-        // 行星间引力
         for (let i = 0; i < physicsBodies.length; i++) { for (let j = i+1; j < physicsBodies.length; j++) {
             const a = physicsBodies[i], b = physicsBodies[j];
             const dx = b.pos.x - a.pos.x, dy = b.pos.y - a.pos.y, dz = b.pos.z - a.pos.z;
@@ -478,32 +551,49 @@ function updatePhysics(dt) {
     for (const pb of physicsBodies) pb.group.position.copy(pb.pos);
 }
 
+function resetHover(body) {
+    const ud = body.userData;
+    if (ud && ud.isBody) {
+        ud.faceMat.color.set(ud.baseFaceColor); ud.faceMat.opacity = ud.baseFaceOpacity;
+        ud.edgeMat.color.set(ud.baseEdgeColor); ud.edgeMat.opacity = ud.baseEdgeOpacity;
+    }
+}
+
 // ==================== ★ 动画循环 ====================
 const clock = new THREE.Clock();
 function animate() {
     requestAnimationFrame(animate);
-    const dt = Math.min(clock.getDelta(), 0.1);
+    const dt = Math.min(clock.getDelta(), 0.12);
     const t = performance.now()*0.001;
+    avgDt = avgDt * 0.88 + dt * 0.12;
 
-    // 鼠标平滑
     mouseX += (targetX-mouseX)*5*dt;
     mouseY += (targetY-mouseY)*5*dt;
 
     updatePhysics(dt);
 
-    // 太阳自转
     sunBody.rotation.x += 0.002; sunBody.rotation.y += 0.003; sunBody.rotation.z += 0.001;
     glowRing1.rotation.z += 0.004; glowRing2.rotation.y += 0.005;
 
-    // 行星自转 + 卫星
     for (const pb of physicsBodies) {
         pb.group.rotation.x += 0.005; pb.group.rotation.y += 0.007;
         const def = orbitDefs.find(d => d._body === pb.group);
-        if (def && def._moon) { pb.moonAngle = (pb.moonAngle||0) + 2.5*dt; const ma = pb.moonAngle; def._moon.position.x = Math.cos(ma)*0.38; def._moon.position.y = Math.sin(ma)*0.18; def._moon.position.z = Math.sin(ma)*0.22; }
+        if (def && def._moon) {
+            pb.moonAngle = (pb.moonAngle||0) + 2.5*dt;
+            const ma = pb.moonAngle;
+            def._moon.position.x = Math.cos(ma)*0.38;
+            def._moon.position.y = Math.sin(ma)*0.18;
+            def._moon.position.z = Math.sin(ma)*0.22;
+        }
     }
 
-    // 小行星带
-    asteroidBelt.forEach(ast => { ast.angle+=ast.speed*dt; const a=ast.angle; ast.mesh.position.x=Math.cos(a)*ast.radius; ast.mesh.position.y=Math.sin(a)*0.25*ast.radius*0.28; ast.mesh.position.z=Math.sin(a)*0.65*ast.radius; ast.mesh.rotation.x+=0.01; ast.mesh.rotation.y+=0.014; });
+    asteroidBelt.forEach(ast => {
+        ast.angle+=ast.speed*dt; const a=ast.angle;
+        ast.mesh.position.x=Math.cos(a)*ast.radius;
+        ast.mesh.position.y=Math.sin(a)*0.25*ast.radius*0.28;
+        ast.mesh.position.z=Math.sin(a)*0.65*ast.radius;
+        ast.mesh.rotation.x+=0.01; ast.mesh.rotation.y+=0.014;
+    });
     stars.rotation.y+=0.0002; stars.rotation.x+=0.0001;
 
     // 悬停检测
@@ -528,57 +618,53 @@ function animate() {
         }
     }
 
-    // ★ 弹簧摄像机系统
+    // ★ 弹簧摄像机（默认模式也响应缩放）
     cameraDistance += (targetCameraDistance - cameraDistance) * 3.5 * dt;
-    _v1.copy(sunBody.position);
+    const scale = cameraDistance / 2.5;
+    v(0).copy(sunBody.position);
 
     if (selectedPhysicsBody) {
-        const planetPos = _v2.copy(selectedPhysicsBody.group.position);
+        const planetPos = v(1).copy(selectedPhysicsBody.group.position);
         const isSun = selectedPhysicsBody.isSun;
 
         if (isSun && sunPosterMode) {
-            // ★ 海报俯瞰模式：太阳在屏幕右下方，摄像机高处俯瞰
-            const posterOffset = _v3.set(
+            const posterOffset = v(2).set(
                 3.5 + Math.sin(t*0.6)*0.6,
                 -2.0 + Math.cos(t*0.8)*0.5,
                 6.5 + Math.sin(t*0.5)*0.4
             );
-            targetLookTarget.copy(_v1).add(_v4.set(0.25, -0.15, 0));
-            _v5.copy(_v1).add(posterOffset);
+            targetLookTarget.copy(v(0)).add(v(3).set(0.25, -0.15, 0));
+            v(4).copy(v(0)).add(posterOffset);
         } else {
-            // ★ 标准模式：太阳为核心，行星轻微偏焦
-            const mixedLook = _v3.copy(_v1).lerp(planetPos, isSun ? 0 : 0.16);
+            const mixFac = isSun ? 0 : 0.16;
+            const mixedLook = v(2).copy(v(0)).lerp(planetPos, mixFac);
             targetLookTarget.copy(mixedLook);
-            const planetDir = _v4.copy(planetPos).sub(_v1).normalize();
+            const planetDir = v(3).copy(planetPos).sub(v(0)).normalize();
             if (planetDir.length() < 0.01) planetDir.set(0, 0.6, 0.8).normalize();
-            _v5.copy(_v1).addScaledVector(planetDir, cameraDistance + (isSun ? 1.2 : 1.6));
-            // Lissajous 微动
-            _v5.x += Math.sin(t*0.7)*0.16 + Math.cos(t*1.3)*0.12;
-            _v5.y += Math.cos(t*0.9)*0.20 + Math.sin(t*1.1)*0.14;
-            _v5.z += Math.sin(t*0.5)*0.10 + Math.cos(t*0.8)*0.16;
+            v(4).copy(v(0)).addScaledVector(planetDir, cameraDistance + (isSun ? 1.2 : 1.6));
+            v(4).x += Math.sin(t*0.7)*0.16 + Math.cos(t*1.3)*0.12;
+            v(4).y += Math.cos(t*0.9)*0.20 + Math.sin(t*1.1)*0.14;
+            v(4).z += Math.sin(t*0.5)*0.10 + Math.cos(t*0.8)*0.16;
         }
     } else {
-        // 默认视角
-        targetLookTarget.set(0,0,0);
-        _v5.set(mouseX*1.5, 2.5-mouseY*0.8, 9);
+        targetLookTarget.set(0, 0, 0);
+        v(4).set(mouseX * 1.5 * scale, (2.5 - mouseY * 0.8) * scale, 9 * scale);
     }
 
-    // ★ 弹簧动力学：camera position
+    // 弹簧动力学
     const camStiffness = 5.5, camDamping = 3.0;
-    _v6.subVectors(_v5, camera.position).multiplyScalar(camStiffness);
-    camVel.add(_v6.multiplyScalar(dt));
+    v(5).subVectors(v(4), camera.position).multiplyScalar(camStiffness);
+    camVel.add(v(5).multiplyScalar(dt));
     camVel.multiplyScalar(Math.exp(-camDamping * dt));
-    camera.position.add(_v6.copy(camVel).multiplyScalar(dt));
+    camera.position.add(v(5).copy(camVel).multiplyScalar(dt));
 
-    // ★ 弹簧动力学：lookAt target
     const lookStiffness = 6.0, lookDamping = 3.5;
-    _v6.subVectors(targetLookTarget, currentLookTarget).multiplyScalar(lookStiffness);
-    lookVel.add(_v6.multiplyScalar(dt));
+    v(5).subVectors(targetLookTarget, currentLookTarget).multiplyScalar(lookStiffness);
+    lookVel.add(v(5).multiplyScalar(dt));
     lookVel.multiplyScalar(Math.exp(-lookDamping * dt));
-    currentLookTarget.add(_v6.copy(lookVel).multiplyScalar(dt));
+    currentLookTarget.add(v(5).copy(lookVel).multiplyScalar(dt));
     camera.lookAt(currentLookTarget);
 
-    // 主场景微旋转（未选中时）
     if (!selectedPhysicsBody) {
         mainGroup.rotation.y += (mouseX*0.15-mainGroup.rotation.y)*1.8*dt;
         mainGroup.rotation.x += (-mouseY*0.08-mainGroup.rotation.x)*1.8*dt;
@@ -588,36 +674,35 @@ function animate() {
 }
 animate();
 
-function resetHover(body) {
-    const ud = body.userData;
-    if (ud && ud.isBody) {
-        ud.faceMat.color.set(ud.baseFaceColor); ud.faceMat.opacity = ud.baseFaceOpacity;
-        ud.edgeMat.color.set(ud.baseEdgeColor); ud.edgeMat.opacity = ud.baseEdgeOpacity;
-    }
-}
-
 // ==================== 响应式 ====================
-window.addEventListener('resize', () => { camera.aspect = window.innerWidth/window.innerHeight; camera.updateProjectionMatrix(); renderer.setSize(window.innerWidth, window.innerHeight); });
+window.addEventListener('resize', () => {
+    camera.aspect = window.innerWidth/window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+});
 
-// ==================== ★ 昼夜切换 — 统一更新所有交互体边线 ====================
+// ==================== ★ 昼夜切换 — 批量更新 ====================
 window.toggleDayNight = function() {
     isNight = !isNight; document.body.classList.toggle('night', isNight);
     const nc = col();
+
+    // 星空批量更新
     starsMat.opacity = isNight?0.85:0.35;
     const scArr = starsGeo.attributes.color.array;
-    for (let i=0;i<starsCount;i++){const sc=new THREE.Color().setHSL(0.58+Math.random()*0.2,0.2,isNight?0.5+Math.random()*0.4:0.2+Math.random()*0.2);scArr[i*3]=sc.r;scArr[i*3+1]=sc.g;scArr[i*3+2]=sc.b;}
+    for (let i=0;i<starsCount;i++){
+        const sc=new THREE.Color().setHSL(0.58+Math.random()*0.2,0.2,isNight?0.5+Math.random()*0.4:0.2+Math.random()*0.2);
+        scArr[i*3]=sc.r; scArr[i*3+1]=sc.g; scArr[i*3+2]=sc.b;
+    }
     starsGeo.attributes.color.needsUpdate=true;
     glowMat1.color.set(nc.glow); glowMat2.color.set(nc.glow);
 
-    // ★ 遍历所有交互体，统一更新边线和面
+    // ★ 遍历所有交互体，批量更新边线和面
     for (const body of allInteractiveBodies) {
         const ud = body.userData;
         if (!ud || !ud.isBody) continue;
-        const isSun = ud.isSun;
         ud.baseFaceColor = nc.face;
-        ud.baseEdgeColor = isSun ? nc.sunEdge : nc.edge;
+        ud.baseEdgeColor = ud.isSun ? nc.sunEdge : nc.edge;
         ud.baseEdgeOpacity = isNight ? 0.90 : 0.72;
-        // 如果当前未悬停未选中，立即应用
         if (body !== hoveredBody && body !== selectedPhysicsBody?.group) {
             ud.faceMat.color.set(ud.baseFaceColor);
             ud.faceMat.opacity = ud.baseFaceOpacity;
@@ -626,11 +711,11 @@ window.toggleDayNight = function() {
         }
     }
 
-    // 更新轨道环和小行星
+    // 轨道环
     orbitDefs.forEach(def => { if (def._ring) def._ring.material.color.set(nc.orbit); });
     asteroidBelt.forEach(ast=>{ast.mesh.material.color.set(nc.orbit);});
 
-    // 更新选中/悬停状态
+    // 恢复悬停/选中高亮
     if (hoveredBody) {
         const ud = hoveredBody.userData;
         ud.faceMat.color.set(isNight?0x5577aa:0xffffff);
