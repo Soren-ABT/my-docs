@@ -12,7 +12,7 @@
 
   <style>
     /* ============================================================
-       CSS 变量 —— 亮色 / 暗色（深度优化阅读舒适度）
+       CSS Custom Properties — Light / Dark Theme (GitHub-style)
        ============================================================ */
     :root {
       --bg: #fff; --bg-secondary: #f5f5f5; --bg-tertiary: #fafafa;
@@ -32,20 +32,14 @@
       --scrollbar-thumb: #c0c0c0; --scrollbar-track: transparent;
       --toast-bg: #333; --toast-text: #fff;
       --loader-blur-bg: rgba(255,255,255,0.15);
-      --loader-tri-stroke: #888;
-      --loader-tri-fill: #f1c40f;
-      --loader-text: #888;
-      --toc-link: var(--text);
-      --toc-link-hover: #27ae60;
+      --loader-tri-stroke: #888; --loader-tri-fill: #f1c40f; --loader-text: #888;
+      --toc-link: var(--text); --toc-link-hover: #27ae60;
       --heading-color: #27ae60;
       --line-number: #999; --line-number-bg: rgba(0,0,0,0.02);
       --lightbox-bg: rgba(0,0,0,0.88);
-      --inline-code-bg: rgba(0,0,0,0.06);
-      --inline-code-text: #c7254e;
-      --table-stripe: rgba(0,0,0,0.025);
-      --table-border: #e0e0e0;
-      --blockquote-bg: rgba(0,0,0,0.02);
-      --blockquote-border: #27ae60;
+      --inline-code-bg: rgba(0,0,0,0.06); --inline-code-text: #c7254e;
+      --table-stripe: rgba(0,0,0,0.025); --table-border: #e0e0e0;
+      --blockquote-bg: rgba(0,0,0,0.02); --blockquote-border: #27ae60;
     }
     body.dark {
       --bg: #0d1117; --bg-secondary: #161b22; --bg-tertiary: #21262d;
@@ -65,227 +59,204 @@
       --scrollbar-thumb: #30363d; --scrollbar-track: #0d1117;
       --toast-bg: #c9d1d9; --toast-text: #0d1117;
       --loader-blur-bg: rgba(13,17,23,0.15);
-      --loader-tri-stroke: #8b949e;
-      --loader-tri-fill: #f1c40f;
-      --loader-text: #8b949e;
-      --toc-link: var(--text);
-      --toc-link-hover: #3fb950;
+      --loader-tri-stroke: #8b949e; --loader-tri-fill: #f1c40f; --loader-text: #8b949e;
+      --toc-link: var(--text); --toc-link-hover: #3fb950;
       --heading-color: #3fb950;
       --line-number: #484f58; --line-number-bg: rgba(255,255,255,0.02);
       --lightbox-bg: rgba(0,0,0,0.94);
-      --inline-code-bg: rgba(255,255,255,0.08);
-      --inline-code-text: #f0883e;
-      --table-stripe: rgba(255,255,255,0.02);
-      --table-border: #30363d;
-      --blockquote-bg: rgba(255,255,255,0.01);
-      --blockquote-border: #3fb950;
+      --inline-code-bg: rgba(255,255,255,0.08); --inline-code-text: #f0883e;
+      --table-stripe: rgba(255,255,255,0.02); --table-border: #30363d;
+      --blockquote-bg: rgba(255,255,255,0.01); --blockquote-border: #3fb950;
     }
 
     /* ============================================================
-       防闪烁
+       Transition-freeze Utility
        ============================================================ */
     .no-transition,
     .no-transition *,
     .no-transition *::before,
-    .no-transition *::after {
-      transition: none !important;
-      animation: none !important;
-    }
+    .no-transition *::after { transition: none !important; animation: none !important; }
 
     /* ============================================================
-       全局
+       Reset & Global
        ============================================================ */
-    * { box-sizing: border-box; }
-    body {
-      background: var(--bg); color: var(--text); margin: 0; padding: 0;
-      transition: background 0.3s, color 0.3s; scroll-behavior: smooth;
-    }
-    ::-webkit-scrollbar { width: 6px; }
-    ::-webkit-scrollbar-track { background: var(--scrollbar-track); }
-    ::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 3px; }
+    *,*::before,*::after{box-sizing:border-box}
+    body{background:var(--bg);color:var(--text);margin:0;padding:0;transition:background .3s,color .3s;scroll-behavior:smooth}
+    ::-webkit-scrollbar{width:6px}
+    ::-webkit-scrollbar-track{background:var(--scrollbar-track)}
+    ::-webkit-scrollbar-thumb{background:var(--scrollbar-thumb);border-radius:3px}
 
     /* ============================================================
-       毛玻璃加载
+       Loading Overlay (frosted glass + 3D triangle + mouse-tracking)
        ============================================================ */
-    #loading {
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: var(--loader-blur-bg);
-      backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-      z-index: 99999; display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
-      transition: opacity 0.45s ease; perspective: 700px;
-    }
-    #loading.fade-out { opacity: 0; pointer-events: none; }
-    .loader-wrapper { display: flex; flex-direction: column; align-items: center; justify-content: center; transform-style: preserve-3d; }
-    .loader-triangle { width: 100px; height: 100px; margin-bottom: 1.6rem; transform-style: preserve-3d; filter: drop-shadow(0 0 4px rgba(0,0,0,0.15)) drop-shadow(0 0 1px rgba(0,0,0,0.3)); }
-    .loader-triangle svg { width: 100%; height: 100%; }
-    .loader-triangle .tri-bg { fill: none; stroke: var(--loader-tri-stroke); stroke-width: 6; stroke-linejoin: round; opacity: 0.65; }
-    .loader-triangle .tri-progress { fill: none; stroke: var(--loader-tri-fill); stroke-width: 7; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 10 110; animation: dashRhythm 2s cubic-bezier(0.45,0.05,0.55,0.95) infinite; }
-    @keyframes dashRhythm { 0% { stroke-dashoffset: 0; } 100% { stroke-dashoffset: -120; } }
-    .loading-text { color: var(--loader-text); font-size: 0.85rem; letter-spacing: 2.5px; font-weight: 400; }
-    .loading-error { display: none; margin-top: 1rem; font-size: 0.76rem; color: #c0392b; text-align: center; max-width: 300px; line-height: 1.6; }
-    .loading-error.show { display: block; }
+    #loading{position:fixed;top:0;left:0;width:100%;height:100%;background:var(--loader-blur-bg);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity .45s ease;perspective:700px}
+    #loading.fade-out{opacity:0;pointer-events:none}
+    .loader-wrapper{display:flex;flex-direction:column;align-items:center;justify-content:center;transform-style:preserve-3d}
+    .loader-triangle{width:100px;height:100px;margin-bottom:1.6rem;transform-style:preserve-3d;filter:drop-shadow(0 0 4px rgba(0,0,0,.15)) drop-shadow(0 0 1px rgba(0,0,0,.3))}
+    .loader-triangle svg{width:100%;height:100%}
+    .loader-triangle .tri-bg{fill:none;stroke:var(--loader-tri-stroke);stroke-width:6;stroke-linejoin:round;opacity:.65}
+    .loader-triangle .tri-progress{fill:none;stroke:var(--loader-tri-fill);stroke-width:7;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:10 110;animation:dashRhythm 2s cubic-bezier(.45,.05,.55,.95) infinite}
+    @keyframes dashRhythm{0%{stroke-dashoffset:0}100%{stroke-dashoffset:-120}}
+    .loading-text{color:var(--loader-text);font-size:.85rem;letter-spacing:2.5px;font-weight:400}
+    .loading-error{display:none;margin-top:1rem;font-size:.76rem;color:#c0392b;text-align:center;max-width:300px;line-height:1.6}
+    .loading-error.show{display:block}
 
     /* ============================================================
-       阅读进度条
+       Reading Progress Bar
        ============================================================ */
-    #reading-progress { position: fixed; top: 0; left: 0; height: 3px; background: linear-gradient(90deg, var(--progress-color), var(--progress-color-end)); z-index: 10000; transition: width 0.12s linear; border-radius: 0 2px 2px 0; pointer-events: none; }
+    #reading-progress{position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,var(--progress-color),var(--progress-color-end));z-index:10000;transition:width .12s linear;border-radius:0 2px 2px 0;pointer-events:none}
 
     /* ============================================================
-       Toast
+       Toast Notification System
        ============================================================ */
-    #toast-container { position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%); z-index: 10050; display: flex; flex-direction: column-reverse; align-items: center; gap: 8px; pointer-events: none; }
-    .toast { padding: 10px 22px; border-radius: 20px; background: var(--toast-bg); color: var(--toast-text); font-size: 0.85rem; font-weight: 500; box-shadow: 0 8px 28px var(--shadow-lg); pointer-events: auto; animation: toastIn 0.35s cubic-bezier(0.22,0.61,0.36,1), toastOut 0.3s 2s cubic-bezier(0.55,0.06,0.68,0.19) forwards; }
-    .toast.success { border-left: 3px solid #27ae60; }
-    .toast.info    { border-left: 3px solid var(--accent); }
-    @keyframes toastIn  { 0%{opacity:0;transform:translateY(16px) scale(0.9)} 100%{opacity:1;transform:translateY(0) scale(1)} }
-    @keyframes toastOut { 0%{opacity:1;transform:translateY(0) scale(1)} 100%{opacity:0;transform:translateY(-8px) scale(0.9)} }
+    #toast-container{position:fixed;bottom:28px;left:50%;transform:translateX(-50%);z-index:10050;display:flex;flex-direction:column-reverse;align-items:center;gap:8px;pointer-events:none}
+    .toast{padding:10px 22px;border-radius:20px;background:var(--toast-bg);color:var(--toast-text);font-size:.85rem;font-weight:500;box-shadow:0 8px 28px var(--shadow-lg);pointer-events:auto;animation:toastIn .35s cubic-bezier(.22,.61,.36,1),toastOut .3s 2s cubic-bezier(.55,.06,.68,.19) forwards}
+    .toast.success{border-left:3px solid #27ae60}
+    .toast.info{border-left:3px solid var(--accent)}
+    @keyframes toastIn{0%{opacity:0;transform:translateY(16px) scale(.9)}100%{opacity:1;transform:translateY(0) scale(1)}}
+    @keyframes toastOut{0%{opacity:1;transform:translateY(0) scale(1)}100%{opacity:0;transform:translateY(-8px) scale(.9)}}
 
     /* ============================================================
-       侧边栏
+       Sidebar
        ============================================================ */
-    .sidebar { background: var(--sidebar-bg) !important; border-right: 1px solid var(--border) !important; box-shadow: 2px 0 12px var(--shadow) !important; width: 260px !important; transition: transform 0.35s cubic-bezier(0.45,0.05,0.55,0.95) !important; will-change: transform; }
-    .sidebar.close { transform: translateX(-100%); }
-    .sidebar-toggle { display: none !important; }
-    .sidebar-header { display: flex; align-items: center; padding: 12px 12px; border-bottom: 1px solid var(--border); gap: 6px; background: var(--sidebar-bg); }
-    .sidebar-brand { font-size: 1rem; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1; min-width: 0; }
-    .sidebar-brand.hidden { display: none; }
-    .sidebar-filter-input { flex: 1; padding: 5px 8px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg); color: var(--text); font-size: 0.8rem; outline: none; display: none; min-width: 0; transition: border 0.2s; }
-    .sidebar-filter-input:focus { border-color: var(--accent); }
-    .sidebar-filter-input.show { display: block; }
-    .sidebar-actions { display: flex; align-items: center; gap: 2px; flex-shrink: 0; }
-    .icon-btn { background: none; border: none; cursor: pointer; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 6px; transition: background 0.18s, color 0.18s; color: var(--text-secondary); flex-shrink: 0; }
-    .icon-btn:hover { background: var(--btn-hover); color: var(--text); }
-    .icon-btn svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; }
+    .sidebar{background:var(--sidebar-bg)!important;border-right:1px solid var(--border)!important;box-shadow:2px 0 12px var(--shadow)!important;width:260px!important;transition:transform .35s cubic-bezier(.45,.05,.55,.95)!important;will-change:transform}
+    .sidebar.close{transform:translateX(-100%)}
+    .sidebar-toggle{display:none!important}
+    .sidebar-header{display:flex;align-items:center;padding:12px 12px;border-bottom:1px solid var(--border);gap:6px;background:var(--sidebar-bg)}
+    .sidebar-brand{font-size:1rem;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1;min-width:0}
+    .sidebar-brand.hidden{display:none}
+    .sidebar-filter-input{flex:1;padding:5px 8px;border:1px solid var(--border);border-radius:6px;background:var(--bg);color:var(--text);font-size:.8rem;outline:none;display:none;min-width:0;transition:border .2s}
+    .sidebar-filter-input:focus{border-color:var(--accent)}
+    .sidebar-filter-input.show{display:block}
+    .sidebar-actions{display:flex;align-items:center;gap:2px;flex-shrink:0}
+    .icon-btn{background:none;border:none;cursor:pointer;width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:6px;transition:background .18s,color .18s;color:var(--text-secondary);flex-shrink:0}
+    .icon-btn:hover{background:var(--btn-hover);color:var(--text)}
+    .icon-btn svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round}
 
     /* ============================================================
-       侧边栏导航
+       Sidebar Navigation (accordion folders + stagger animation)
        ============================================================ */
-    .sidebar-nav { padding: 6px 0; }
-    .sidebar-nav > ul { padding-left: 0; }
-    .sidebar-nav li { list-style: none; margin: 0; }
-    .sidebar-nav a { display: block; padding: 7px 14px; border-radius: 7px; margin: 1px 6px; color: var(--text); text-decoration: none; font-size: 0.88rem; transition: background 0.15s, color 0.15s, padding-left 0.2s; }
-    .sidebar-nav a:hover { background: var(--sidebar-hover); }
-    .sidebar-nav .active > a { background: var(--sidebar-active); font-weight: 500; color: var(--heading-color); padding-left: 18px; }
-    .sidebar-nav li.filtered-out { display: none !important; }
-    .folder-item { display: flex !important; flex-wrap: wrap; align-items: center; margin: 1px 6px; }
-    .folder-label { flex: 1 1 auto; display: flex !important; align-items: center; gap: 7px; padding: 7px 12px; border-radius: 7px; color: var(--text); cursor: pointer; font-size: 0.88rem; text-decoration: none; user-select: none; min-width: 0; transition: background 0.18s, color 0.18s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .folder-label:hover { background: var(--sidebar-hover); }
-    .folder-item.expanded > .folder-label { background: var(--folder-open-bg); color: var(--text); font-weight: 500; }
-    .folder-arrow { flex-shrink: 0; width: 16px; height: 16px; display: flex; align-items: center; justify-content: center; transition: transform 0.28s cubic-bezier(0.45,0.05,0.55,0.95); color: var(--text-muted); }
-    .folder-item.expanded > .folder-label .folder-arrow { transform: rotate(90deg); }
-    .folder-arrow svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2.5; stroke-linecap: round; }
-    .folder-item > ul { flex-basis: 100%; width: 100%; }
-    .sidebar-nav ul.sidebar-sub { padding-left: 6px; margin-left: 12px; max-height: 0; overflow: hidden; will-change: max-height; transition: max-height 0.32s cubic-bezier(0.45,0.05,0.55,0.95); border-left: 1px solid transparent; }
-    .sidebar-nav ul.sidebar-sub.expanded { max-height: 500px; border-left-color: var(--folder-open-border); }
-    .sidebar-nav ul.sidebar-sub > li { opacity: 0; transform: translateX(-6px); transition: opacity 0.25s ease, transform 0.25s ease; will-change: opacity, transform; }
-    .sidebar-nav ul.sidebar-sub.expanded > li { opacity: 1; transform: translateX(0); }
-    .sidebar-nav ul.sidebar-sub.expanded > li:nth-child(1){transition-delay:0.03s}
-    .sidebar-nav ul.sidebar-sub.expanded > li:nth-child(2){transition-delay:0.06s}
-    .sidebar-nav ul.sidebar-sub.expanded > li:nth-child(3){transition-delay:0.09s}
-    .sidebar-nav ul.sidebar-sub.expanded > li:nth-child(4){transition-delay:0.12s}
-    .sidebar-nav ul.sidebar-sub.expanded > li:nth-child(5){transition-delay:0.15s}
-    .sidebar-nav ul.sidebar-sub.expanded > li:nth-child(n+6){transition-delay:0.17s}
-    .sidebar-nav ul.sidebar-sub li a { font-size: 0.84rem; padding: 5px 11px; margin: 1px 4px; }
+    .sidebar-nav{padding:6px 0}
+    .sidebar-nav>ul{padding-left:0}
+    .sidebar-nav li{list-style:none;margin:0}
+    .sidebar-nav a{display:block;padding:7px 14px;border-radius:7px;margin:1px 6px;color:var(--text);text-decoration:none;font-size:.88rem;transition:background .15s,color .15s,padding-left .2s}
+    .sidebar-nav a:hover{background:var(--sidebar-hover)}
+    .sidebar-nav .active>a{background:var(--sidebar-active);font-weight:500;color:var(--heading-color);padding-left:18px}
+    .sidebar-nav li.filtered-out{display:none!important}
+    .folder-item{display:flex!important;flex-wrap:wrap;align-items:center;margin:1px 6px}
+    .folder-label{flex:1 1 auto;display:flex!important;align-items:center;gap:7px;padding:7px 12px;border-radius:7px;color:var(--text);cursor:pointer;font-size:.88rem;text-decoration:none;user-select:none;min-width:0;transition:background .18s,color .18s;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .folder-label:hover{background:var(--sidebar-hover)}
+    .folder-item.expanded>.folder-label{background:var(--folder-open-bg);color:var(--text);font-weight:500}
+    .folder-arrow{flex-shrink:0;width:16px;height:16px;display:flex;align-items:center;justify-content:center;transition:transform .28s cubic-bezier(.45,.05,.55,.95);color:var(--text-muted)}
+    .folder-item.expanded>.folder-label .folder-arrow{transform:rotate(90deg)}
+    .folder-arrow svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2.5;stroke-linecap:round}
+    .folder-item>ul{flex-basis:100%;width:100%}
+    .sidebar-nav ul.sidebar-sub{padding-left:6px;margin-left:12px;max-height:0;overflow:hidden;will-change:max-height;transition:max-height .32s cubic-bezier(.45,.05,.55,.95);border-left:1px solid transparent}
+    .sidebar-nav ul.sidebar-sub.expanded{max-height:500px;border-left-color:var(--folder-open-border)}
+    .sidebar-nav ul.sidebar-sub>li{opacity:0;transform:translateX(-6px);transition:opacity .25s ease,transform .25s ease;will-change:opacity,transform}
+    .sidebar-nav ul.sidebar-sub.expanded>li{opacity:1;transform:translateX(0)}
+    .sidebar-nav ul.sidebar-sub.expanded>li:nth-child(1){transition-delay:.03s}
+    .sidebar-nav ul.sidebar-sub.expanded>li:nth-child(2){transition-delay:.06s}
+    .sidebar-nav ul.sidebar-sub.expanded>li:nth-child(3){transition-delay:.09s}
+    .sidebar-nav ul.sidebar-sub.expanded>li:nth-child(4){transition-delay:.12s}
+    .sidebar-nav ul.sidebar-sub.expanded>li:nth-child(5){transition-delay:.15s}
+    .sidebar-nav ul.sidebar-sub.expanded>li:nth-child(n+6){transition-delay:.17s}
+    .sidebar-nav ul.sidebar-sub li a{font-size:.84rem;padding:5px 11px;margin:1px 4px}
 
     /* ============================================================
-       标题锚点
+       Heading Anchor
        ============================================================ */
-    .heading-anchor { display: inline-block; opacity: 0; margin-left: 4px; color: var(--text-muted); cursor: pointer; font-size: 0.9rem; transition: opacity 0.2s, transform 0.2s; vertical-align: middle; user-select: none; }
-    .markdown-section h1:hover .heading-anchor,
-    .markdown-section h2:hover .heading-anchor,
-    .markdown-section h3:hover .heading-anchor,
-    .markdown-section h4:hover .heading-anchor { opacity: 1; }
-    .heading-anchor:hover { transform: scale(1.15); color: var(--text); }
+    .heading-anchor{display:inline-block;opacity:0;margin-left:4px;color:var(--text-muted);cursor:pointer;font-size:.9rem;transition:opacity .2s,transform .2s;vertical-align:middle;user-select:none}
+    .markdown-section h1:hover .heading-anchor,.markdown-section h2:hover .heading-anchor,.markdown-section h3:hover .heading-anchor,.markdown-section h4:hover .heading-anchor{opacity:1}
+    .heading-anchor:hover{transform:scale(1.15);color:var(--text)}
 
     /* ============================================================
-       文档抬头
+       Doc Header (fixed top bar)
        ============================================================ */
-    .doc-header { position: fixed; top: 0; left: 260px; right: 0; height: 56px; background: var(--header-bg); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid var(--border-light); display: none; align-items: center; padding: 0 20px; z-index: 999; transition: left 0.35s cubic-bezier(0.45,0.05,0.55,0.95), background 0.3s; }
-    body.close .doc-header { left: 0; }
-    .doc-header-left { display: flex; align-items: center; gap: 6px; flex: 1; min-width: 0; }
-    .doc-title { font-size: 15px; font-weight: 500; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .doc-reading-time { font-size: 0.7rem; color: var(--text-muted); white-space: nowrap; margin-left: 4px; }
-    .doc-header-actions { display: flex; align-items: center; gap: 2px; flex-shrink: 0; }
-    .capsule { display: none; align-items: center; background: var(--header-bg); backdrop-filter: blur(10px); border: 1px solid var(--border); border-radius: 24px; padding: 4px 6px; gap: 2px; position: absolute; left: 14px; top: 50%; transform: translateY(-50%); z-index: 1000; box-shadow: 0 2px 8px var(--shadow); }
-    body.close .capsule { display: flex; }
-    body.close .doc-header-left { padding-left: 68px; }
-    .capsule .icon-btn { width: 28px; height: 28px; border-radius: 50%; }
-    #darkModeBtn .sun-icon, #darkModeBtn .moon-icon { transition: transform 0.4s; }
-    body:not(.dark) #darkModeBtn .moon-icon { display: none; }
-    body.dark #darkModeBtn .sun-icon { display: none; }
+    .doc-header{position:fixed;top:0;left:260px;right:0;height:56px;background:var(--header-bg);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--border-light);display:none;align-items:center;padding:0 20px;z-index:999;transition:left .35s cubic-bezier(.45,.05,.55,.95),background .3s}
+    body.close .doc-header{left:0}
+    .doc-header-left{display:flex;align-items:center;gap:6px;flex:1;min-width:0}
+    .doc-title{font-size:15px;font-weight:500;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .doc-reading-time{font-size:.7rem;color:var(--text-muted);white-space:nowrap;margin-left:4px}
+    .doc-header-actions{display:flex;align-items:center;gap:2px;flex-shrink:0}
+    .capsule{display:none;align-items:center;background:var(--header-bg);backdrop-filter:blur(10px);border:1px solid var(--border);border-radius:24px;padding:4px 6px;gap:2px;position:absolute;left:14px;top:50%;transform:translateY(-50%);z-index:1000;box-shadow:0 2px 8px var(--shadow)}
+    body.close .capsule{display:flex}
+    body.close .doc-header-left{padding-left:68px}
+    .capsule .icon-btn{width:28px;height:28px;border-radius:50%}
+    #darkModeBtn .sun-icon,#darkModeBtn .moon-icon{transition:transform .4s}
+    body:not(.dark) #darkModeBtn .moon-icon{display:none}
+    body.dark #darkModeBtn .sun-icon{display:none}
 
     /* ============================================================
-       回到顶部
+       Back to Top + Circular Progress
        ============================================================ */
-    #backToTop { position: fixed; bottom: 28px; right: 28px; z-index: 998; width: 44px; height: 44px; border-radius: 50%; background: var(--accent); color: #fff; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 14px var(--shadow-lg); opacity: 0; transform: translateY(20px); transition: opacity 0.3s, transform 0.3s; pointer-events: none; }
-    body.dark #backToTop { color: #0d1117; }
-    #backToTop.visible { opacity: 1; transform: translateY(0); pointer-events: auto; }
-    #backToTop:hover { transform: translateY(-3px); box-shadow: 0 6px 20px var(--shadow-lg); }
-    #backToTop svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2.5; }
-    #backToTop::before { content: ''; position: absolute; inset: -3px; border-radius: 50%; background: conic-gradient(var(--progress-color) var(--scroll-pct, 0%), transparent var(--scroll-pct, 0%)); mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #fff calc(100% - 3px)); -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #fff calc(100% - 3px)); opacity: 0.55; }
+    #backToTop{position:fixed;bottom:28px;right:28px;z-index:998;width:44px;height:44px;border-radius:50%;background:var(--accent);color:#fff;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 14px var(--shadow-lg);opacity:0;transform:translateY(20px);transition:opacity .3s,transform .3s;pointer-events:none}
+    body.dark #backToTop{color:#0d1117}
+    #backToTop.visible{opacity:1;transform:translateY(0);pointer-events:auto}
+    #backToTop:hover{transform:translateY(-3px);box-shadow:0 6px 20px var(--shadow-lg)}
+    #backToTop svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2.5}
+    #backToTop::before{content:'';position:absolute;inset:-3px;border-radius:50%;background:conic-gradient(var(--progress-color) var(--scroll-pct,0%),transparent var(--scroll-pct,0%));mask:radial-gradient(farthest-side,transparent calc(100% - 3px),#fff calc(100% - 3px));-webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 3px),#fff calc(100% - 3px));opacity:.55}
 
     /* ============================================================
-       TOC 面板（链接黑色，hover 绿色）
+       Table of Contents Panel
        ============================================================ */
-    #toc-panel { position: fixed; right: 16px; top: 80px; z-index: 997; background: var(--toc-bg); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border: 1px solid var(--border); border-radius: 12px; padding: 12px 16px; max-width: 240px; max-height: 60vh; overflow-y: auto; font-size: 0.8rem; box-shadow: 0 8px 24px var(--shadow); transition: opacity 0.3s, transform 0.3s; opacity: 0; transform: translateX(20px); pointer-events: none; }
-    #toc-panel.visible { opacity: 1; transform: translateX(0); pointer-events: auto; }
-    #toc-panel .toc-title { font-weight: 600; color: var(--text); margin-bottom: 8px; font-size: 0.76rem; text-transform: uppercase; letter-spacing: 0.5px; }
-    #toc-panel a { display: block; padding: 4px 0; color: var(--toc-link); text-decoration: none; border-left: 2px solid transparent; padding-left: 8px; transition: all 0.2s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    #toc-panel a:hover,
-    #toc-panel a.active { color: var(--toc-link-hover); border-left-color: var(--toc-link-hover); }
-    #toc-panel a.toc-h2 { padding-left: 8px; font-weight: 500; }
-    #toc-panel a.toc-h3 { padding-left: 18px; font-size: 0.75rem; }
-    #toc-panel a.toc-h4 { padding-left: 28px; font-size: 0.72rem; }
-    #tocToggleBtn.active { color: var(--heading-color); }
+    #toc-panel{position:fixed;right:16px;top:80px;z-index:997;background:var(--toc-bg);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:1px solid var(--border);border-radius:12px;padding:12px 16px;max-width:240px;max-height:60vh;overflow-y:auto;font-size:.8rem;box-shadow:0 8px 24px var(--shadow);transition:opacity .3s,transform .3s;opacity:0;transform:translateX(20px);pointer-events:none}
+    #toc-panel.visible{opacity:1;transform:translateX(0);pointer-events:auto}
+    #toc-panel .toc-title{font-weight:600;color:var(--text);margin-bottom:8px;font-size:.76rem;text-transform:uppercase;letter-spacing:.5px}
+    #toc-panel a{display:block;padding:4px 0;color:var(--toc-link);text-decoration:none;border-left:2px solid transparent;padding-left:8px;transition:all .2s;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    #toc-panel a:hover,#toc-panel a.active{color:var(--toc-link-hover);border-left-color:var(--toc-link-hover)}
+    #toc-panel a.toc-h2{padding-left:8px;font-weight:500}
+    #toc-panel a.toc-h3{padding-left:18px;font-size:.75rem}
+    #toc-panel a.toc-h4{padding-left:28px;font-size:.72rem}
+    #tocToggleBtn.active{color:var(--heading-color)}
 
     /* ============================================================
-       搜索模态
+       Search Modal
        ============================================================ */
-    .search-modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: var(--modal-overlay); backdrop-filter: blur(6px); z-index: 10001; display: none; align-items: flex-start; justify-content: center; padding-top: 10vh; }
-    .search-modal-overlay.active { display: flex; }
-    .search-modal { background: var(--modal-bg); border-radius: 18px; width: 90%; max-width: 580px; box-shadow: 0 18px 45px rgba(0,0,0,0.3); overflow: hidden; display: flex; flex-direction: column; max-height: 70vh; border: 1px solid var(--border); }
-    .search-modal-header { display: flex; align-items: center; padding: 14px 18px; border-bottom: 1px solid var(--border); }
-    .search-modal-header .search-icon { color: var(--text-muted); margin-right: 10px; flex-shrink: 0; }
-    .search-modal-input { flex: 1; border: none; outline: none; font-size: 1.05rem; padding: 8px 0; background: transparent; color: var(--text); }
-    .search-modal-input::placeholder { color: var(--text-muted); }
-    .search-modal-close { background: none; border: none; cursor: pointer; color: var(--text-muted); padding: 4px; border-radius: 50%; }
-    .search-modal-close:hover { background: var(--btn-hover); color: var(--text); }
-    .search-results { overflow-y: auto; flex: 1; padding: 8px 0; }
-    .search-result-item { padding: 11px 18px; cursor: pointer; border-bottom: 1px solid var(--border-light); color: var(--text); font-size: 0.88rem; line-height: 1.5; transition: background 0.15s; }
-    .search-result-item:hover { background: var(--btn-hover); }
-    .search-result-item.selected { background: var(--search-selected); border-left: 3px solid var(--accent); }
-    .search-result-item mark { background: var(--search-highlight); border-radius: 2px; color: var(--text); }
-    .search-no-results { padding: 28px; text-align: center; color: var(--text-muted); }
-    .search-result-title { font-weight: 600; margin-bottom: 3px; }
-    .search-hint { padding: 7px 18px; font-size: 0.72rem; color: var(--text-muted); border-bottom: 1px solid var(--border-light); }
+    .search-modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:var(--modal-overlay);backdrop-filter:blur(6px);z-index:10001;display:none;align-items:flex-start;justify-content:center;padding-top:10vh}
+    .search-modal-overlay.active{display:flex}
+    .search-modal{background:var(--modal-bg);border-radius:18px;width:90%;max-width:580px;box-shadow:0 18px 45px rgba(0,0,0,.3);overflow:hidden;display:flex;flex-direction:column;max-height:70vh;border:1px solid var(--border)}
+    .search-modal-header{display:flex;align-items:center;padding:14px 18px;border-bottom:1px solid var(--border)}
+    .search-modal-header .search-icon{color:var(--text-muted);margin-right:10px;flex-shrink:0}
+    .search-modal-input{flex:1;border:none;outline:none;font-size:1.05rem;padding:8px 0;background:transparent;color:var(--text)}
+    .search-modal-input::placeholder{color:var(--text-muted)}
+    .search-modal-close{background:none;border:none;cursor:pointer;color:var(--text-muted);padding:4px;border-radius:50%}
+    .search-modal-close:hover{background:var(--btn-hover);color:var(--text)}
+    .search-results{overflow-y:auto;flex:1;padding:8px 0}
+    .search-result-item{padding:11px 18px;cursor:pointer;border-bottom:1px solid var(--border-light);color:var(--text);font-size:.88rem;line-height:1.5;transition:background .15s}
+    .search-result-item:hover{background:var(--btn-hover)}
+    .search-result-item.selected{background:var(--search-selected);border-left:3px solid var(--accent)}
+    .search-result-item mark{background:var(--search-highlight);border-radius:2px;color:var(--text)}
+    .search-no-results{padding:28px;text-align:center;color:var(--text-muted)}
+    .search-result-title{font-weight:600;margin-bottom:3px}
+    .search-hint{padding:7px 18px;font-size:.72rem;color:var(--text-muted);border-bottom:1px solid var(--border-light)}
 
     /* ============================================================
-       快捷键面板
+       Keyboard Shortcuts Panel
        ============================================================ */
-    #shortcuts-panel { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: var(--modal-overlay); backdrop-filter: blur(4px); z-index: 10002; display: none; align-items: center; justify-content: center; }
-    #shortcuts-panel.active { display: flex; }
-    .shortcuts-modal { background: var(--modal-bg); border-radius: 16px; padding: 24px 28px; max-width: 400px; width: 90%; box-shadow: 0 18px 45px rgba(0,0,0,0.3); border: 1px solid var(--border); }
-    .shortcuts-modal h3 { margin: 0 0 14px; font-size: 1.05rem; color: var(--text); }
-    .shortcuts-modal .kbd-row { display: flex; justify-content: space-between; align-items: center; padding: 7px 0; border-bottom: 1px solid var(--border-light); font-size: 0.84rem; color: var(--text-secondary); }
-    .shortcuts-modal .kbd-row:last-child { border-bottom: none; }
-    .shortcuts-modal kbd { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 4px; padding: 2px 7px; font-size: 0.73rem; font-family: 'JetBrains Mono', monospace; color: var(--heading-color); }
+    #shortcuts-panel{position:fixed;top:0;left:0;right:0;bottom:0;background:var(--modal-overlay);backdrop-filter:blur(4px);z-index:10002;display:none;align-items:center;justify-content:center}
+    #shortcuts-panel.active{display:flex}
+    .shortcuts-modal{background:var(--modal-bg);border-radius:16px;padding:24px 28px;max-width:400px;width:90%;box-shadow:0 18px 45px rgba(0,0,0,.3);border:1px solid var(--border)}
+    .shortcuts-modal h3{margin:0 0 14px;font-size:1.05rem;color:var(--text)}
+    .shortcuts-modal .kbd-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--border-light);font-size:.84rem;color:var(--text-secondary)}
+    .shortcuts-modal .kbd-row:last-child{border-bottom:none}
+    .shortcuts-modal kbd{background:var(--bg-secondary);border:1px solid var(--border);border-radius:4px;padding:2px 7px;font-size:.73rem;font-family:'JetBrains Mono',monospace;color:var(--heading-color)}
 
     /* ============================================================
-       代码块 + 行号 + Prism（暗色彻底优化）
+       Code Block + Line Numbers + Prism Highlighting
        ============================================================ */
-    .code-block-wrapper { margin: 1.6rem 0; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 10px var(--shadow); background: var(--code-bg); border: 1px solid var(--code-border); position: relative; }
-    .code-toolbar { display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 1.2rem; background: var(--bg-secondary); border-bottom: 1px solid var(--code-border); }
-    .code-lang { font-weight: 600; text-transform: uppercase; font-size: 0.68rem; color: var(--text-muted); letter-spacing: 0.4px; }
-    .code-copy-btn { background: transparent; border: 1px solid var(--border); color: var(--text-secondary); padding: 4px 11px; border-radius: 6px; font-size: 0.73rem; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 4px; }
-    .code-copy-btn:hover { background: var(--btn-hover); border-color: var(--accent); color: var(--text); }
-    .code-copy-btn.copied { background: #27ae60; border-color: #27ae60; color: #fff; }
-    .code-block-wrapper pre { margin: 0; padding: 1.2rem 0; overflow-x: auto; background: transparent !important; display: flex; }
-    .code-block-wrapper pre code { font-family: 'JetBrains Mono','Fira Code',Consolas,monospace; font-size: 0.86rem; line-height: 1.7; padding: 0 1.4rem; flex: 1; display: block; color: var(--text) !important; background: transparent !important; }
-    .code-line-numbers { flex-shrink: 0; padding: 1.2rem 0; user-select: none; background: var(--line-number-bg); border-right: 1px solid var(--code-border); }
-    .code-line-numbers span { display: block; font-family: 'JetBrains Mono',monospace; font-size: 0.8rem; line-height: 1.7; color: var(--line-number); text-align: right; padding: 0 12px 0 14px; min-width: 3.5rem; }
+    .code-block-wrapper{margin:1.6rem 0;border-radius:10px;overflow:hidden;box-shadow:0 2px 10px var(--shadow);background:var(--code-bg);border:1px solid var(--code-border);position:relative}
+    .code-toolbar{display:flex;justify-content:space-between;align-items:center;padding:.5rem 1.2rem;background:var(--bg-secondary);border-bottom:1px solid var(--code-border)}
+    .code-lang{font-weight:600;text-transform:uppercase;font-size:.68rem;color:var(--text-muted);letter-spacing:.4px}
+    .code-copy-btn{background:transparent;border:1px solid var(--border);color:var(--text-secondary);padding:4px 11px;border-radius:6px;font-size:.73rem;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:4px}
+    .code-copy-btn:hover{background:var(--btn-hover);border-color:var(--accent);color:var(--text)}
+    .code-copy-btn.copied{background:#27ae60;border-color:#27ae60;color:#fff}
+    .code-block-wrapper pre{margin:0;padding:1.2rem 0;overflow-x:auto;background:transparent!important;display:flex}
+    .code-block-wrapper pre code{font-family:'JetBrains Mono','Fira Code',Consolas,monospace;font-size:.86rem;line-height:1.7;padding:0 1.4rem;flex:1;display:block;color:var(--text)!important;background:transparent!important}
+    .code-line-numbers{flex-shrink:0;padding:1.2rem 0;user-select:none;background:var(--line-number-bg);border-right:1px solid var(--code-border)}
+    .code-line-numbers span{display:block;font-family:'JetBrains Mono',monospace;font-size:.8rem;line-height:1.7;color:var(--line-number);text-align:right;padding:0 12px 0 14px;min-width:3.5rem}
 
-    /* Prism light */
+    /* Prism Light */
     .markdown-section .token.comment,.markdown-section .token.prolog,.markdown-section .token.doctype,.markdown-section .token.cdata{color:#6a737d;font-style:italic}
     .markdown-section .token.punctuation{color:#393a34}
     .markdown-section .token.property,.markdown-section .token.tag,.markdown-section .token.boolean,.markdown-section .token.number,.markdown-section .token.constant,.markdown-section .token.symbol,.markdown-section .token.deleted{color:#005cc5}
@@ -297,7 +268,7 @@
     .markdown-section .token.important,.markdown-section .token.bold{font-weight:600}
     .markdown-section .token.italic{font-style:italic}
 
-    /* Prism dark */
+    /* Prism Dark */
     body.dark .markdown-section .token.comment,body.dark .markdown-section .token.prolog,body.dark .markdown-section .token.doctype,body.dark .markdown-section .token.cdata{color:#8b949e;font-style:italic}
     body.dark .markdown-section .token.punctuation{color:#c9d1d9}
     body.dark .markdown-section .token.property,body.dark .markdown-section .token.tag,body.dark .markdown-section .token.boolean,body.dark .markdown-section .token.number,body.dark .markdown-section .token.constant,body.dark .markdown-section .token.symbol,body.dark .markdown-section .token.deleted{color:#79c0ff}
@@ -308,57 +279,53 @@
     body.dark .markdown-section .token.regex,body.dark .markdown-section .token.important,body.dark .markdown-section .token.variable{color:#ffa657}
 
     /* ============================================================
-       Markdown 正文样式（标题绿色 + 内联代码 + 表格 + 引用）
+       Markdown Content Styles
        ============================================================ */
-    .markdown-section { padding: 72px 28px 40px !important; max-width: 860px; margin: 0 auto; }
-    /* ★ 标题绿色 */
-    .markdown-section h1, .markdown-section h2, .markdown-section h3, .markdown-section h4 { color: var(--heading-color); }
-    .markdown-section h1 { font-size: 2rem; font-weight: 700; border-bottom: 2px solid var(--border); padding-bottom: 0.5rem; margin-top: 2rem; }
-    .markdown-section h2 { font-size: 1.5rem; font-weight: 600; margin-top: 1.8rem; }
-    .markdown-section h3 { font-size: 1.2rem; font-weight: 600; margin-top: 1.5rem; }
-    .markdown-section h4 { font-size: 1.05rem; font-weight: 500; margin-top: 1.2rem; }
-    /* 内联代码 */
-    .markdown-section code:not(pre code) { background: var(--inline-code-bg); color: var(--inline-code-text); padding: 2px 6px; border-radius: 4px; font-size: 0.88em; font-family: 'JetBrains Mono',monospace; }
-    /* 表格 */
-    .markdown-section table { border-collapse: collapse; width: 100%; margin: 1.5rem 0; }
-    .markdown-section th, .markdown-section td { border: 1px solid var(--table-border); padding: 10px 14px; text-align: left; }
-    .markdown-section th { background: var(--bg-secondary); font-weight: 600; }
-    .markdown-section tr:nth-child(even) { background: var(--table-stripe); }
-    /* 引用 */
-    .markdown-section blockquote { border-left: 4px solid var(--blockquote-border); background: var(--blockquote-bg); padding: 12px 18px; margin: 1.2rem 0; border-radius: 0 6px 6px 0; color: var(--text-secondary); }
-    .markdown-section blockquote p:last-child { margin-bottom: 0; }
-    /* 链接 */
-    .markdown-section a { color: var(--heading-color); text-decoration: none; border-bottom: 1px solid transparent; transition: border-color 0.15s; }
-    .markdown-section a:hover { border-bottom-color: var(--heading-color); }
+    .markdown-section{padding:72px 28px 40px!important;max-width:860px;margin:0 auto}
+    .markdown-section h1,.markdown-section h2,.markdown-section h3,.markdown-section h4{color:var(--heading-color)}
+    .markdown-section h1{font-size:2rem;font-weight:700;border-bottom:2px solid var(--border);padding-bottom:.5rem;margin-top:2rem}
+    .markdown-section h2{font-size:1.5rem;font-weight:600;margin-top:1.8rem}
+    .markdown-section h3{font-size:1.2rem;font-weight:600;margin-top:1.5rem}
+    .markdown-section h4{font-size:1.05rem;font-weight:500;margin-top:1.2rem}
+    .markdown-section code:not(pre code){background:var(--inline-code-bg);color:var(--inline-code-text);padding:2px 6px;border-radius:4px;font-size:.88em;font-family:'JetBrains Mono',monospace}
+    .markdown-section table{border-collapse:collapse;width:100%;margin:1.5rem 0}
+    .markdown-section th,.markdown-section td{border:1px solid var(--table-border);padding:10px 14px;text-align:left}
+    .markdown-section th{background:var(--bg-secondary);font-weight:600}
+    .markdown-section tr:nth-child(even){background:var(--table-stripe)}
+    .markdown-section blockquote{border-left:4px solid var(--blockquote-border);background:var(--blockquote-bg);padding:12px 18px;margin:1.2rem 0;border-radius:0 6px 6px 0;color:var(--text-secondary)}
+    .markdown-section blockquote p:last-child{margin-bottom:0}
+    .markdown-section a{color:var(--heading-color);text-decoration:none;border-bottom:1px solid transparent;transition:border-color .15s}
+    .markdown-section a:hover{border-bottom-color:var(--heading-color)}
 
     /* ============================================================
-       图片灯箱
+       Image Lightbox
        ============================================================ */
-    #img-lightbox { position: fixed; inset: 0; z-index: 10050; background: var(--lightbox-bg); backdrop-filter: blur(8px); display: none; align-items: center; justify-content: center; cursor: zoom-out; animation: lbFadeIn 0.25s ease; }
-    #img-lightbox.active { display: flex; }
-    #img-lightbox img { max-width: 90vw; max-height: 85vh; border-radius: 6px; box-shadow: 0 20px 60px rgba(0,0,0,0.5); cursor: default; }
-    #img-lightbox .lb-close { position: absolute; top: 20px; right: 28px; z-index: 1; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #fff; width: 40px; height: 40px; border-radius: 50%; font-size: 1.2rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.2s; }
-    #img-lightbox .lb-close:hover { background: rgba(255,255,255,0.2); }
-    @keyframes lbFadeIn { from{opacity:0} to{opacity:1} }
-    .markdown-section img { cursor: zoom-in; border-radius: 6px; transition: transform 0.15s; }
-    .markdown-section img:hover { transform: scale(1.02); }
+    #img-lightbox{position:fixed;inset:0;z-index:10050;background:var(--lightbox-bg);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;cursor:zoom-out;animation:lbFadeIn .25s ease}
+    #img-lightbox.active{display:flex}
+    #img-lightbox img{max-width:90vw;max-height:85vh;border-radius:6px;box-shadow:0 20px 60px rgba(0,0,0,.5);cursor:default}
+    #img-lightbox .lb-close{position:absolute;top:20px;right:28px;z-index:1;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;width:40px;height:40px;border-radius:50%;font-size:1.2rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s}
+    #img-lightbox .lb-close:hover{background:rgba(255,255,255,.2)}
+    @keyframes lbFadeIn{from{opacity:0}to{opacity:1}}
+    .markdown-section img{cursor:zoom-in;border-radius:6px;transition:transform .15s}
+    .markdown-section img:hover{transform:scale(1.02)}
 
     /* ============================================================
-       响应式
+       Responsive
        ============================================================ */
-    @media (max-width: 768px) {
-      .sidebar { width: 100% !important; }
-      .doc-header { left: 0 !important; }
-      .markdown-section { padding: 72px 16px 40px !important; }
-      #toc-panel { display: none !important; }
-      #backToTop { bottom: 16px; right: 16px; }
-      .search-modal { max-height: 85vh; border-radius: 14px; }
-      .loader-triangle { width: 76px; height: 76px; }
+    @media(max-width:768px){
+      .sidebar{width:100%!important}
+      .doc-header{left:0!important}
+      .markdown-section{padding:72px 16px 40px!important}
+      #toc-panel{display:none!important}
+      #backToTop{bottom:16px;right:16px}
+      .search-modal{max-height:85vh;border-radius:14px}
+      .loader-triangle{width:76px;height:76px}
     }
   </style>
 </head>
 <body>
 
+  <!-- ========== Skeleton / Static Elements ========== -->
   <div id="reading-progress"></div>
   <div id="toast-container"></div>
 
@@ -374,16 +341,16 @@
 
   <div class="doc-header" id="docHeader">
     <div class="capsule" id="capsuleGroup">
-      <button class="icon-btn" id="capsuleSidebarBtn" title="侧边栏 (Ctrl+B)"><svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
-      <button class="icon-btn" id="capsuleSearchBtn" title="搜索 (Ctrl+K)"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg></button>
+      <button class="icon-btn" id="capsuleSidebarBtn" title="侧边栏 (Ctrl+B)" aria-label="打开侧边栏"><svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
+      <button class="icon-btn" id="capsuleSearchBtn" title="搜索 (Ctrl+K)" aria-label="搜索"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg></button>
     </div>
     <div class="doc-header-left">
       <span class="doc-title" id="docTitle">文档加载中…</span>
       <span class="doc-reading-time" id="readingTime"></span>
     </div>
     <div class="doc-header-actions">
-      <button class="icon-btn" id="tocToggleBtn" title="本页目录"><svg viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg></button>
-      <button class="icon-btn" id="darkModeBtn" title="暗色模式 (Ctrl+D)">
+      <button class="icon-btn" id="tocToggleBtn" title="本页目录" aria-label="目录"><svg viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg></button>
+      <button class="icon-btn" id="darkModeBtn" title="暗色模式 (Ctrl+D)" aria-label="切换暗色模式">
         <svg class="sun-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
         <svg class="moon-icon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
       </button>
@@ -391,23 +358,23 @@
   </div>
 
   <div id="toc-panel"><div class="toc-title">📑 本页目录</div><div id="toc-content"></div></div>
-  <button id="backToTop" title="回到顶部 (Ctrl+↑)"><svg viewBox="0 0 24 24"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg></button>
-  <div id="img-lightbox"><button class="lb-close">&times;</button><img src="" alt="preview"></div>
+  <button id="backToTop" title="回到顶部 (Ctrl+↑)" aria-label="回到顶部"><svg viewBox="0 0 24 24"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg></button>
+  <div id="img-lightbox" role="dialog" aria-label="图片预览"><button class="lb-close" aria-label="关闭">&times;</button><img src="" alt="preview"></div>
 
   <div class="search-modal-overlay" id="searchModalOverlay">
-    <div class="search-modal">
+    <div class="search-modal" role="search">
       <div class="search-modal-header">
-        <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" stroke="currentColor" fill="none"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg>
-        <input type="text" class="search-modal-input" id="searchModalInput" placeholder="搜索… (Ctrl+K or /)">
-        <button class="search-modal-close" id="searchModalClose"><svg width="20" height="20" viewBox="0 0 24 24" stroke="currentColor" fill="none"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+        <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" stroke="currentColor" fill="none" aria-hidden="true"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg>
+        <input type="text" class="search-modal-input" id="searchModalInput" placeholder="搜索… (Ctrl+K or /)" aria-label="搜索文档">
+        <button class="search-modal-close" id="searchModalClose" aria-label="关闭搜索"><svg width="20" height="20" viewBox="0 0 24 24" stroke="currentColor" fill="none"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
       </div>
-      <div class="search-hint">↑↓ 导航 &nbsp; Enter 跳转 &nbsp; Esc 关闭</div>
-      <div class="search-results" id="searchResults"></div>
+      <div class="search-hint" aria-live="polite">↑↓ 导航 &nbsp; Enter 跳转 &nbsp; Esc 关闭</div>
+      <div class="search-results" id="searchResults" role="listbox"></div>
     </div>
   </div>
 
   <div id="shortcuts-panel">
-    <div class="shortcuts-modal">
+    <div class="shortcuts-modal" role="dialog" aria-label="快捷键帮助">
       <h3>⌨ 键盘快捷键</h3>
       <div class="kbd-row"><span>全局搜索</span><span><kbd>Ctrl</kbd>+<kbd>K</kbd></span></div>
       <div class="kbd-row"><span>快速搜索</span><span><kbd>/</kbd></span></div>
@@ -421,154 +388,1072 @@
 
   <div id="app"></div>
 
-  <!-- ========== localStorage 容错 ========== -->
+  <!-- ============================================================
+       localStorage Polyfill (Edge tracking prevention)
+       ============================================================ -->
   <script>
     (function(){var m={};function b(){try{var k='__t__';localStorage.setItem(k,'1');localStorage.removeItem(k);return false}catch(e){return true}}if(!b())return;var s=Storage.prototype.setItem,g=Storage.prototype.getItem,r=Storage.prototype.removeItem,c=Storage.prototype.clear;Storage.prototype.setItem=function(k,v){try{s.call(this,k,v)}catch(e){m[k]=String(v)}};Storage.prototype.getItem=function(k){try{return g.call(this,k)}catch(e){return k in m?m[k]:null}};Storage.prototype.removeItem=function(k){try{r.call(this,k)}catch(e){delete m[k]}};Storage.prototype.clear=function(){try{c.call(this)}catch(e){m={}}}})();
   </script>
 
+  <!-- ============================================================
+       Application Core (namespaced under `Kb`)
+       ============================================================ -->
   <script>
-    var DOCSIFY_BASE_PATH = '/my-docs/';
-    window.$docsify = {
-      name: 'Soren的知识库', loadSidebar: '_sidebar.md', subMaxLevel: 0,
-      basePath: DOCSIFY_BASE_PATH, homepage: 'README.md', notFoundPage: true,
-      plugins: [function(hook, vm) {
-        hook.ready(function() {
-          hideLoading(); injectSidebarHeader(); bindGlobalEvents();
-          initLightbox(); initImageClickHandler();
-          document.body.classList.remove('close');
-          updateDocTitle(); updateReadingTime();
-          setTimeout(function() { initSidebarFolders(); generateTOC(); updateProgressBar(); addHeadingAnchors(); restoreReadingPosition(); addLineNumbers(); }, 250);
-        });
-        hook.doneEach(function() {
-          // ★ 统一冻结（一次冻结覆盖全部 DOM 操作）
-          var nav = document.querySelector('.sidebar-nav');
-          if (nav) nav.classList.add('no-transition');
+    (function() {
+      'use strict';
 
-          saveReadingPosition(); updateDocTitle(); updateReadingTime();
-          closeSearchModal(); enhanceCodeBlocks(); clearTOC();
-          resetSidebarStateQuiet();
+      /* ==========================================================
+         Configuration
+         ========================================================== */
+      var CFG = {
+        BASE_PATH: '/my-docs/',
+        LOADER_MAX_ANGLE: 9,
+        LOADER_BASE_SHADOW: 'drop-shadow(0 0 4px rgba(0,0,0,0.15)) drop-shadow(0 0 1px rgba(0,0,0,0.3))',
+        READING_POSITION_KEY: 'docsify_reading_pos',
+        DARK_MODE_KEY: 'darkMode',
+        TOAST_DURATION: 2400,
+        CODE_COPIED_DURATION: 2000,
+        LOADING_ERROR_DELAY: 5000,
+        DOM_RESTORE_DELAY: 300,
+        SCROLL_SAVE_DEBOUNCE: 500,
+        BACK_TO_TOP_THRESHOLD: 400,
+        TOC_MIN_HEADINGS: 2,
+        TOC_SCROLL_OFFSET: 80
+      };
 
-          setTimeout(function() {
-            initSidebarFoldersQuiet(); generateTOC(); updateProgressBar();
-            addHeadingAnchors(); addLineNumbers(); initImageClickHandler();
-            // ★ 全部 DOM 操作完成后统一解冻
-            requestAnimationFrame(function() {
-              requestAnimationFrame(function() {
-                if (nav) nav.classList.remove('no-transition');
-              });
-            });
-            setTimeout(restoreReadingPosition, 300);
-          }, 150);
-          if (window.MathJax && typeof MathJax.typesetPromise === 'function') MathJax.typesetPromise();
-        });
-      }]
-    };
+      /* ==========================================================
+         State
+         ========================================================== */
+      var state = {
+        loading: false,
+        searchSelectedIdx: -1,
+        currentOpenFolderUl: null,
+        currentHighlights: [],
+        scrollTimer: null
+      };
 
-    // ========== Toast ==========
-    function showToast(msg, type) { type=type||'info'; var c=document.getElementById('toast-container'); if(!c)return; var t=document.createElement('div'); t.className='toast '+type; t.textContent=msg; c.appendChild(t); setTimeout(function(){if(t.parentNode)t.remove();},2400); }
+      /* ==========================================================
+         DOM References (cached once on ready)
+         ========================================================== */
+      var DOM = {};
 
-    // ========== 加载三角形 ==========
-    (function(){var wrapper=document.getElementById('loaderWrapper'),triangle=document.getElementById('loaderTriangle'); if(!wrapper||!triangle)return; var maxAngle=9,baseShadow='drop-shadow(0 0 4px rgba(0,0,0,0.15)) drop-shadow(0 0 1px rgba(0,0,0,0.3))'; function h(e){if(_loaded)return; var dx=(e.clientX-window.innerWidth/2)/(window.innerWidth/2),dy=(e.clientY-window.innerHeight/2)/(window.innerHeight/2); wrapper.style.transform='rotateX('+(-dy*maxAngle)+'deg) rotateY('+(dx*maxAngle)+'deg) translateZ(14px)'; triangle.style.filter=baseShadow+' drop-shadow('+(dx*10)+'px '+(dy*10)+'px 12px rgba(0,0,0,0.35))'; } document.addEventListener('mousemove',h); window._loaderMouse=h; })();
-
-    var _loaded=false;
-    function hideLoading(){if(_loaded)return;_loaded=true; var el=document.getElementById('loading'),dh=document.getElementById('docHeader'); if(el){el.classList.add('fade-out');setTimeout(function(){if(el)el.style.display='none';},450);} if(dh)dh.style.display='flex'; if(window._loaderMouse){document.removeEventListener('mousemove',window._loaderMouse);window._loaderMouse=null;}}
-    setTimeout(function(){if(!_loaded){var e=document.getElementById('loadingError');if(e)e.classList.add('show');}},5000);
-
-    // ========== 侧边栏头部 ==========
-    function injectSidebarHeader(){var sb=document.querySelector('.sidebar');if(!sb||sb.querySelector('.sidebar-header'))return;var nav=sb.querySelector('.sidebar-nav');if(!nav)return;var h=document.createElement('div');h.className='sidebar-header';h.innerHTML='<span class="sidebar-brand" id="sidebarBrand">📚 知识库总览</span><input type="text" class="sidebar-filter-input" id="sidebarFilterInput" placeholder="过滤…"><div class="sidebar-actions"><button class="icon-btn" id="sidebarSearchBtn" title="过滤"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg></button><button class="icon-btn" id="sidebarCloseBtn" title="关闭"><svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button></div>';sb.insertBefore(h,nav);bindSidebarButtons();}
-    function bindSidebarButtons(){var closeBtn=document.getElementById('sidebarCloseBtn'),searchBtn=document.getElementById('sidebarSearchBtn'),fi=document.getElementById('sidebarFilterInput'),brand=document.getElementById('sidebarBrand');if(closeBtn)closeBtn.addEventListener('click',function(){document.body.classList.add('close');});if(searchBtn&&fi&&brand){searchBtn.addEventListener('click',function(){if(fi.classList.contains('show')){fi.classList.remove('show');brand.classList.remove('hidden');fi.value='';filterSidebarItems('');}else{fi.classList.add('show');brand.classList.add('hidden');fi.focus();}});}if(fi){fi.addEventListener('input',function(){filterSidebarItems(this.value);});fi.addEventListener('keydown',function(e){if(e.key==='Escape'){this.value='';filterSidebarItems('');this.classList.remove('show');if(brand)brand.classList.remove('hidden');}});}}
-
-    // ========== 全局事件 ==========
-    function bindGlobalEvents(){
-      var cb1=document.getElementById('capsuleSidebarBtn'),cb2=document.getElementById('capsuleSearchBtn');if(cb1)cb1.addEventListener('click',function(){document.body.classList.remove('close');});if(cb2)cb2.addEventListener('click',openSearchModal);
-      var dm=document.getElementById('darkModeBtn');if(dm){dm.addEventListener('click',toggleDarkMode);if(localStorage.getItem('darkMode')==='true')document.body.classList.add('dark');}
-      var tocBtn=document.getElementById('tocToggleBtn'),tocPanel=document.getElementById('toc-panel');if(tocBtn&&tocPanel)tocBtn.addEventListener('click',function(){tocPanel.classList.toggle('visible');tocBtn.classList.toggle('active');});
-      var btt=document.getElementById('backToTop');if(btt)btt.addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'});});
-      window.addEventListener('scroll',function(){updateProgressBar();if(btt){btt.classList.toggle('visible',window.scrollY>400);var dh=document.documentElement.scrollHeight-window.innerHeight;btt.style.setProperty('--scroll-pct',dh>0?Math.min(100,Math.round((window.scrollY/dh)*100))+'%':'0%');}updateTOCHighlight();});
-      var scrollTimer;window.addEventListener('scroll',function(){clearTimeout(scrollTimer);scrollTimer=setTimeout(saveReadingPosition,500);});
-      var closeBtn=document.getElementById('searchModalClose'),overlay=document.getElementById('searchModalOverlay');if(closeBtn)closeBtn.addEventListener('click',closeSearchModal);if(overlay)overlay.addEventListener('click',function(e){if(e.target===overlay)closeSearchModal();});
-      var si=document.getElementById('searchModalInput');if(si){si.addEventListener('input',function(){highlightInDocument(this.value);generateSearchResults(this.value);_searchSelectedIdx=-1;});si.addEventListener('keydown',handleSearchKeyboard);}
-      document.addEventListener('keydown',handleGlobalShortcuts);
-    }
-
-    function toggleDarkMode(){document.body.classList.toggle('dark');localStorage.setItem('darkMode',document.body.classList.contains('dark'));}
-    function handleGlobalShortcuts(e){var tag=(e.target.tagName||'').toLowerCase(),isInput=tag==='input'||tag==='textarea'||e.target.isContentEditable;if(e.key==='Escape'){closeSearchModal();closeShortcutsPanel();var tp=document.getElementById('toc-panel');if(tp)tp.classList.remove('visible');var tb=document.getElementById('tocToggleBtn');if(tb)tb.classList.remove('active');}if((e.ctrlKey||e.metaKey)&&e.key==='k'){e.preventDefault();openSearchModal();return;}if((e.ctrlKey||e.metaKey)&&e.key==='b'){e.preventDefault();document.body.classList.toggle('close');return;}if((e.ctrlKey||e.metaKey)&&e.key==='d'){e.preventDefault();toggleDarkMode();return;}if((e.ctrlKey||e.metaKey)&&e.key==='ArrowUp'){e.preventDefault();window.scrollTo({top:0,behavior:'smooth'});return;}if(e.key==='/'&&!isInput){e.preventDefault();openSearchModal();return;}if(e.key==='?'&&!isInput){e.preventDefault();openShortcutsPanel();return;}}
-    function openShortcutsPanel(){var p=document.getElementById('shortcuts-panel');if(p)p.classList.add('active');}
-    function closeShortcutsPanel(){var p=document.getElementById('shortcuts-panel');if(p)p.classList.remove('active');}
-
-    // ========== 搜索键盘导航 ==========
-    var _searchSelectedIdx=-1;
-    function handleSearchKeyboard(e){var items=document.querySelectorAll('.search-result-item');if(!items.length)return;if(e.key==='ArrowDown'){e.preventDefault();_searchSelectedIdx=Math.min(_searchSelectedIdx+1,items.length-1);updateSearchSelection(items);}else if(e.key==='ArrowUp'){e.preventDefault();_searchSelectedIdx=Math.max(_searchSelectedIdx-1,0);updateSearchSelection(items);}else if(e.key==='Enter'){e.preventDefault();if(_searchSelectedIdx>=0&&items[_searchSelectedIdx])items[_searchSelectedIdx].click();}}
-    function updateSearchSelection(items){items.forEach(function(item,i){item.classList.toggle('selected',i===_searchSelectedIdx);if(i===_searchSelectedIdx)item.scrollIntoView({block:'nearest'});});}
-
-    // ========== 进度条 ==========
-    function updateProgressBar(){var bar=document.getElementById('reading-progress');if(!bar)return;var dh=document.documentElement.scrollHeight-window.innerHeight;bar.style.width=dh<=0?'0%':Math.min(100,Math.max(0,(window.scrollY/dh)*100))+'%';}
-    function updateReadingTime(){var el=document.getElementById('readingTime');if(!el)return;var c=document.querySelector('.markdown-section');if(!c){el.textContent='';return;}var text=c.textContent||'',words=text.replace(/\s+/g,' ').trim().split(/\s+/).length,chinese=(text.match(/[\u4e00-\u9fff]/g)||[]).length;el.textContent='⏱ ~'+Math.max(1,Math.ceil((words/200)+(chinese/400)))+' min';}
-
-    // ========== 标题锚点 ==========
-    function addHeadingAnchors(){var c=document.querySelector('.markdown-section');if(!c)return;c.querySelectorAll('h1,h2,h3,h4').forEach(function(h){if(h.querySelector('.heading-anchor'))return;if(!h.id)h.id='h-'+Math.random().toString(36).substr(2,8);var a=document.createElement('a');a.className='heading-anchor';a.innerHTML='#';a.title='复制链接';a.href='javascript:void(0)';a.addEventListener('click',function(e){e.preventDefault();e.stopPropagation();var url=window.location.origin+window.location.pathname+'?id='+h.id+'#'+h.id;if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(url).then(function(){showToast('✓ 链接已复制','success');});else{var ta=document.createElement('textarea');ta.value=url;ta.style.cssText='position:fixed;left:-9999px';document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);showToast('✓ 链接已复制','success');}});h.appendChild(a);});}
-
-    // ========== TOC ==========
-    function generateTOC(){var c=document.querySelector('.markdown-section'),tc=document.getElementById('toc-content'),tp=document.getElementById('toc-panel'),tb=document.getElementById('tocToggleBtn');if(!c||!tc)return;var hs=c.querySelectorAll('h1,h2,h3,h4');if(hs.length<2){if(tp)tp.classList.remove('visible');if(tb){tb.classList.remove('active');tb.style.display='none';}return;}if(tb)tb.style.display='';var html='';hs.forEach(function(h,i){if(!h.id)h.id='toc-'+i;html+='<a href="#'+h.id+'" class="toc-'+h.tagName.toLowerCase()+'" data-target="'+h.id+'">'+h.textContent.trim()+'</a>';});tc.innerHTML=html;tc.querySelectorAll('a').forEach(function(a){a.addEventListener('click',function(e){e.preventDefault();var t=document.getElementById(a.getAttribute('data-target'));if(t)t.scrollIntoView({behavior:'smooth',block:'start'});});});updateTOCHighlight();}
-    function updateTOCHighlight(){var links=document.querySelectorAll('#toc-content a');if(!links.length)return;var st=window.scrollY+80,activeId=null;links.forEach(function(a){var el=document.getElementById(a.getAttribute('data-target'));if(el&&el.offsetTop<=st)activeId=a.getAttribute('data-target');});links.forEach(function(a){a.classList.toggle('active',a.getAttribute('data-target')===activeId);});}
-    function clearTOC(){var tc=document.getElementById('toc-content');if(tc)tc.innerHTML='';var tp=document.getElementById('toc-panel');if(tp)tp.classList.remove('visible');}
-
-    function updateDocTitle(){var active=document.querySelector('.sidebar-nav .active'),title='';if(active){var link=active.querySelector(':scope > a');title=(link||active).textContent.trim();}if(!title){var h1=document.querySelector('.markdown-section h1');if(h1)title=h1.textContent.trim();}if(!title&&window.location.hash)title=decodeURIComponent(window.location.hash.substring(1)).replace(/\?.*$/,'').replace(/-/g,' ');var el=document.getElementById('docTitle');if(el)el.textContent=title||'文档';}
-
-    function filterSidebarItems(keyword){var all=document.querySelectorAll('.sidebar-nav li');if(!keyword||!keyword.trim()){all.forEach(function(l){l.classList.remove('filtered-out');});return;}var kw=keyword.trim().toLowerCase();all.forEach(function(li){var el=li.querySelector(':scope > a')||li.querySelector(':scope > .folder-label'),text=(el?el.textContent:li.textContent)||'',childUl=li.querySelector('ul'),cm=false;if(childUl){childUl.querySelectorAll('li').forEach(function(cli){if((cli.textContent||'').toLowerCase().indexOf(kw)!==-1)cm=true;});}if(text.toLowerCase().indexOf(kw)!==-1||cm){li.classList.remove('filtered-out');if(cm&&childUl&&!childUl.classList.contains('expanded'))expandFolder(li,childUl);}else{li.classList.add('filtered-out');}});}
-
-    // ============================================================
-    // ★ 侧边栏 —— 统一冻结版（消除闪烁）
-    // ============================================================
-    var _currentOpenFolderUl=null;
-
-    // ★ 安静版（不自行管理 no-transition）
-    function resetSidebarStateQuiet(){var nav=document.querySelector('.sidebar-nav');if(!nav)return;var subs=nav.querySelectorAll('ul.sidebar-sub.expanded');subs.forEach(function(ul){ul.classList.remove('expanded');var pl=ul.parentNode;if(pl)pl.classList.remove('expanded');});_currentOpenFolderUl=null;}
-
-    function initSidebarFoldersQuiet(){var nav=document.querySelector('.sidebar-nav');if(!nav)return;
-      if(nav.querySelector('.folder-item')){
-        var uls2=nav.querySelectorAll('ul');uls2.forEach(function(ul){if(ul.parentNode===nav||ul.parentNode.classList.contains('sidebar-nav')){ul.classList.remove('sidebar-sub','expanded');}else{ul.classList.add('sidebar-sub');}});
-        function sl2(ul){var its=Array.from(ul.children).filter(function(c){return c.tagName==='LI';});its.sort(function(a,b){var aD=!!a.querySelector('ul'),bD=!!b.querySelector('ul');if(aD&&!bD)return -1;if(!aD&&bD)return 1;return(a.textContent||'').trim().localeCompare((b.textContent||'').trim(),'en');});its.forEach(function(l){ul.appendChild(l);});}
-        uls2.forEach(sl2);_currentOpenFolderUl=null;autoExpandActiveFolder();return;
+      function cacheDOM() {
+        DOM.loading = document.getElementById('loading');
+        DOM.docHeader = document.getElementById('docHeader');
+        DOM.loaderWrapper = document.getElementById('loaderWrapper');
+        DOM.loaderTriangle = document.getElementById('loaderTriangle');
+        DOM.loadingError = document.getElementById('loadingError');
+        DOM.readingProgress = document.getElementById('reading-progress');
+        DOM.toastContainer = document.getElementById('toast-container');
+        DOM.docTitle = document.getElementById('docTitle');
+        DOM.readingTime = document.getElementById('readingTime');
+        DOM.tocPanel = document.getElementById('toc-panel');
+        DOM.tocContent = document.getElementById('toc-content');
+        DOM.tocToggleBtn = document.getElementById('tocToggleBtn');
+        DOM.backToTop = document.getElementById('backToTop');
+        DOM.searchOverlay = document.getElementById('searchModalOverlay');
+        DOM.searchInput = document.getElementById('searchModalInput');
+        DOM.searchResults = document.getElementById('searchResults');
+        DOM.searchCloseBtn = document.getElementById('searchModalClose');
+        DOM.shortcutsPanel = document.getElementById('shortcuts-panel');
+        DOM.darkModeBtn = document.getElementById('darkModeBtn');
+        DOM.lightbox = document.getElementById('img-lightbox');
+        DOM.lightboxImg = DOM.lightbox ? DOM.lightbox.querySelector('img') : null;
+        DOM.app = document.getElementById('app');
+        // Capsule buttons
+        DOM.capsuleSidebarBtn = document.getElementById('capsuleSidebarBtn');
+        DOM.capsuleSearchBtn = document.getElementById('capsuleSearchBtn');
+        // Sidebar header (injected later)
+        DOM.sidebarSearchBtn = null;
+        DOM.sidebarCloseBtn = null;
+        DOM.sidebarFilterInput = null;
+        DOM.sidebarBrand = null;
       }
-      var uls=nav.querySelectorAll('ul');uls.forEach(function(ul){if(ul.parentNode===nav||ul.parentNode.classList.contains('sidebar-nav')){ul.classList.remove('sidebar-sub','expanded');}else{ul.classList.add('sidebar-sub');}});
-      function sl(ul){var its=Array.from(ul.children).filter(function(c){return c.tagName==='LI';});its.sort(function(a,b){var aD=!!a.querySelector('ul'),bD=!!b.querySelector('ul');if(aD&&!bD)return -1;if(!aD&&bD)return 1;return(a.textContent||'').trim().localeCompare((b.textContent||'').trim(),'en');});its.forEach(function(l){ul.appendChild(l);});}
-      uls.forEach(sl);_currentOpenFolderUl=null;
-      nav.querySelectorAll('li').forEach(function(li){var childUl=li.querySelector('ul');if(!childUl)return;li.classList.add('folder-item');var label=li.querySelector(':scope > .folder-label');if(!label){var link=li.querySelector(':scope > a');if(link){label=link;label.classList.add('folder-label');label.setAttribute('href','javascript:void(0)');label.removeAttribute('target');}else{var fn='',tr=[];for(var i=0;i<li.childNodes.length;i++){var cn=li.childNodes[i];if(cn.nodeType===3&&cn.textContent.trim()){fn+=cn.textContent.trim();tr.push(cn);}}tr.forEach(function(n){li.removeChild(n);});label=document.createElement('span');label.className='folder-label';label.textContent=fn||'Folder';li.insertBefore(label,li.firstChild);}}
-      var arrow=label.querySelector('.folder-arrow');if(!arrow){arrow=document.createElement('span');arrow.className='folder-arrow';arrow.innerHTML='<svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>';label.appendChild(arrow);}
-      label.onclick=function(e){e.preventDefault();e.stopPropagation();if(childUl.classList.contains('expanded')){collapseFolder(li,childUl);}else{expandFolder(li,childUl);}};});autoExpandActiveFolder();}
 
-    function expandFolder(li,childUl){if(_currentOpenFolderUl&&_currentOpenFolderUl!==childUl){_currentOpenFolderUl.classList.remove('expanded');var pl=_currentOpenFolderUl.parentNode;if(pl)pl.classList.remove('expanded');}childUl.classList.add('expanded');li.classList.add('expanded');_currentOpenFolderUl=childUl;}
-    function collapseFolder(li,childUl){childUl.classList.remove('expanded');li.classList.remove('expanded');if(_currentOpenFolderUl===childUl)_currentOpenFolderUl=null;}
-    function autoExpandActiveFolder(){var al=document.querySelector('.sidebar-nav .active > a');if(!al)return;var p=al.closest('.folder-item');if(!p){var pu=al.closest('ul.sidebar-sub');if(pu)p=pu.closest('.folder-item');}if(p){var cu=p.querySelector(':scope > ul');if(cu)expandFolder(p,cu);}}
+      /* ==========================================================
+         Utility Functions
+         ========================================================== */
 
-    // ★ 保留原函数名兼容 ready 中的调用
-    function initSidebarFolders(){initSidebarFoldersQuiet();}
-    function resetSidebarState(){resetSidebarStateQuiet();}
+      /** Show a toast notification */
+      function toast(msg, type) {
+        type = type || 'info';
+        if (!DOM.toastContainer) return;
+        var el = document.createElement('div');
+        el.className = 'toast ' + type;
+        el.textContent = msg;
+        DOM.toastContainer.appendChild(el);
+        setTimeout(function() { if (el.parentNode) el.remove(); }, CFG.TOAST_DURATION);
+      }
 
-    // ========== 代码块 + 行号 ==========
-    function addLineNumbers(){document.querySelectorAll('.code-block-wrapper pre').forEach(function(pre){if(pre.querySelector('.code-line-numbers'))return;var code=pre.querySelector('code');if(!code)return;var text=code.textContent||'',lines=text.split('\n');if(lines.length>1&&lines[lines.length-1].trim()==='')lines.pop();var html='';for(var i=0;i<lines.length;i++)html+='<span>'+(i+1)+'</span>';var ln=document.createElement('div');ln.className='code-line-numbers';ln.innerHTML=html;pre.insertBefore(ln,pre.firstChild);});}
-    function enhanceCodeBlocks(){document.querySelectorAll('.markdown-section pre').forEach(function(pre){if(pre.parentNode.classList.contains('code-block-wrapper'))return;var code=pre.querySelector('code'),lang='';if(code&&code.className){var m=code.className.match(/lang(?:uage)?-(\w+)/);if(m)lang=m[1];}var w=document.createElement('div');w.className='code-block-wrapper';var tb=document.createElement('div');tb.className='code-toolbar';tb.innerHTML='<span class="code-lang">'+(lang||'code')+'</span>';var btn=document.createElement('button');btn.className='code-copy-btn';btn.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy';btn.addEventListener('click',function(){var text=pre.textContent||'';var done=function(){btn.classList.add('copied');btn.innerHTML='✓ Copied';showToast('✓ 代码已复制','success');setTimeout(function(){btn.classList.remove('copied');btn.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy';},2000);};if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(text).then(done).catch(function(){fc(text,done);});else fc(text,done);});tb.appendChild(btn);w.appendChild(tb);pre.parentNode.insertBefore(w,pre);w.appendChild(pre);});function fc(text,cb){var ta=document.createElement('textarea');ta.value=text;ta.style.cssText='position:fixed;left:-9999px';document.body.appendChild(ta);ta.select();try{document.execCommand('copy');}catch(e){}document.body.removeChild(ta);if(cb)cb();}}
+      /** Freeze / unfreeze CSS transitions on an element */
+      function freezeTransitions(el) {
+        el.classList.add('no-transition');
+        return function unfreeze() {
+          requestAnimationFrame(function() {
+            requestAnimationFrame(function() {
+              el.classList.remove('no-transition');
+            });
+          });
+        };
+      }
 
-    // ========== 阅读位置记忆 ==========
-    function saveReadingPosition(){try{var pk=window.location.pathname+window.location.hash,pos={scrollY:window.scrollY,pageKey:pk,timestamp:Date.now()};localStorage.setItem('docsify_reading_pos',JSON.stringify(pos));}catch(e){}}
-    function restoreReadingPosition(){try{var raw=localStorage.getItem('docsify_reading_pos');if(!raw)return;var pos=JSON.parse(raw),ck=window.location.pathname+window.location.hash;if(pos.pageKey===ck&&typeof pos.scrollY==='number'){setTimeout(function(){window.scrollTo({top:pos.scrollY,behavior:'instant'});},150);}}catch(e){}}
+      /** Safely copy text to clipboard with fallback */
+      function copyToClipboard(text, onSuccess) {
+        var done = function() { if (onSuccess) onSuccess(); };
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(done).catch(function() { fallbackCopy(text, done); });
+        } else {
+          fallbackCopy(text, done);
+        }
+      }
 
-    // ========== 图片灯箱 ==========
-    function initLightbox(){var lb=document.getElementById('img-lightbox');if(!lb)return;var lbImg=lb.querySelector('img'),lbClose=lb.querySelector('.lb-close');lb.addEventListener('click',function(e){if(e.target===lb||e.target===lbClose){lb.classList.remove('active');document.body.style.overflow='';}});lbClose.addEventListener('click',function(){lb.classList.remove('active');document.body.style.overflow='';});document.addEventListener('keydown',function(e){if(e.key==='Escape'&&lb.classList.contains('active')){lb.classList.remove('active');document.body.style.overflow='';}});window._lbImg=lbImg;window._lb=lb;}
-    function initImageClickHandler(){document.querySelectorAll('.markdown-section img').forEach(function(img){if(img.hasAttribute('data-lb'))return;img.setAttribute('data-lb','1');img.addEventListener('click',function(e){e.preventDefault();var lb=window._lb,lbImg=window._lbImg;if(!lb||!lbImg)return;lbImg.src=img.src;lbImg.alt=img.alt||'';lb.classList.add('active');document.body.style.overflow='hidden';});});}
+      function fallbackCopy(text, cb) {
+        var ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.cssText = 'position:fixed;left:-9999px;top:-9999px';
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand('copy'); } catch (e) { /* ignore */ }
+        document.body.removeChild(ta);
+        if (cb) cb();
+      }
 
-    // ========== 全文搜索 ==========
-    var currentHighlights=[];
-    function openSearchModal(){var o=document.getElementById('searchModalOverlay'),i=document.getElementById('searchModalInput'),r=document.getElementById('searchResults');if(!o)return;o.classList.add('active');if(i){i.value='';i.focus();}if(r)r.innerHTML='';clearHighlights();_searchSelectedIdx=-1;}
-    function closeSearchModal(){var o=document.getElementById('searchModalOverlay'),r=document.getElementById('searchResults');if(o)o.classList.remove('active');if(r)r.innerHTML='';clearHighlights();_searchSelectedIdx=-1;}
-    function clearHighlights(){currentHighlights.forEach(function(m){var p=m.parentNode;if(p){p.replaceChild(document.createTextNode(m.textContent||''),m);p.normalize();}});currentHighlights=[];}
-    function highlightInDocument(kw){clearHighlights();if(!kw||!kw.trim())return;var c=document.querySelector('.markdown-section');if(!c)return;var w=document.createTreeWalker(c,NodeFilter.SHOW_TEXT,{acceptNode:function(n){if(!n.textContent||!n.textContent.trim())return NodeFilter.FILTER_REJECT;var p=n.parentNode;if(!p)return NodeFilter.FILTER_REJECT;if(p.tagName==='SCRIPT'||p.tagName==='STYLE')return NodeFilter.FILTER_REJECT;if(p.closest&&(p.closest('.search-modal')||p.closest('.code-copy-btn')||p.closest('#toc-panel')||p.closest('.heading-anchor')||p.closest('.code-line-numbers')))return NodeFilter.FILTER_REJECT;return NodeFilter.FILTER_ACCEPT;}}),nodes=[],n;while((n=w.nextNode()))nodes.push(n);if(!nodes.length)return;var esc=kw.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),re=new RegExp(esc,'gi');nodes.forEach(function(tn){var text=tn.textContent;re.lastIndex=0;var frag=document.createDocumentFragment(),last=0,match,hit=false;while((match=re.exec(text))!==null){hit=true;if(match.index>last)frag.appendChild(document.createTextNode(text.slice(last,match.index)));var mk=document.createElement('mark');mk.className='search-highlight';mk.textContent=match[0];frag.appendChild(mk);currentHighlights.push(mk);last=re.lastIndex;if(match[0].length===0){re.lastIndex++;if(re.lastIndex>text.length)break;}}if(hit&&last<text.length)frag.appendChild(document.createTextNode(text.slice(last)));if(hit&&frag.childNodes.length)tn.parentNode.replaceChild(frag,tn);});}
-    function generateSearchResults(kw){var r=document.getElementById('searchResults');if(!r)return;r.innerHTML='';if(!kw||!kw.trim())return;var c=document.querySelector('.markdown-section');if(!c){r.innerHTML='<div class="search-no-results">暂无内容</div>';return;}var blocks=c.querySelectorAll('p,li,td,th,h1,h2,h3,h4,h5,h6'),esc=kw.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),re=new RegExp(esc,'gi'),seen=new Set(),count=0;blocks.forEach(function(b){if(b.closest('pre')||b.closest('.code-block-wrapper')||b.closest('#toc-panel')||b.closest('.heading-anchor')||b.closest('.code-line-numbers'))return;if(seen.has(b))return;var text=b.textContent||'';re.lastIndex=0;if(!re.test(text))return;seen.add(b);count++;re.lastIndex=0;var match=re.exec(text),idx=match?match.index:0,len=match?match[0].length:0,start=Math.max(0,idx-40),end=Math.min(text.length,idx+len+40),excerpt=(start>0?'…':'')+text.substring(start,end)+(end<text.length?'…':''),div=document.createElement('div');div.className='search-result-item';var h=b.closest('h1,h2,h3,h4,h5,h6')||findPrev(b);if(h&&h!==b)div.innerHTML='<div class="search-result-title">'+h.textContent.trim()+'</div>'+excerpt.replace(new RegExp(esc,'gi'),'<mark>$&</mark>');else div.innerHTML=excerpt.replace(new RegExp(esc,'gi'),'<mark>$&</mark>');div.addEventListener('click',function(){closeSearchModal();b.scrollIntoView({behavior:'smooth',block:'center'});});r.appendChild(div);});if(count===0)r.innerHTML='<div class="search-no-results">未找到匹配内容</div>';}
-    function findPrev(el){var p=el.previousElementSibling;while(p){if(/^H[1-6]$/.test(p.tagName))return p;p=p.previousElementSibling;}return null;}
+      /** Escape regex special characters */
+      function escapeRegex(str) {
+        return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      }
 
-    window.MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']],displayMath:[['$$','$$'],['\\[','\\]']],processEscapes:true},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code'],ignoreHtmlClass:'tex2jax_ignore',processHtmlClass:'tex2jax_process'}};
+      /** Generate a short random ID */
+      function randomId() {
+        return Math.random().toString(36).substr(2, 8);
+      }
+
+      /* ==========================================================
+         Module: Loader (3D triangle + mouse tracking)
+         ========================================================== */
+      var Loader = {
+        _mouseHandler: null,
+
+        init: function() {
+          if (!DOM.loaderWrapper || !DOM.loaderTriangle) return;
+          var self = this;
+          var maxAngle = CFG.LOADER_MAX_ANGLE;
+          var baseShadow = CFG.LOADER_BASE_SHADOW;
+
+          this._mouseHandler = function(e) {
+            if (state.loading) return;
+            var dx = (e.clientX - window.innerWidth / 2) / (window.innerWidth / 2);
+            var dy = (e.clientY - window.innerHeight / 2) / (window.innerHeight / 2);
+            DOM.loaderWrapper.style.transform = 'rotateX(' + (-dy * maxAngle) + 'deg) rotateY(' + (dx * maxAngle) + 'deg) translateZ(14px)';
+            DOM.loaderTriangle.style.filter = baseShadow + ' drop-shadow(' + (dx * 10) + 'px ' + (dy * 10) + 'px 12px rgba(0,0,0,0.35))';
+          };
+
+          document.addEventListener('mousemove', this._mouseHandler);
+        },
+
+        hide: function() {
+          if (state.loading) return;
+          state.loading = true;
+          if (DOM.loading) {
+            DOM.loading.classList.add('fade-out');
+            setTimeout(function() { if (DOM.loading) DOM.loading.style.display = 'none'; }, 450);
+          }
+          if (DOM.docHeader) DOM.docHeader.style.display = 'flex';
+          if (this._mouseHandler) {
+            document.removeEventListener('mousemove', this._mouseHandler);
+            this._mouseHandler = null;
+          }
+        },
+
+        showError: function() {
+          if (!state.loading && DOM.loadingError) {
+            DOM.loadingError.classList.add('show');
+          }
+        }
+      };
+
+      /* ==========================================================
+         Module: Dark Mode
+         ========================================================== */
+      var DarkMode = {
+        toggle: function() {
+          var isDark = document.body.classList.toggle('dark');
+          try { localStorage.setItem(CFG.DARK_MODE_KEY, String(isDark)); } catch (e) {}
+        },
+
+        restore: function() {
+          try {
+            if (localStorage.getItem(CFG.DARK_MODE_KEY) === 'true') {
+              document.body.classList.add('dark');
+            }
+          } catch (e) {}
+        }
+      };
+
+      /* ==========================================================
+         Module: Reading Progress Bar
+         ========================================================== */
+      var ProgressBar = {
+        update: function() {
+          if (!DOM.readingProgress) return;
+          var dh = document.documentElement.scrollHeight - window.innerHeight;
+          DOM.readingProgress.style.width = dh <= 0 ? '0%' : Math.min(100, Math.max(0, (window.scrollY / dh) * 100)) + '%';
+        }
+      };
+
+      /* ==========================================================
+         Module: Back to Top Button
+         ========================================================== */
+      var BackToTop = {
+        update: function() {
+          if (!DOM.backToTop) return;
+          var visible = window.scrollY > CFG.BACK_TO_TOP_THRESHOLD;
+          DOM.backToTop.classList.toggle('visible', visible);
+          if (visible) {
+            var dh = document.documentElement.scrollHeight - window.innerHeight;
+            var pct = dh > 0 ? Math.min(100, Math.round((window.scrollY / dh) * 100)) : 0;
+            DOM.backToTop.style.setProperty('--scroll-pct', pct + '%');
+          }
+        }
+      };
+
+      /* ==========================================================
+         Module: Reading Time Estimation
+         ========================================================== */
+      var ReadingTime = {
+        update: function() {
+          if (!DOM.readingTime) return;
+          var container = document.querySelector('.markdown-section');
+          if (!container) { DOM.readingTime.textContent = ''; return; }
+          var text = container.textContent || '';
+          var words = text.replace(/\s+/g, ' ').trim().split(/\s+/).length;
+          var chinese = (text.match(/[\u4e00-\u9fff]/g) || []).length;
+          DOM.readingTime.textContent = '⏱ ~' + Math.max(1, Math.ceil((words / 200) + (chinese / 400))) + ' min';
+        }
+      };
+
+      /* ==========================================================
+         Module: Doc Header Title
+         ========================================================== */
+      var DocTitle = {
+        update: function() {
+          if (!DOM.docTitle) return;
+          var active = document.querySelector('.sidebar-nav .active');
+          var title = '';
+          if (active) {
+            var link = active.querySelector(':scope > a');
+            title = (link || active).textContent.trim();
+          }
+          if (!title) {
+            var h1 = document.querySelector('.markdown-section h1');
+            if (h1) title = h1.textContent.trim();
+          }
+          if (!title && window.location.hash) {
+            title = decodeURIComponent(window.location.hash.substring(1)).replace(/\?.*$/, '').replace(/-/g, ' ');
+          }
+          DOM.docTitle.textContent = title || '文档';
+        }
+      };
+
+      /* ==========================================================
+         Module: Heading Anchors
+         ========================================================== */
+      var HeadingAnchors = {
+        add: function() {
+          var container = document.querySelector('.markdown-section');
+          if (!container) return;
+          var headings = container.querySelectorAll('h1, h2, h3, h4');
+          headings.forEach(function(h) {
+            if (h.querySelector('.heading-anchor')) return;
+            if (!h.id) h.id = 'h-' + randomId();
+            var a = document.createElement('a');
+            a.className = 'heading-anchor';
+            a.innerHTML = '#';
+            a.title = '复制链接';
+            a.href = 'javascript:void(0)';
+            a.addEventListener('click', function(e) {
+              e.preventDefault();
+              e.stopPropagation();
+              var url = window.location.origin + window.location.pathname + '?id=' + h.id + '#' + h.id;
+              copyToClipboard(url, function() { toast('✓ 链接已复制', 'success'); });
+            });
+            h.appendChild(a);
+          });
+        }
+      };
+
+      /* ==========================================================
+         Module: Table of Contents
+         ========================================================== */
+      var TOC = {
+        generate: function() {
+          var container = document.querySelector('.markdown-section');
+          if (!container || !DOM.tocContent) return;
+          var headings = container.querySelectorAll('h1, h2, h3, h4');
+          if (headings.length < CFG.TOC_MIN_HEADINGS) {
+            if (DOM.tocPanel) DOM.tocPanel.classList.remove('visible');
+            if (DOM.tocToggleBtn) { DOM.tocToggleBtn.classList.remove('active'); DOM.tocToggleBtn.style.display = 'none'; }
+            return;
+          }
+          if (DOM.tocToggleBtn) DOM.tocToggleBtn.style.display = '';
+
+          var html = '';
+          headings.forEach(function(h, i) {
+            if (!h.id) h.id = 'toc-' + i;
+            html += '<a href="#' + h.id + '" class="toc-' + h.tagName.toLowerCase() + '" data-target="' + h.id + '">' + h.textContent.trim() + '</a>';
+          });
+          DOM.tocContent.innerHTML = html;
+
+          var links = DOM.tocContent.querySelectorAll('a');
+          links.forEach(function(a) {
+            a.addEventListener('click', function(e) {
+              e.preventDefault();
+              var target = document.getElementById(a.getAttribute('data-target'));
+              if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            });
+          });
+          this.highlight();
+        },
+
+        highlight: function() {
+          var links = document.querySelectorAll('#toc-content a');
+          if (!links.length) return;
+          var scrollTop = window.scrollY + CFG.TOC_SCROLL_OFFSET;
+          var activeId = null;
+          links.forEach(function(a) {
+            var el = document.getElementById(a.getAttribute('data-target'));
+            if (el && el.offsetTop <= scrollTop) activeId = a.getAttribute('data-target');
+          });
+          links.forEach(function(a) {
+            a.classList.toggle('active', a.getAttribute('data-target') === activeId);
+          });
+        },
+
+        clear: function() {
+          if (DOM.tocContent) DOM.tocContent.innerHTML = '';
+          if (DOM.tocPanel) DOM.tocPanel.classList.remove('visible');
+        },
+
+        toggle: function() {
+          if (DOM.tocPanel) DOM.tocPanel.classList.toggle('visible');
+          if (DOM.tocToggleBtn) DOM.tocToggleBtn.classList.toggle('active');
+        }
+      };
+
+      /* ==========================================================
+         Module: Reading Position Persistence
+         ========================================================== */
+      var ReadingPosition = {
+        _pageKey: function() {
+          return window.location.pathname + window.location.hash;
+        },
+
+        save: function() {
+          try {
+            var data = { scrollY: window.scrollY, pageKey: this._pageKey(), timestamp: Date.now() };
+            localStorage.setItem(CFG.READING_POSITION_KEY, JSON.stringify(data));
+          } catch (e) {}
+        },
+
+        restore: function() {
+          try {
+            var raw = localStorage.getItem(CFG.READING_POSITION_KEY);
+            if (!raw) return;
+            var data = JSON.parse(raw);
+            if (data.pageKey === this._pageKey() && typeof data.scrollY === 'number') {
+              setTimeout(function() { window.scrollTo({ top: data.scrollY, behavior: 'instant' }); }, 150);
+            }
+          } catch (e) {}
+        }
+      };
+
+      /* ==========================================================
+         Module: Image Lightbox
+         ========================================================== */
+      var Lightbox = {
+        init: function() {
+          if (!DOM.lightbox || !DOM.lightboxImg) return;
+          var self = this;
+          var lbClose = DOM.lightbox.querySelector('.lb-close');
+
+          DOM.lightbox.addEventListener('click', function(e) {
+            if (e.target === DOM.lightbox || e.target === lbClose) self.close();
+          });
+          if (lbClose) lbClose.addEventListener('click', function() { self.close(); });
+
+          document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && DOM.lightbox.classList.contains('active')) self.close();
+          });
+        },
+
+        open: function(src, alt) {
+          if (!DOM.lightbox || !DOM.lightboxImg) return;
+          DOM.lightboxImg.src = src;
+          DOM.lightboxImg.alt = alt || '';
+          DOM.lightbox.classList.add('active');
+          document.body.style.overflow = 'hidden';
+        },
+
+        close: function() {
+          if (!DOM.lightbox) return;
+          DOM.lightbox.classList.remove('active');
+          document.body.style.overflow = '';
+        },
+
+        bindImages: function() {
+          var self = this;
+          document.querySelectorAll('.markdown-section img').forEach(function(img) {
+            if (img.hasAttribute('data-lb')) return;
+            img.setAttribute('data-lb', '1');
+            img.addEventListener('click', function(e) {
+              e.preventDefault();
+              self.open(img.src, img.alt || '');
+            });
+          });
+        }
+      };
+
+      /* ==========================================================
+         Module: Code Block Enhancement + Line Numbers
+         ========================================================== */
+      var CodeBlock = {
+        /** Wrap raw <pre> elements into styled card */
+        enhance: function() {
+          document.querySelectorAll('.markdown-section pre').forEach(function(pre) {
+            if (pre.parentNode.classList.contains('code-block-wrapper')) return;
+            var code = pre.querySelector('code');
+            var lang = '';
+            if (code && code.className) {
+              var m = code.className.match(/lang(?:uage)?-(\w+)/);
+              if (m) lang = m[1];
+            }
+
+            var wrapper = document.createElement('div');
+            wrapper.className = 'code-block-wrapper';
+
+            var toolbar = document.createElement('div');
+            toolbar.className = 'code-toolbar';
+            toolbar.innerHTML = '<span class="code-lang">' + (lang || 'code') + '</span>';
+
+            var btn = document.createElement('button');
+            btn.className = 'code-copy-btn';
+            btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy';
+
+            btn.addEventListener('click', function() {
+              var text = pre.textContent || '';
+              var done = function() {
+                btn.classList.add('copied');
+                btn.innerHTML = '✓ Copied';
+                toast('✓ 代码已复制', 'success');
+                setTimeout(function() {
+                  btn.classList.remove('copied');
+                  btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy';
+                }, CFG.CODE_COPIED_DURATION);
+              };
+              copyToClipboard(text, done);
+            });
+
+            toolbar.appendChild(btn);
+            wrapper.appendChild(toolbar);
+            pre.parentNode.insertBefore(wrapper, pre);
+            wrapper.appendChild(pre);
+          });
+        },
+
+        /** Add line numbers column */
+        addLineNumbers: function() {
+          document.querySelectorAll('.code-block-wrapper pre').forEach(function(pre) {
+            if (pre.querySelector('.code-line-numbers')) return;
+            var code = pre.querySelector('code');
+            if (!code) return;
+            var lines = (code.textContent || '').split('\n');
+            if (lines.length > 1 && lines[lines.length - 1].trim() === '') lines.pop();
+            var html = '';
+            for (var i = 0; i < lines.length; i++) html += '<span>' + (i + 1) + '</span>';
+            var lnDiv = document.createElement('div');
+            lnDiv.className = 'code-line-numbers';
+            lnDiv.innerHTML = html;
+            pre.insertBefore(lnDiv, pre.firstChild);
+          });
+        }
+      };
+
+      /* ==========================================================
+         Module: Global Search
+         ========================================================== */
+      var Search = {
+        open: function() {
+          if (!DOM.searchOverlay) return;
+          DOM.searchOverlay.classList.add('active');
+          if (DOM.searchInput) { DOM.searchInput.value = ''; DOM.searchInput.focus(); }
+          if (DOM.searchResults) DOM.searchResults.innerHTML = '';
+          this._clearHighlights();
+          state.searchSelectedIdx = -1;
+        },
+
+        close: function() {
+          if (DOM.searchOverlay) DOM.searchOverlay.classList.remove('active');
+          if (DOM.searchResults) DOM.searchResults.innerHTML = '';
+          this._clearHighlights();
+          state.searchSelectedIdx = -1;
+        },
+
+        _clearHighlights: function() {
+          state.currentHighlights.forEach(function(mark) {
+            var p = mark.parentNode;
+            if (p) { p.replaceChild(document.createTextNode(mark.textContent || ''), mark); p.normalize(); }
+          });
+          state.currentHighlights = [];
+        },
+
+        highlightInDocument: function(keyword) {
+          this._clearHighlights();
+          if (!keyword || !keyword.trim()) return;
+          var container = document.querySelector('.markdown-section');
+          if (!container) return;
+
+          var walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT, {
+            acceptNode: function(n) {
+              if (!n.textContent || !n.textContent.trim()) return NodeFilter.FILTER_REJECT;
+              var p = n.parentNode;
+              if (!p) return NodeFilter.FILTER_REJECT;
+              if (p.tagName === 'SCRIPT' || p.tagName === 'STYLE') return NodeFilter.FILTER_REJECT;
+              if (p.closest && (p.closest('.search-modal') || p.closest('.code-copy-btn') || p.closest('#toc-panel') || p.closest('.heading-anchor') || p.closest('.code-line-numbers'))) return NodeFilter.FILTER_REJECT;
+              return NodeFilter.FILTER_ACCEPT;
+            }
+          });
+
+          var nodes = [], n;
+          while ((n = walker.nextNode())) nodes.push(n);
+          if (!nodes.length) return;
+
+          var esc = escapeRegex(keyword);
+          var regex = new RegExp(esc, 'gi');
+
+          nodes.forEach(function(tn) {
+            var text = tn.textContent;
+            regex.lastIndex = 0;
+            var frag = document.createDocumentFragment();
+            var last = 0, match, hit = false;
+            while ((match = regex.exec(text)) !== null) {
+              hit = true;
+              if (match.index > last) frag.appendChild(document.createTextNode(text.slice(last, match.index)));
+              var mk = document.createElement('mark');
+              mk.className = 'search-highlight';
+              mk.textContent = match[0];
+              frag.appendChild(mk);
+              state.currentHighlights.push(mk);
+              last = regex.lastIndex;
+              if (match[0].length === 0) { regex.lastIndex++; if (regex.lastIndex > text.length) break; }
+            }
+            if (hit && last < text.length) frag.appendChild(document.createTextNode(text.slice(last)));
+            if (hit && frag.childNodes.length) tn.parentNode.replaceChild(frag, tn);
+          });
+        },
+
+        generateResults: function(keyword) {
+          if (!DOM.searchResults) return;
+          DOM.searchResults.innerHTML = '';
+          if (!keyword || !keyword.trim()) return;
+
+          var container = document.querySelector('.markdown-section');
+          if (!container) { DOM.searchResults.innerHTML = '<div class="search-no-results">暂无内容</div>'; return; }
+
+          var blocks = container.querySelectorAll('p, li, td, th, h1, h2, h3, h4, h5, h6');
+          var esc = escapeRegex(keyword);
+          var regex = new RegExp(esc, 'gi');
+          var seen = new Set(), count = 0;
+
+          blocks.forEach(function(block) {
+            if (block.closest('pre') || block.closest('.code-block-wrapper') || block.closest('#toc-panel') || block.closest('.heading-anchor') || block.closest('.code-line-numbers')) return;
+            if (seen.has(block)) return;
+            var text = block.textContent || '';
+            regex.lastIndex = 0;
+            if (!regex.test(text)) return;
+            seen.add(block);
+            count++;
+            regex.lastIndex = 0;
+            var match = regex.exec(text);
+            var idx = match ? match.index : 0;
+            var len = match ? match[0].length : 0;
+            var start = Math.max(0, idx - 40);
+            var end = Math.min(text.length, idx + len + 40);
+            var excerpt = (start > 0 ? '…' : '') + text.substring(start, end) + (end < text.length ? '…' : '');
+
+            var div = document.createElement('div');
+            div.className = 'search-result-item';
+            var heading = block.closest('h1, h2, h3, h4, h5, h6') || Search._findPrevHeading(block);
+            if (heading && heading !== block) {
+              div.innerHTML = '<div class="search-result-title">' + heading.textContent.trim() + '</div>' + excerpt.replace(new RegExp(esc, 'gi'), '<mark>$&</mark>');
+            } else {
+              div.innerHTML = excerpt.replace(new RegExp(esc, 'gi'), '<mark>$&</mark>');
+            }
+            div.addEventListener('click', function() {
+              Search.close();
+              block.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            });
+            DOM.searchResults.appendChild(div);
+          });
+
+          if (count === 0) DOM.searchResults.innerHTML = '<div class="search-no-results">未找到匹配内容</div>';
+        },
+
+        _findPrevHeading: function(el) {
+          var prev = el.previousElementSibling;
+          while (prev) { if (/^H[1-6]$/.test(prev.tagName)) return prev; prev = prev.previousElementSibling; }
+          return null;
+        },
+
+        /** Keyboard navigation within search results */
+        handleKeyboard: function(e) {
+          var items = DOM.searchResults ? DOM.searchResults.querySelectorAll('.search-result-item') : [];
+          if (!items.length) return;
+          if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            state.searchSelectedIdx = Math.min(state.searchSelectedIdx + 1, items.length - 1);
+            this._updateSelection(items);
+          } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            state.searchSelectedIdx = Math.max(state.searchSelectedIdx - 1, 0);
+            this._updateSelection(items);
+          } else if (e.key === 'Enter') {
+            e.preventDefault();
+            if (state.searchSelectedIdx >= 0 && items[state.searchSelectedIdx]) {
+              items[state.searchSelectedIdx].click();
+            }
+          }
+        },
+
+        _updateSelection: function(items) {
+          items.forEach(function(item, i) {
+            item.classList.toggle('selected', i === state.searchSelectedIdx);
+            if (i === state.searchSelectedIdx) item.scrollIntoView({ block: 'nearest' });
+          });
+        }
+      };
+
+      /* ==========================================================
+         Module: Sidebar — Accordion Folders + Filtering
+         ========================================================== */
+      var Sidebar = {
+        /** Inject sidebar header */
+        injectHeader: function() {
+          var sb = document.querySelector('.sidebar');
+          if (!sb || sb.querySelector('.sidebar-header')) return;
+          var nav = sb.querySelector('.sidebar-nav');
+          if (!nav) return;
+
+          var h = document.createElement('div');
+          h.className = 'sidebar-header';
+          h.innerHTML =
+            '<span class="sidebar-brand" id="sidebarBrand">📚 知识库总览</span>' +
+            '<input type="text" class="sidebar-filter-input" id="sidebarFilterInput" placeholder="过滤…">' +
+            '<div class="sidebar-actions">' +
+              '<button class="icon-btn" id="sidebarSearchBtn" title="过滤"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg></button>' +
+              '<button class="icon-btn" id="sidebarCloseBtn" title="关闭"><svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>' +
+            '</div>';
+          sb.insertBefore(h, nav);
+
+          // Cache sidebar header elements
+          DOM.sidebarSearchBtn = document.getElementById('sidebarSearchBtn');
+          DOM.sidebarCloseBtn = document.getElementById('sidebarCloseBtn');
+          DOM.sidebarFilterInput = document.getElementById('sidebarFilterInput');
+          DOM.sidebarBrand = document.getElementById('sidebarBrand');
+
+          this._bindHeaderEvents();
+        },
+
+        _bindHeaderEvents: function() {
+          if (DOM.sidebarCloseBtn) {
+            DOM.sidebarCloseBtn.addEventListener('click', function() { document.body.classList.add('close'); });
+          }
+          if (DOM.sidebarSearchBtn && DOM.sidebarFilterInput && DOM.sidebarBrand) {
+            DOM.sidebarSearchBtn.addEventListener('click', function() {
+              if (DOM.sidebarFilterInput.classList.contains('show')) {
+                DOM.sidebarFilterInput.classList.remove('show');
+                DOM.sidebarBrand.classList.remove('hidden');
+                DOM.sidebarFilterInput.value = '';
+                Sidebar.filter('');
+              } else {
+                DOM.sidebarFilterInput.classList.add('show');
+                DOM.sidebarBrand.classList.add('hidden');
+                DOM.sidebarFilterInput.focus();
+              }
+            });
+          }
+          if (DOM.sidebarFilterInput) {
+            DOM.sidebarFilterInput.addEventListener('input', function() { Sidebar.filter(this.value); });
+            DOM.sidebarFilterInput.addEventListener('keydown', function(e) {
+              if (e.key === 'Escape') {
+                this.value = '';
+                Sidebar.filter('');
+                this.classList.remove('show');
+                if (DOM.sidebarBrand) DOM.sidebarBrand.classList.remove('hidden');
+              }
+            });
+          }
+        },
+
+        /** Reset all expanded folders (quiet — no transitions) */
+        reset: function() {
+          var nav = document.querySelector('.sidebar-nav');
+          if (!nav) return;
+          var subs = nav.querySelectorAll('ul.sidebar-sub.expanded');
+          subs.forEach(function(ul) {
+            ul.classList.remove('expanded');
+            var parentLi = ul.parentNode;
+            if (parentLi) parentLi.classList.remove('expanded');
+          });
+          state.currentOpenFolderUl = null;
+        },
+
+        /** Initialize folder accordion (idempotent after first run) */
+        initFolders: function() {
+          var nav = document.querySelector('.sidebar-nav');
+          if (!nav) return;
+
+          // Already initialized — only re-order + auto-expand
+          if (nav.querySelector('.folder-item')) {
+            var uls = nav.querySelectorAll('ul');
+            uls.forEach(function(ul) {
+              if (ul.parentNode === nav || ul.parentNode.classList.contains('sidebar-nav')) {
+                ul.classList.remove('sidebar-sub', 'expanded');
+              } else {
+                ul.classList.add('sidebar-sub');
+              }
+            });
+            this._sortAll(uls);
+            state.currentOpenFolderUl = null;
+            this._autoExpandActive();
+            return;
+          }
+
+          // First init
+          var allUls = nav.querySelectorAll('ul');
+          allUls.forEach(function(ul) {
+            if (ul.parentNode === nav || ul.parentNode.classList.contains('sidebar-nav')) {
+              ul.classList.remove('sidebar-sub', 'expanded');
+            } else {
+              ul.classList.add('sidebar-sub');
+            }
+          });
+          this._sortAll(allUls);
+          state.currentOpenFolderUl = null;
+
+          // Transform folder <li> entries
+          nav.querySelectorAll('li').forEach(function(li) {
+            var childUl = li.querySelector('ul');
+            if (!childUl) return;
+            li.classList.add('folder-item');
+
+            var label = li.querySelector(':scope > .folder-label');
+            if (!label) {
+              var link = li.querySelector(':scope > a');
+              if (link) {
+                label = link;
+                label.classList.add('folder-label');
+                label.setAttribute('href', 'javascript:void(0)');
+                label.removeAttribute('target');
+              } else {
+                // Collect text nodes, remove duplicates
+                var folderName = '', toRemove = [];
+                for (var i = 0; i < li.childNodes.length; i++) {
+                  var cn = li.childNodes[i];
+                  if (cn.nodeType === 3 && cn.textContent.trim()) {
+                    folderName += cn.textContent.trim();
+                    toRemove.push(cn);
+                  }
+                }
+                toRemove.forEach(function(n) { li.removeChild(n); });
+                label = document.createElement('span');
+                label.className = 'folder-label';
+                label.textContent = folderName || 'Folder';
+                li.insertBefore(label, li.firstChild);
+              }
+            }
+
+            var arrow = label.querySelector('.folder-arrow');
+            if (!arrow) {
+              arrow = document.createElement('span');
+              arrow.className = 'folder-arrow';
+              arrow.innerHTML = '<svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>';
+              label.appendChild(arrow);
+            }
+
+            label.onclick = function(e) {
+              e.preventDefault();
+              e.stopPropagation();
+              if (childUl.classList.contains('expanded')) {
+                Sidebar._collapse(li, childUl);
+              } else {
+                Sidebar._expand(li, childUl);
+              }
+            };
+          });
+
+          this._autoExpandActive();
+        },
+
+        _sortAll: function(uls) {
+          var sortFn = function(a, b) {
+            var aDir = !!a.querySelector('ul'), bDir = !!b.querySelector('ul');
+            if (aDir && !bDir) return -1;
+            if (!aDir && bDir) return 1;
+            return (a.textContent || '').trim().localeCompare((b.textContent || '').trim(), 'en');
+          };
+          uls.forEach(function(ul) {
+            var items = Array.from(ul.children).filter(function(c) { return c.tagName === 'LI'; });
+            items.sort(sortFn);
+            items.forEach(function(li) { ul.appendChild(li); });
+          });
+        },
+
+        _expand: function(li, childUl) {
+          if (state.currentOpenFolderUl && state.currentOpenFolderUl !== childUl) {
+            state.currentOpenFolderUl.classList.remove('expanded');
+            var prevLi = state.currentOpenFolderUl.parentNode;
+            if (prevLi) prevLi.classList.remove('expanded');
+          }
+          childUl.classList.add('expanded');
+          li.classList.add('expanded');
+          state.currentOpenFolderUl = childUl;
+        },
+
+        _collapse: function(li, childUl) {
+          childUl.classList.remove('expanded');
+          li.classList.remove('expanded');
+          if (state.currentOpenFolderUl === childUl) state.currentOpenFolderUl = null;
+        },
+
+        _autoExpandActive: function() {
+          var activeLink = document.querySelector('.sidebar-nav .active > a');
+          if (!activeLink) return;
+          var parent = activeLink.closest('.folder-item');
+          if (!parent) {
+            var pu = activeLink.closest('ul.sidebar-sub');
+            if (pu) parent = pu.closest('.folder-item');
+          }
+          if (parent) {
+            var childUl = parent.querySelector(':scope > ul');
+            if (childUl) this._expand(parent, childUl);
+          }
+        },
+
+        /** Filter sidebar items by keyword */
+        filter: function(keyword) {
+          var allLis = document.querySelectorAll('.sidebar-nav li');
+          if (!keyword || !keyword.trim()) {
+            allLis.forEach(function(l) { l.classList.remove('filtered-out'); });
+            return;
+          }
+          var kw = keyword.trim().toLowerCase();
+          allLis.forEach(function(li) {
+            var el = li.querySelector(':scope > a') || li.querySelector(':scope > .folder-label');
+            var text = (el ? el.textContent : li.textContent) || '';
+            var childUl = li.querySelector('ul');
+            var childMatch = false;
+            if (childUl) {
+              childUl.querySelectorAll('li').forEach(function(cli) {
+                if ((cli.textContent || '').toLowerCase().indexOf(kw) !== -1) childMatch = true;
+              });
+            }
+            if (text.toLowerCase().indexOf(kw) !== -1 || childMatch) {
+              li.classList.remove('filtered-out');
+              if (childMatch && childUl && !childUl.classList.contains('expanded')) {
+                Sidebar._expand(li, childUl);
+              }
+            } else {
+              li.classList.add('filtered-out');
+            }
+          });
+        }
+      };
+
+      /* ==========================================================
+         Module: Keyboard Shortcuts
+         ========================================================== */
+      var Keyboard = {
+        init: function() {
+          document.addEventListener('keydown', this._handler);
+        },
+
+        _handler: function(e) {
+          var tag = (e.target.tagName || '').toLowerCase();
+          var isInput = tag === 'input' || tag === 'textarea' || e.target.isContentEditable;
+
+          if (e.key === 'Escape') {
+            Search.close();
+            Keyboard._closeShortcuts();
+            if (DOM.tocPanel) DOM.tocPanel.classList.remove('visible');
+            if (DOM.tocToggleBtn) DOM.tocToggleBtn.classList.remove('active');
+          }
+          if ((e.ctrlKey || e.metaKey) && e.key === 'k') { e.preventDefault(); Search.open(); return; }
+          if ((e.ctrlKey || e.metaKey) && e.key === 'b') { e.preventDefault(); document.body.classList.toggle('close'); return; }
+          if ((e.ctrlKey || e.metaKey) && e.key === 'd') { e.preventDefault(); DarkMode.toggle(); return; }
+          if ((e.ctrlKey || e.metaKey) && e.key === 'ArrowUp') { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); return; }
+          if (e.key === '/' && !isInput) { e.preventDefault(); Search.open(); return; }
+          if (e.key === '?' && !isInput) { e.preventDefault(); Keyboard._openShortcuts(); return; }
+        },
+
+        _openShortcuts: function() {
+          if (DOM.shortcutsPanel) DOM.shortcutsPanel.classList.add('active');
+        },
+
+        _closeShortcuts: function() {
+          if (DOM.shortcutsPanel) DOM.shortcutsPanel.classList.remove('active');
+        }
+      };
+
+      /* ==========================================================
+         Global Scroll Handler (delegates to sub-modules)
+         ========================================================== */
+      function onScroll() {
+        ProgressBar.update();
+        BackToTop.update();
+
+        // Debounced position save
+        clearTimeout(state.scrollTimer);
+        state.scrollTimer = setTimeout(function() { ReadingPosition.save(); }, CFG.SCROLL_SAVE_DEBOUNCE);
+
+        TOC.highlight();
+      }
+
+      /* ==========================================================
+         Docsify Plugin Hook
+         ========================================================== */
+      function onPageReady() {
+        cacheDOM();
+        DarkMode.restore();
+        Loader.init();
+        Loader.hide();
+        Sidebar.injectHeader();
+        _bindGlobalEvents();
+        Lightbox.init();
+
+        document.body.classList.remove('close');
+        DocTitle.update();
+        ReadingTime.update();
+
+        // Defer heavy DOM operations
+        setTimeout(function() {
+          Sidebar.initFolders();
+          TOC.generate();
+          ProgressBar.update();
+          HeadingAnchors.add();
+          ReadingPosition.restore();
+          CodeBlock.addLineNumbers();
+        }, 250);
+
+        // Show error hint if loading takes too long (safety net)
+        setTimeout(function() { Loader.showError(); }, CFG.LOADING_ERROR_DELAY);
+      }
+
+      function onPageSwitch() {
+        // Freeze all transitions in one pass
+        var nav = document.querySelector('.sidebar-nav');
+        var unfreeze = nav ? freezeTransitions(nav) : function() {};
+
+        ReadingPosition.save();
+        DocTitle.update();
+        ReadingTime.update();
+        Search.close();
+        CodeBlock.enhance();
+        TOC.clear();
+        Sidebar.reset();
+
+        setTimeout(function() {
+          Sidebar.initFolders();
+          TOC.generate();
+          ProgressBar.update();
+          HeadingAnchors.add();
+          CodeBlock.addLineNumbers();
+          Lightbox.bindImages();
+          unfreeze();
+          setTimeout(function() { ReadingPosition.restore(); }, CFG.DOM_RESTORE_DELAY);
+        }, 150);
+
+        // MathJax re-render
+        if (window.MathJax && typeof window.MathJax.typesetPromise === 'function') {
+          window.MathJax.typesetPromise();
+        }
+      }
+
+      /* ==========================================================
+         Global Event Binding
+         ========================================================== */
+      function _bindGlobalEvents() {
+        // Capsule buttons
+        if (DOM.capsuleSidebarBtn) DOM.capsuleSidebarBtn.addEventListener('click', function() { document.body.classList.remove('close'); });
+        if (DOM.capsuleSearchBtn) DOM.capsuleSearchBtn.addEventListener('click', Search.open);
+
+        // Dark mode toggle
+        if (DOM.darkModeBtn) DOM.darkModeBtn.addEventListener('click', DarkMode.toggle);
+
+        // TOC toggle
+        if (DOM.tocToggleBtn && DOM.tocPanel) {
+          DOM.tocToggleBtn.addEventListener('click', TOC.toggle);
+        }
+
+        // Back to top
+        if (DOM.backToTop) DOM.backToTop.addEventListener('click', function() { window.scrollTo({ top: 0, behavior: 'smooth' }); });
+
+        // Scroll listener
+        window.addEventListener('scroll', onScroll, { passive: true });
+
+        // Search modal close
+        if (DOM.searchCloseBtn) DOM.searchCloseBtn.addEventListener('click', Search.close);
+        if (DOM.searchOverlay) DOM.searchOverlay.addEventListener('click', function(e) { if (e.target === DOM.searchOverlay) Search.close(); });
+
+        // Search input
+        if (DOM.searchInput) {
+          DOM.searchInput.addEventListener('input', function() {
+            Search.highlightInDocument(this.value);
+            Search.generateResults(this.value);
+            state.searchSelectedIdx = -1;
+          });
+          DOM.searchInput.addEventListener('keydown', function(e) { Search.handleKeyboard(e); });
+        }
+
+        // Keyboard shortcuts
+        Keyboard.init();
+      }
+
+      /* ==========================================================
+         Docsify Configuration (global, required by docsify)
+         ========================================================== */
+      window.$docsify = {
+        name: 'Soren的知识库',
+        loadSidebar: '_sidebar.md',
+        subMaxLevel: 0,
+        basePath: CFG.BASE_PATH,
+        homepage: 'README.md',
+        notFoundPage: true,
+        plugins: [
+          function(hook) {
+            hook.ready(onPageReady);
+            hook.doneEach(onPageSwitch);
+          }
+        ]
+      };
+
+      // MathJax config
+      window.MathJax = {
+        tex: {
+          inlineMath: [['$', '$'], ['\\(', '\\)']],
+          displayMath: [['$$', '$$'], ['\\[', '\\]']],
+          processEscapes: true
+        },
+        options: {
+          skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+          ignoreHtmlClass: 'tex2jax_ignore',
+          processHtmlClass: 'tex2jax_process'
+        }
+      };
+
+    })();
   </script>
+
+  <!-- ========== External Dependencies ========== -->
   <script src="//cdn.jsdelivr.net/npm/docsify@4"></script>
   <script id="MathJax-script" async src="//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 </body>
