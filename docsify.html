@@ -69,18 +69,12 @@
       --blockquote-bg: rgba(255,255,255,0.01); --blockquote-border: #3fb950;
     }
 
-    /* ============================================================
-       Transition-freeze Utility
-       ============================================================ */
     .no-transition,.no-transition *,.no-transition *::before,.no-transition *::after{transition:none!important;animation:none!important}
 
     /* ============================================================
-       ★ 波浪主题切换画布 (Apple‑style wave transition)
+       Wave Transition Canvas (Apple‑style bidirectional)
        ============================================================ */
-    #theme-wave-canvas{
-      position:fixed;inset:0;z-index:9998;pointer-events:none;
-      display:none;
-    }
+    #theme-wave-canvas{position:fixed;inset:0;z-index:9998;pointer-events:none;display:none}
 
     /* ============================================================
        Reset & Global
@@ -91,9 +85,7 @@
     ::-webkit-scrollbar-track{background:var(--scrollbar-track)}
     ::-webkit-scrollbar-thumb{background:var(--scrollbar-thumb);border-radius:3px}
 
-    /* ============================================================
-       Loading Overlay
-       ============================================================ */
+    /* Loading */
     #loading{position:fixed;top:0;left:0;width:100%;height:100%;background:var(--loader-blur-bg);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity .45s ease;perspective:700px}
     #loading.fade-out{opacity:0;pointer-events:none}
     .loader-wrapper{display:flex;flex-direction:column;align-items:center;justify-content:center;transform-style:preserve-3d}
@@ -106,14 +98,10 @@
     .loading-error{display:none;margin-top:1rem;font-size:.76rem;color:#c0392b;text-align:center;max-width:300px;line-height:1.6}
     .loading-error.show{display:block}
 
-    /* ============================================================
-       Reading Progress Bar
-       ============================================================ */
+    /* Reading Progress Bar */
     #reading-progress{position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,var(--progress-color),var(--progress-color-end));z-index:10000;transition:width .12s linear;border-radius:0 2px 2px 0;pointer-events:none}
 
-    /* ============================================================
-       Toast
-       ============================================================ */
+    /* Toast */
     #toast-container{position:fixed;bottom:28px;left:50%;transform:translateX(-50%);z-index:10050;display:flex;flex-direction:column-reverse;align-items:center;gap:8px;pointer-events:none}
     .toast{padding:10px 22px;border-radius:20px;background:var(--toast-bg);color:var(--toast-text);font-size:.85rem;font-weight:500;box-shadow:0 8px 28px var(--shadow-lg);pointer-events:auto;animation:toastIn .35s cubic-bezier(.22,.61,.36,1),toastOut .3s 2s cubic-bezier(.55,.06,.68,.19) forwards}
     .toast.success{border-left:3px solid #27ae60}
@@ -121,9 +109,7 @@
     @keyframes toastIn{0%{opacity:0;transform:translateY(16px) scale(.9)}100%{opacity:1;transform:translateY(0) scale(1)}}
     @keyframes toastOut{0%{opacity:1;transform:translateY(0) scale(1)}100%{opacity:0;transform:translateY(-8px) scale(.9)}}
 
-    /* ============================================================
-       Sidebar
-       ============================================================ */
+    /* Sidebar */
     .sidebar{background:var(--sidebar-bg)!important;border-right:1px solid var(--border)!important;box-shadow:2px 0 12px var(--shadow)!important;width:260px!important;transition:transform .35s cubic-bezier(.45,.05,.55,.95)!important;will-change:transform}
     .sidebar.close{transform:translateX(-100%)}
     .sidebar-toggle{display:none!important}
@@ -138,9 +124,7 @@
     .icon-btn:hover{background:var(--btn-hover);color:var(--text)}
     .icon-btn svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round}
 
-    /* ============================================================
-       Sidebar Navigation
-       ============================================================ */
+    /* Sidebar Navigation */
     .sidebar-nav{padding:6px 0}
     .sidebar-nav>ul{padding-left:0}
     .sidebar-nav li{list-style:none;margin:0}
@@ -168,16 +152,12 @@
     .sidebar-nav ul.sidebar-sub.expanded>li:nth-child(n+6){transition-delay:.17s}
     .sidebar-nav ul.sidebar-sub li a{font-size:.84rem;padding:5px 11px;margin:1px 4px}
 
-    /* ============================================================
-       Heading Anchor
-       ============================================================ */
+    /* Heading Anchor */
     .heading-anchor{display:inline-block;opacity:0;margin-left:4px;color:var(--text-muted);cursor:pointer;font-size:.9rem;transition:opacity .2s,transform .2s;vertical-align:middle;user-select:none}
     .markdown-section h1:hover .heading-anchor,.markdown-section h2:hover .heading-anchor,.markdown-section h3:hover .heading-anchor,.markdown-section h4:hover .heading-anchor{opacity:1}
     .heading-anchor:hover{transform:scale(1.15);color:var(--text)}
 
-    /* ============================================================
-       Doc Header
-       ============================================================ */
+    /* Doc Header */
     .doc-header{position:fixed;top:0;left:260px;right:0;height:56px;background:var(--header-bg);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--border-light);display:none;align-items:center;padding:0 20px;z-index:999;transition:left .35s cubic-bezier(.45,.05,.55,.95),background .3s}
     body.close .doc-header{left:0}
     .doc-header-left{display:flex;align-items:center;gap:6px;flex:1;min-width:0}
@@ -192,9 +172,7 @@
     body:not(.dark) #darkModeBtn .moon-icon{display:none}
     body.dark #darkModeBtn .sun-icon{display:none}
 
-    /* ============================================================
-       Back to Top
-       ============================================================ */
+    /* Back to Top */
     #backToTop{position:fixed;bottom:28px;right:28px;z-index:998;width:44px;height:44px;border-radius:50%;background:var(--accent);color:#fff;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 14px var(--shadow-lg);opacity:0;transform:translateY(20px);transition:opacity .3s,transform .3s;pointer-events:none}
     body.dark #backToTop{color:#0d1117}
     #backToTop.visible{opacity:1;transform:translateY(0);pointer-events:auto}
@@ -202,9 +180,7 @@
     #backToTop svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2.5}
     #backToTop::before{content:'';position:absolute;inset:-3px;border-radius:50%;background:conic-gradient(var(--progress-color) var(--scroll-pct,0%),transparent var(--scroll-pct,0%));mask:radial-gradient(farthest-side,transparent calc(100% - 3px),#fff calc(100% - 3px));-webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 3px),#fff calc(100% - 3px));opacity:.55}
 
-    /* ============================================================
-       TOC Panel
-       ============================================================ */
+    /* TOC */
     #toc-panel{position:fixed;right:16px;top:80px;z-index:997;background:var(--toc-bg);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:1px solid var(--border);border-radius:12px;padding:12px 16px;max-width:240px;max-height:60vh;overflow-y:auto;font-size:.8rem;box-shadow:0 8px 24px var(--shadow);transition:opacity .3s,transform .3s;opacity:0;transform:translateX(20px);pointer-events:none}
     #toc-panel.visible{opacity:1;transform:translateX(0);pointer-events:auto}
     #toc-panel .toc-title{font-weight:600;color:var(--text);margin-bottom:8px;font-size:.76rem;text-transform:uppercase;letter-spacing:.5px}
@@ -215,9 +191,7 @@
     #toc-panel a.toc-h4{padding-left:28px;font-size:.72rem}
     #tocToggleBtn.active{color:var(--heading-color)}
 
-    /* ============================================================
-       Search Modal
-       ============================================================ */
+    /* Search */
     .search-modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:var(--modal-overlay);backdrop-filter:blur(6px);z-index:10001;display:none;align-items:flex-start;justify-content:center;padding-top:10vh}
     .search-modal-overlay.active{display:flex}
     .search-modal{background:var(--modal-bg);border-radius:18px;width:90%;max-width:580px;box-shadow:0 18px 45px rgba(0,0,0,.3);overflow:hidden;display:flex;flex-direction:column;max-height:70vh;border:1px solid var(--border)}
@@ -236,9 +210,7 @@
     .search-result-title{font-weight:600;margin-bottom:3px}
     .search-hint{padding:7px 18px;font-size:.72rem;color:var(--text-muted);border-bottom:1px solid var(--border-light)}
 
-    /* ============================================================
-       Shortcuts Panel
-       ============================================================ */
+    /* Shortcuts */
     #shortcuts-panel{position:fixed;top:0;left:0;right:0;bottom:0;background:var(--modal-overlay);backdrop-filter:blur(4px);z-index:10002;display:none;align-items:center;justify-content:center}
     #shortcuts-panel.active{display:flex}
     .shortcuts-modal{background:var(--modal-bg);border-radius:16px;padding:24px 28px;max-width:400px;width:90%;box-shadow:0 18px 45px rgba(0,0,0,.3);border:1px solid var(--border)}
@@ -247,9 +219,7 @@
     .shortcuts-modal .kbd-row:last-child{border-bottom:none}
     .shortcuts-modal kbd{background:var(--bg-secondary);border:1px solid var(--border);border-radius:4px;padding:2px 7px;font-size:.73rem;font-family:'JetBrains Mono',monospace;color:var(--heading-color)}
 
-    /* ============================================================
-       Code Block + Line Numbers + Prism
-       ============================================================ */
+    /* Code Block + Prism */
     .code-block-wrapper{margin:1.6rem 0;border-radius:10px;overflow:hidden;box-shadow:0 2px 10px var(--shadow);background:var(--code-bg);border:1px solid var(--code-border);position:relative}
     .code-toolbar{display:flex;justify-content:space-between;align-items:center;padding:.5rem 1.2rem;background:var(--bg-secondary);border-bottom:1px solid var(--code-border)}
     .code-lang{font-weight:600;text-transform:uppercase;font-size:.68rem;color:var(--text-muted);letter-spacing:.4px}
@@ -261,7 +231,7 @@
     .code-line-numbers{flex-shrink:0;padding:1.2rem 0;user-select:none;background:var(--line-number-bg);border-right:1px solid var(--code-border)}
     .code-line-numbers span{display:block;font-family:'JetBrains Mono',monospace;font-size:.8rem;line-height:1.7;color:var(--line-number);text-align:right;padding:0 12px 0 14px;min-width:3.5rem}
 
-    /* Prism */
+    /* Prism light */
     .markdown-section .token.comment,.markdown-section .token.prolog,.markdown-section .token.doctype,.markdown-section .token.cdata{color:#6a737d;font-style:italic}
     .markdown-section .token.punctuation{color:#393a34}
     .markdown-section .token.property,.markdown-section .token.tag,.markdown-section .token.boolean,.markdown-section .token.number,.markdown-section .token.constant,.markdown-section .token.symbol,.markdown-section .token.deleted{color:#005cc5}
@@ -272,6 +242,8 @@
     .markdown-section .token.regex,.markdown-section .token.important,.markdown-section .token.variable{color:#e36209}
     .markdown-section .token.important,.markdown-section .token.bold{font-weight:600}
     .markdown-section .token.italic{font-style:italic}
+
+    /* Prism dark */
     body.dark .markdown-section .token.comment,body.dark .markdown-section .token.prolog,body.dark .markdown-section .token.doctype,body.dark .markdown-section .token.cdata{color:#8b949e;font-style:italic}
     body.dark .markdown-section .token.punctuation{color:#c9d1d9}
     body.dark .markdown-section .token.property,body.dark .markdown-section .token.tag,body.dark .markdown-section .token.boolean,body.dark .markdown-section .token.number,body.dark .markdown-section .token.constant,body.dark .markdown-section .token.symbol,body.dark .markdown-section .token.deleted{color:#79c0ff}
@@ -281,9 +253,7 @@
     body.dark .markdown-section .token.function,body.dark .markdown-section .token.class-name{color:#d2a8ff}
     body.dark .markdown-section .token.regex,body.dark .markdown-section .token.important,body.dark .markdown-section .token.variable{color:#ffa657}
 
-    /* ============================================================
-       Markdown Content
-       ============================================================ */
+    /* Markdown Content */
     .markdown-section{padding:72px 28px 40px!important;max-width:860px;margin:0 auto}
     .markdown-section h1,.markdown-section h2,.markdown-section h3,.markdown-section h4{color:var(--heading-color)}
     .markdown-section h1{font-size:2rem;font-weight:700;border-bottom:2px solid var(--border);padding-bottom:.5rem;margin-top:2rem}
@@ -300,9 +270,7 @@
     .markdown-section a{color:var(--heading-color);text-decoration:none;border-bottom:1px solid transparent;transition:border-color .15s}
     .markdown-section a:hover{border-bottom-color:var(--heading-color)}
 
-    /* ============================================================
-       Image Lightbox
-       ============================================================ */
+    /* Image Lightbox */
     #img-lightbox{position:fixed;inset:0;z-index:10050;background:var(--lightbox-bg);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;cursor:zoom-out;animation:lbFadeIn .25s ease}
     #img-lightbox.active{display:flex}
     #img-lightbox img{max-width:90vw;max-height:85vh;border-radius:6px;box-shadow:0 20px 60px rgba(0,0,0,.5);cursor:default}
@@ -312,29 +280,14 @@
     .markdown-section img{cursor:zoom-in;border-radius:6px;transition:transform .15s}
     .markdown-section img:hover{transform:scale(1.02)}
 
-    /* ============================================================
-       Responsive
-       ============================================================ */
-    @media(max-width:768px){
-      .sidebar{width:100%!important}
-      .doc-header{left:0!important}
-      .markdown-section{padding:72px 16px 40px!important}
-      #toc-panel{display:none!important}
-      #backToTop{bottom:16px;right:16px}
-      .search-modal{max-height:85vh;border-radius:14px}
-      .loader-triangle{width:76px;height:76px}
-    }
+    /* Responsive */
+    @media(max-width:768px){.sidebar{width:100%!important}.doc-header{left:0!important}.markdown-section{padding:72px 16px 40px!important}#toc-panel{display:none!important}#backToTop{bottom:16px;right:16px}.search-modal{max-height:85vh;border-radius:14px}.loader-triangle{width:76px;height:76px}}
   </style>
 </head>
 <body>
 
-  <!-- ============================================================
-       Skeleton / Static Elements
-       ============================================================ -->
   <div id="reading-progress"></div>
   <div id="toast-container"></div>
-
-  <!-- ★ 波浪主题切换画布 -->
   <canvas id="theme-wave-canvas"></canvas>
 
   <div id="loading">
@@ -397,14 +350,14 @@
   <div id="app"></div>
 
   <!-- ============================================================
-       localStorage Polyfill (Edge tracking prevention)
+       localStorage Polyfill
        ============================================================ -->
   <script>
     (function(){var m={};function b(){try{var k='__t__';localStorage.setItem(k,'1');localStorage.removeItem(k);return false}catch(e){return true}}if(!b())return;var s=Storage.prototype.setItem,g=Storage.prototype.getItem,r=Storage.prototype.removeItem,c=Storage.prototype.clear;Storage.prototype.setItem=function(k,v){try{s.call(this,k,v)}catch(e){m[k]=String(v)}};Storage.prototype.getItem=function(k){try{return g.call(this,k)}catch(e){return k in m?m[k]:null}};Storage.prototype.removeItem=function(k){try{r.call(this,k)}catch(e){delete m[k]}};Storage.prototype.clear=function(){try{c.call(this)}catch(e){m={}}}})();
   </script>
 
   <!-- ============================================================
-       Application Core (namespaced under IIFE)
+       Application Core
        ============================================================ -->
   <script>
     (function() {
@@ -427,12 +380,9 @@
         BACK_TO_TOP_THRESHOLD: 400,
         TOC_MIN_HEADINGS: 2,
         TOC_SCROLL_OFFSET: 80,
-        // ★ 波浪动画参数
-        WAVE_DURATION: 800,          // 动画时长 (ms)
-        WAVE_FREQ: 2.5,              // 波浪频率
-        WAVE_MAX_AMP: 55,            // 最大振幅 (px)
-        WAVE_SPRING: 7,              // 弹簧刚度
-        WAVE_DAMPING: 3.5            // 弹簧阻尼
+        WAVE_DURATION: 1000,       // 1 秒丝滑流动
+        WAVE_FREQ: 2.2,            // 波浪频率
+        WAVE_MAX_AMP: 65           // 最大振幅 (px)
       };
 
       /* ==========================================================
@@ -444,7 +394,7 @@
         currentOpenFolderUl: null,
         currentHighlights: [],
         scrollTimer: null,
-        waveAnimId: null            // ★ 波浪动画 ID
+        waveAnimId: null
       };
 
       /* ==========================================================
@@ -453,37 +403,35 @@
       var DOM = {};
 
       function cacheDOM() {
-        DOM.loading = document.getElementById('loading');
-        DOM.docHeader = document.getElementById('docHeader');
-        DOM.loaderWrapper = document.getElementById('loaderWrapper');
-        DOM.loaderTriangle = document.getElementById('loaderTriangle');
-        DOM.loadingError = document.getElementById('loadingError');
+        DOM.loading         = document.getElementById('loading');
+        DOM.docHeader       = document.getElementById('docHeader');
+        DOM.loaderWrapper   = document.getElementById('loaderWrapper');
+        DOM.loaderTriangle  = document.getElementById('loaderTriangle');
+        DOM.loadingError    = document.getElementById('loadingError');
         DOM.readingProgress = document.getElementById('reading-progress');
-        DOM.toastContainer = document.getElementById('toast-container');
-        DOM.docTitle = document.getElementById('docTitle');
-        DOM.readingTime = document.getElementById('readingTime');
-        DOM.tocPanel = document.getElementById('toc-panel');
-        DOM.tocContent = document.getElementById('toc-content');
-        DOM.tocToggleBtn = document.getElementById('tocToggleBtn');
-        DOM.backToTop = document.getElementById('backToTop');
-        DOM.searchOverlay = document.getElementById('searchModalOverlay');
-        DOM.searchInput = document.getElementById('searchModalInput');
-        DOM.searchResults = document.getElementById('searchResults');
-        DOM.searchCloseBtn = document.getElementById('searchModalClose');
-        DOM.shortcutsPanel = document.getElementById('shortcuts-panel');
-        DOM.darkModeBtn = document.getElementById('darkModeBtn');
-        DOM.lightbox = document.getElementById('img-lightbox');
-        DOM.lightboxImg = DOM.lightbox ? DOM.lightbox.querySelector('img') : null;
-        DOM.app = document.getElementById('app');
+        DOM.toastContainer  = document.getElementById('toast-container');
+        DOM.docTitle        = document.getElementById('docTitle');
+        DOM.readingTime     = document.getElementById('readingTime');
+        DOM.tocPanel        = document.getElementById('toc-panel');
+        DOM.tocContent      = document.getElementById('toc-content');
+        DOM.tocToggleBtn    = document.getElementById('tocToggleBtn');
+        DOM.backToTop       = document.getElementById('backToTop');
+        DOM.searchOverlay   = document.getElementById('searchModalOverlay');
+        DOM.searchInput     = document.getElementById('searchModalInput');
+        DOM.searchResults   = document.getElementById('searchResults');
+        DOM.searchCloseBtn  = document.getElementById('searchModalClose');
+        DOM.shortcutsPanel  = document.getElementById('shortcuts-panel');
+        DOM.darkModeBtn     = document.getElementById('darkModeBtn');
+        DOM.lightbox        = document.getElementById('img-lightbox');
+        DOM.lightboxImg     = DOM.lightbox ? DOM.lightbox.querySelector('img') : null;
+        DOM.app             = document.getElementById('app');
         DOM.capsuleSidebarBtn = document.getElementById('capsuleSidebarBtn');
-        DOM.capsuleSearchBtn = document.getElementById('capsuleSearchBtn');
-        // ★ 波浪画布
-        DOM.waveCanvas = document.getElementById('theme-wave-canvas');
-        // Sidebar header (injected later)
+        DOM.capsuleSearchBtn  = document.getElementById('capsuleSearchBtn');
+        DOM.waveCanvas      = document.getElementById('theme-wave-canvas');
         DOM.sidebarSearchBtn = null;
-        DOM.sidebarCloseBtn = null;
+        DOM.sidebarCloseBtn  = null;
         DOM.sidebarFilterInput = null;
-        DOM.sidebarBrand = null;
+        DOM.sidebarBrand     = null;
       }
 
       /* ==========================================================
@@ -504,9 +452,7 @@
         el.classList.add('no-transition');
         return function unfreeze() {
           requestAnimationFrame(function() {
-            requestAnimationFrame(function() {
-              el.classList.remove('no-transition');
-            });
+            requestAnimationFrame(function() { el.classList.remove('no-transition'); });
           });
         };
       }
@@ -515,9 +461,7 @@
         var done = function() { if (onSuccess) onSuccess(); };
         if (navigator.clipboard && navigator.clipboard.writeText) {
           navigator.clipboard.writeText(text).then(done).catch(function() { fallbackCopy(text, done); });
-        } else {
-          fallbackCopy(text, done);
-        }
+        } else { fallbackCopy(text, done); }
       }
 
       function fallbackCopy(text, cb) {
@@ -531,13 +475,8 @@
         if (cb) cb();
       }
 
-      function escapeRegex(str) {
-        return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-      }
-
-      function randomId() {
-        return Math.random().toString(36).substr(2, 8);
-      }
+      function escapeRegex(str) { return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
+      function randomId() { return Math.random().toString(36).substr(2, 8); }
 
       /* ==========================================================
          Module: Loader
@@ -571,30 +510,27 @@
       };
 
       /* ==========================================================
-         ★ Module: ThemeWave — Apple‑style liquid wave transition
+         ★ Module: ThemeWave — bidirectional Apple‑style transition
          ========================================================== */
       var ThemeWave = {
         _ctx: null,
 
-        /** One‑time canvas context cache */
         _ensureContext: function() {
-          if (!this._ctx && DOM.waveCanvas) {
-            this._ctx = DOM.waveCanvas.getContext('2d');
-          }
+          if (!this._ctx && DOM.waveCanvas) this._ctx = DOM.waveCanvas.getContext('2d');
           return this._ctx;
         },
 
         /**
-         * Animate a wave sweeping from top to bottom.
-         * @param {string} oldBgColor - CSS color for the old theme background
-         * @param {number} [duration] - animation duration in ms
+         * @param {string} oldBgColor — CSS colour of the outgoing theme background
+         * @param {string} direction  — 'down' (light→dark, wave sweeps top→bottom)
+         *                              or 'up' (dark→light, wave sweeps bottom→top)
          */
-        animate: function(oldBgColor, duration) {
+        animate: function(oldBgColor, direction) {
           var canvas = DOM.waveCanvas;
           var ctx = this._ensureContext();
           if (!canvas || !ctx) return;
 
-          duration = duration || CFG.WAVE_DURATION;
+          direction = direction || 'down';
 
           // Cancel any running animation
           if (state.waveAnimId) { cancelAnimationFrame(state.waveAnimId); state.waveAnimId = null; }
@@ -604,101 +540,122 @@
           canvas.height = window.innerHeight;
           canvas.style.display = 'block';
 
-          var self = this;
           var w = canvas.width;
           var h = canvas.height;
           var freq = CFG.WAVE_FREQ;
           var maxAmp = CFG.WAVE_MAX_AMP;
-          var spring = CFG.WAVE_SPRING;
-          var damping = CFG.WAVE_DAMPING;
+          var duration = CFG.WAVE_DURATION;
           var startTime = performance.now();
+          var self = this;
 
           function frame(now) {
             var elapsed = now - startTime;
             var raw = Math.min(elapsed / duration, 1);
 
-            // Spring‑based easing with subtle overshoot (Apple‑style)
-            var t = raw;
-            var eased = 1 - Math.exp(-spring * t) * Math.cos(damping * Math.PI * t);
-            eased = Math.min(1, Math.max(0, eased));
+            // ★ Pure power‑ease‑out — silky smooth, no overshoot
+            var eased = 1 - Math.pow(1 - raw, 3.5);
 
-            // Wave vertical position: start above viewport, end below
-            var waveY = -maxAmp + eased * (h + maxAmp * 2);
-            // Amplitude fades as wave moves down (settling feel)
-            var amp = maxAmp * (1 - eased) * (1 + 0.3 * Math.sin(eased * Math.PI));
+            // ★ Wave vertical position (bidirectional)
+            var waveY;
+            if (direction === 'up') {
+              // Dark → Light : wave rises from bottom
+              waveY = (h + maxAmp) - eased * (h + maxAmp * 2);
+            } else {
+              // Light → Dark : wave falls from top
+              waveY = -maxAmp + eased * (h + maxAmp * 2);
+            }
+
+            // Amplitude peaks mid‑animation, fades at start & end
+            var amp = maxAmp * Math.sin(eased * Math.PI) * (1 + 0.15 * Math.sin(eased * Math.PI * 2));
 
             ctx.clearRect(0, 0, w, h);
 
-            // ---- Draw old‑theme shape below wave ----
+            // ---- Draw old‑theme mask ----
             ctx.beginPath();
-            ctx.moveTo(0, 0);
-
-            var steps = Math.max(2, Math.floor(w / 2));
-            for (var i = 0; i <= steps; i++) {
-              var x = (i / steps) * w;
-              var phase = (i / steps) * Math.PI * 2 * freq + eased * Math.PI * 1.5;
-              // Multi‑harmonic wave for organic feel
-              var y = waveY
-                    + Math.sin(phase) * amp
-                    + Math.sin(phase * 2.3) * amp * 0.25
-                    + Math.sin(phase * 4.7) * amp * 0.1;
-              ctx.lineTo(x, y);
+            if (direction === 'up') {
+              // Old (dark) theme fills **below** the wave crest
+              ctx.moveTo(0, h);
+              var steps = Math.max(2, Math.floor(w / 2));
+              var phaseBase = eased * Math.PI * 1.8;
+              for (var i = steps; i >= 0; i--) {
+                var x = (i / steps) * w;
+                var phase = (i / steps) * Math.PI * 2 * freq + phaseBase;
+                var y = waveY
+                      + Math.sin(phase) * amp
+                      + Math.sin(phase * 2.3) * amp * 0.25
+                      + Math.sin(phase * 4.7) * amp * 0.1;
+                ctx.lineTo(x, y);
+              }
+              ctx.lineTo(0, h);
+            } else {
+              // Old (light) theme fills **above** the wave crest
+              ctx.moveTo(0, 0);
+              var steps = Math.max(2, Math.floor(w / 2));
+              var phaseBase = eased * Math.PI * 1.8;
+              for (var i = 0; i <= steps; i++) {
+                var x = (i / steps) * w;
+                var phase = (i / steps) * Math.PI * 2 * freq + phaseBase;
+                var y = waveY
+                      + Math.sin(phase) * amp
+                      + Math.sin(phase * 2.3) * amp * 0.25
+                      + Math.sin(phase * 4.7) * amp * 0.1;
+                ctx.lineTo(x, y);
+              }
+              ctx.lineTo(w, 0);
             }
-
-            ctx.lineTo(w, h);
-            ctx.lineTo(0, h);
             ctx.closePath();
             ctx.fillStyle = oldBgColor;
             ctx.fill();
 
-            // ---- Subtle shadow gradient below the crest ----
+            // ---- Subtle shadow gradient below crest ----
             ctx.save();
             ctx.clip();
-            var gY1 = waveY - amp - 12;
-            var gY2 = waveY + amp + 60;
+            var gY1 = waveY - amp - 18;
+            var gY2 = waveY + amp + 70;
             var grad = ctx.createLinearGradient(0, gY1, 0, gY2);
             grad.addColorStop(0, 'rgba(0,0,0,0)');
-            grad.addColorStop(0.3, 'rgba(0,0,0,0)');
-            grad.addColorStop(0.6, 'rgba(0,0,0,0.12)');
+            grad.addColorStop(0.25, 'rgba(0,0,0,0)');
+            grad.addColorStop(0.55, 'rgba(0,0,0,0.10)');
             grad.addColorStop(1, 'rgba(0,0,0,0)');
             ctx.fillStyle = grad;
             ctx.fillRect(0, gY1, w, gY2 - gY1);
             ctx.restore();
 
-            // ---- Luminous crest line (primary glow) ----
+            // ---- Luminous crest line (soft glow) ----
             ctx.beginPath();
-            for (var i = 0; i <= steps; i++) {
-              var x = (i / steps) * w;
-              var phase = (i / steps) * Math.PI * 2 * freq + eased * Math.PI * 1.5;
+            var steps2 = Math.max(2, Math.floor(w / 2));
+            var phaseBase2 = eased * Math.PI * 1.8;
+            for (var i = 0; i <= steps2; i++) {
+              var x = (i / steps2) * w;
+              var phase = (i / steps2) * Math.PI * 2 * freq + phaseBase2;
               var y = waveY
                     + Math.sin(phase) * amp
                     + Math.sin(phase * 2.3) * amp * 0.25
                     + Math.sin(phase * 4.7) * amp * 0.1;
               if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
             }
-            ctx.strokeStyle = 'rgba(255,255,255,0.28)';
-            ctx.lineWidth = 1.8;
+            ctx.strokeStyle = 'rgba(255,255,255,0.22)';
+            ctx.lineWidth = 1.6;
             ctx.stroke();
 
-            // ---- Secondary hairline highlight (Apple crispness) ----
+            // ---- Fine highlight hairline ----
             ctx.beginPath();
-            for (var i = 0; i <= steps; i++) {
-              var x = (i / steps) * w;
-              var phase = (i / steps) * Math.PI * 2 * freq + eased * Math.PI * 1.5;
+            for (var i = 0; i <= steps2; i++) {
+              var x = (i / steps2) * w;
+              var phase = (i / steps2) * Math.PI * 2 * freq + phaseBase2;
               var y = waveY
                     + Math.sin(phase) * amp
                     + Math.sin(phase * 2.3) * amp * 0.25
-                    + Math.sin(phase * 4.7) * amp * 0.1 - 1.5;
+                    + Math.sin(phase * 4.7) * amp * 0.1 - 1.2;
               if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
             }
-            ctx.strokeStyle = 'rgba(255,255,255,0.45)';
-            ctx.lineWidth = 0.7;
+            ctx.strokeStyle = 'rgba(255,255,255,0.40)';
+            ctx.lineWidth = 0.6;
             ctx.stroke();
 
             if (raw < 1) {
               state.waveAnimId = requestAnimationFrame(frame);
             } else {
-              // Cleanup
               ctx.clearRect(0, 0, w, h);
               canvas.style.display = 'none';
               state.waveAnimId = null;
@@ -710,26 +667,24 @@
       };
 
       /* ==========================================================
-         Module: Dark Mode (now with wave transition)
+         ★ Module: Dark Mode — with bidirectional wave
          ========================================================== */
       var DarkMode = {
         toggle: function() {
-          // ★ Capture old background BEFORE switching
-          var oldBg = getComputedStyle(document.body).getPropertyValue('--bg').trim() || '#fff';
-
-          // Switch
-          var isDark = document.body.classList.toggle('dark');
+          var isCurrentlyDark = document.body.classList.contains('dark');
+          // Capture old background BEFORE switching
+          var oldBg = getComputedStyle(document.body).getPropertyValue('--bg').trim() || (isCurrentlyDark ? '#0d1117' : '#fff');
+          // Switch theme class
+          var isDark = !isCurrentlyDark;
+          document.body.classList.toggle('dark', isDark);
           try { localStorage.setItem(CFG.DARK_MODE_KEY, String(isDark)); } catch (e) {}
-
-          // ★ Trigger Apple‑style wave
-          ThemeWave.animate(oldBg, CFG.WAVE_DURATION);
+          // ★ Directional wave: dark‑mode‑on → wave flows down; dark‑mode‑off → wave flows up
+          var direction = isDark ? 'down' : 'up';
+          ThemeWave.animate(oldBg, direction);
         },
-
         restore: function() {
           try {
-            if (localStorage.getItem(CFG.DARK_MODE_KEY) === 'true') {
-              document.body.classList.add('dark');
-            }
+            if (localStorage.getItem(CFG.DARK_MODE_KEY) === 'true') document.body.classList.add('dark');
           } catch (e) {}
         }
       };
@@ -755,8 +710,7 @@
           DOM.backToTop.classList.toggle('visible', visible);
           if (visible) {
             var dh = document.documentElement.scrollHeight - window.innerHeight;
-            var pct = dh > 0 ? Math.min(100, Math.round((window.scrollY / dh) * 100)) : 0;
-            DOM.backToTop.style.setProperty('--scroll-pct', pct + '%');
+            DOM.backToTop.style.setProperty('--scroll-pct', dh > 0 ? Math.min(100, Math.round((window.scrollY / dh) * 100)) + '%' : '0%');
           }
         }
       };
@@ -786,7 +740,7 @@
           var title = '';
           if (active) { var link = active.querySelector(':scope > a'); title = (link || active).textContent.trim(); }
           if (!title) { var h1 = document.querySelector('.markdown-section h1'); if (h1) title = h1.textContent.trim(); }
-          if (!title && window.location.hash) { title = decodeURIComponent(window.location.hash.substring(1)).replace(/\?.*$/, '').replace(/-/g, ' '); }
+          if (!title && window.location.hash) title = decodeURIComponent(window.location.hash.substring(1)).replace(/\?.*$/, '').replace(/-/g, ' ');
           DOM.docTitle.textContent = title || '文档';
         }
       };
@@ -802,8 +756,7 @@
             if (!h.id) h.id = 'h-' + randomId();
             var a = document.createElement('a'); a.className = 'heading-anchor'; a.innerHTML = '#'; a.title = '复制链接'; a.href = 'javascript:void(0)';
             a.addEventListener('click', function(e) { e.preventDefault(); e.stopPropagation();
-              var url = window.location.origin + window.location.pathname + '?id=' + h.id + '#' + h.id;
-              copyToClipboard(url, function() { toast('✓ 链接已复制', 'success'); });
+              copyToClipboard(window.location.origin + window.location.pathname + '?id=' + h.id + '#' + h.id, function() { toast('✓ 链接已复制', 'success'); });
             });
             h.appendChild(a);
           });
@@ -817,11 +770,7 @@
         generate: function() {
           var c = document.querySelector('.markdown-section'); if (!c || !DOM.tocContent) return;
           var hs = c.querySelectorAll('h1,h2,h3,h4');
-          if (hs.length < CFG.TOC_MIN_HEADINGS) {
-            if (DOM.tocPanel) DOM.tocPanel.classList.remove('visible');
-            if (DOM.tocToggleBtn) { DOM.tocToggleBtn.classList.remove('active'); DOM.tocToggleBtn.style.display = 'none'; }
-            return;
-          }
+          if (hs.length < CFG.TOC_MIN_HEADINGS) { if (DOM.tocPanel) DOM.tocPanel.classList.remove('visible'); if (DOM.tocToggleBtn) { DOM.tocToggleBtn.classList.remove('active'); DOM.tocToggleBtn.style.display = 'none'; } return; }
           if (DOM.tocToggleBtn) DOM.tocToggleBtn.style.display = '';
           var html = '';
           hs.forEach(function(h, i) { if (!h.id) h.id = 'toc-' + i; html += '<a href="#' + h.id + '" class="toc-' + h.tagName.toLowerCase() + '" data-target="' + h.id + '">' + h.textContent.trim() + '</a>'; });
@@ -844,7 +793,7 @@
          ========================================================== */
       var ReadingPosition = {
         _pageKey: function() { return window.location.pathname + window.location.hash; },
-        save: function() { try { var d = { scrollY: window.scrollY, pageKey: this._pageKey(), timestamp: Date.now() }; localStorage.setItem(CFG.READING_POSITION_KEY, JSON.stringify(d)); } catch (e) {} },
+        save: function() { try { localStorage.setItem(CFG.READING_POSITION_KEY, JSON.stringify({ scrollY: window.scrollY, pageKey: this._pageKey(), timestamp: Date.now() })); } catch (e) {} },
         restore: function() { try { var raw = localStorage.getItem(CFG.READING_POSITION_KEY); if (!raw) return; var d = JSON.parse(raw); if (d.pageKey === this._pageKey() && typeof d.scrollY === 'number') setTimeout(function() { window.scrollTo({ top: d.scrollY, behavior: 'instant' }); }, 150); } catch (e) {} }
       };
 
@@ -852,13 +801,7 @@
          Module: Lightbox
          ========================================================== */
       var Lightbox = {
-        init: function() {
-          if (!DOM.lightbox || !DOM.lightboxImg) return;
-          var self = this, lbClose = DOM.lightbox.querySelector('.lb-close');
-          DOM.lightbox.addEventListener('click', function(e) { if (e.target === DOM.lightbox || e.target === lbClose) self.close(); });
-          if (lbClose) lbClose.addEventListener('click', function() { self.close(); });
-          document.addEventListener('keydown', function(e) { if (e.key === 'Escape' && DOM.lightbox.classList.contains('active')) self.close(); });
-        },
+        init: function() { if (!DOM.lightbox || !DOM.lightboxImg) return; var self = this, lbClose = DOM.lightbox.querySelector('.lb-close'); DOM.lightbox.addEventListener('click', function(e) { if (e.target === DOM.lightbox || e.target === lbClose) self.close(); }); if (lbClose) lbClose.addEventListener('click', function() { self.close(); }); document.addEventListener('keydown', function(e) { if (e.key === 'Escape' && DOM.lightbox.classList.contains('active')) self.close(); }); },
         open: function(src, alt) { if (!DOM.lightbox || !DOM.lightboxImg) return; DOM.lightboxImg.src = src; DOM.lightboxImg.alt = alt || ''; DOM.lightbox.classList.add('active'); document.body.style.overflow = 'hidden'; },
         close: function() { if (!DOM.lightbox) return; DOM.lightbox.classList.remove('active'); document.body.style.overflow = ''; },
         bindImages: function() { var self = this; document.querySelectorAll('.markdown-section img').forEach(function(img) { if (img.hasAttribute('data-lb')) return; img.setAttribute('data-lb', '1'); img.addEventListener('click', function(e) { e.preventDefault(); self.open(img.src, img.alt || ''); }); }); }
@@ -907,18 +850,16 @@
         open: function() { if (!DOM.searchOverlay) return; DOM.searchOverlay.classList.add('active'); if (DOM.searchInput) { DOM.searchInput.value = ''; DOM.searchInput.focus(); } if (DOM.searchResults) DOM.searchResults.innerHTML = ''; this._clearHighlights(); state.searchSelectedIdx = -1; },
         close: function() { if (DOM.searchOverlay) DOM.searchOverlay.classList.remove('active'); if (DOM.searchResults) DOM.searchResults.innerHTML = ''; this._clearHighlights(); state.searchSelectedIdx = -1; },
         _clearHighlights: function() { state.currentHighlights.forEach(function(m) { var p = m.parentNode; if (p) { p.replaceChild(document.createTextNode(m.textContent || ''), m); p.normalize(); } }); state.currentHighlights = []; },
-        highlightInDocument: function(kw) {
-          this._clearHighlights(); if (!kw || !kw.trim()) return;
-          var c = document.querySelector('.markdown-section'); if (!c) return;
+        highlightInDocument: function(kw) { this._clearHighlights(); if (!kw || !kw.trim()) return; var c = document.querySelector('.markdown-section'); if (!c) return;
           var w = document.createTreeWalker(c, NodeFilter.SHOW_TEXT, { acceptNode: function(n) { if (!n.textContent || !n.textContent.trim()) return NodeFilter.FILTER_REJECT; var p = n.parentNode; if (!p) return NodeFilter.FILTER_REJECT; if (p.tagName === 'SCRIPT' || p.tagName === 'STYLE') return NodeFilter.FILTER_REJECT; if (p.closest && (p.closest('.search-modal') || p.closest('.code-copy-btn') || p.closest('#toc-panel') || p.closest('.heading-anchor') || p.closest('.code-line-numbers'))) return NodeFilter.FILTER_REJECT; return NodeFilter.FILTER_ACCEPT; } });
-          var nodes = [], n; while ((n = w.nextNode())) nodes.push(n);
-          if (!nodes.length) return;
+          var nodes = [], n; while ((n = w.nextNode())) nodes.push(n); if (!nodes.length) return;
           var esc = escapeRegex(kw), re = new RegExp(esc, 'gi');
-          nodes.forEach(function(tn) { var text = tn.textContent; re.lastIndex = 0; var frag = document.createDocumentFragment(), last = 0, match, hit = false; while ((match = re.exec(text)) !== null) { hit = true; if (match.index > last) frag.appendChild(document.createTextNode(text.slice(last, match.index))); var mk = document.createElement('mark'); mk.className = 'search-highlight'; mk.textContent = match[0]; frag.appendChild(mk); state.currentHighlights.push(mk); last = re.lastIndex; if (match[0].length === 0) { re.lastIndex++; if (re.lastIndex > text.length) break; } } if (hit && last < text.length) frag.appendChild(document.createTextNode(text.slice(last))); if (hit && frag.childNodes.length) tn.parentNode.replaceChild(frag, tn); });
+          nodes.forEach(function(tn) { var text = tn.textContent; re.lastIndex = 0; var frag = document.createDocumentFragment(), last = 0, match, hit = false;
+            while ((match = re.exec(text)) !== null) { hit = true; if (match.index > last) frag.appendChild(document.createTextNode(text.slice(last, match.index))); var mk = document.createElement('mark'); mk.className = 'search-highlight'; mk.textContent = match[0]; frag.appendChild(mk); state.currentHighlights.push(mk); last = re.lastIndex; if (match[0].length === 0) { re.lastIndex++; if (re.lastIndex > text.length) break; } }
+            if (hit && last < text.length) frag.appendChild(document.createTextNode(text.slice(last))); if (hit && frag.childNodes.length) tn.parentNode.replaceChild(frag, tn);
+          });
         },
-        generateResults: function(kw) {
-          if (!DOM.searchResults) return; DOM.searchResults.innerHTML = ''; if (!kw || !kw.trim()) return;
-          var c = document.querySelector('.markdown-section'); if (!c) { DOM.searchResults.innerHTML = '<div class="search-no-results">暂无内容</div>'; return; }
+        generateResults: function(kw) { if (!DOM.searchResults) return; DOM.searchResults.innerHTML = ''; if (!kw || !kw.trim()) return; var c = document.querySelector('.markdown-section'); if (!c) { DOM.searchResults.innerHTML = '<div class="search-no-results">暂无内容</div>'; return; }
           var blocks = c.querySelectorAll('p,li,td,th,h1,h2,h3,h4,h5,h6'), esc = escapeRegex(kw), re = new RegExp(esc, 'gi'), seen = new Set(), count = 0;
           blocks.forEach(function(b) { if (b.closest('pre') || b.closest('.code-block-wrapper') || b.closest('#toc-panel') || b.closest('.heading-anchor') || b.closest('.code-line-numbers')) return; if (seen.has(b)) return; var text = b.textContent || ''; re.lastIndex = 0; if (!re.test(text)) return; seen.add(b); count++; re.lastIndex = 0; var match = re.exec(text), idx = match ? match.index : 0, len = match ? match[0].length : 0, start = Math.max(0, idx - 40), end = Math.min(text.length, idx + len + 40), excerpt = (start > 0 ? '…' : '') + text.substring(start, end) + (end < text.length ? '…' : ''), div = document.createElement('div'); div.className = 'search-result-item'; var h = b.closest('h1,h2,h3,h4,h5,h6') || this._prevH(b); div.innerHTML = (h && h !== b) ? '<div class="search-result-title">' + h.textContent.trim() + '</div>' + excerpt.replace(new RegExp(esc, 'gi'), '<mark>$&</mark>') : excerpt.replace(new RegExp(esc, 'gi'), '<mark>$&</mark>'); div.addEventListener('click', function() { Search.close(); b.scrollIntoView({ behavior: 'smooth', block: 'center' }); }); DOM.searchResults.appendChild(div); });
           if (count === 0) DOM.searchResults.innerHTML = '<div class="search-no-results">未找到匹配内容</div>';
@@ -929,19 +870,16 @@
       };
 
       /* ==========================================================
-         Module: Sidebar
+         ★ Module: Sidebar — with "首页" pinned to top
          ========================================================== */
       var Sidebar = {
         injectHeader: function() {
-          var sb = document.querySelector('.sidebar'); if (!sb || sb.querySelector('.sidebar-header')) return;
-          var nav = sb.querySelector('.sidebar-nav'); if (!nav) return;
+          var sb = document.querySelector('.sidebar'); if (!sb || sb.querySelector('.sidebar-header')) return; var nav = sb.querySelector('.sidebar-nav'); if (!nav) return;
           var h = document.createElement('div'); h.className = 'sidebar-header';
           h.innerHTML = '<span class="sidebar-brand" id="sidebarBrand">📚 知识库总览</span><input type="text" class="sidebar-filter-input" id="sidebarFilterInput" placeholder="过滤…"><div class="sidebar-actions"><button class="icon-btn" id="sidebarSearchBtn" title="过滤"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg></button><button class="icon-btn" id="sidebarCloseBtn" title="关闭"><svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button></div>';
           sb.insertBefore(h, nav);
-          DOM.sidebarSearchBtn = document.getElementById('sidebarSearchBtn');
-          DOM.sidebarCloseBtn = document.getElementById('sidebarCloseBtn');
-          DOM.sidebarFilterInput = document.getElementById('sidebarFilterInput');
-          DOM.sidebarBrand = document.getElementById('sidebarBrand');
+          DOM.sidebarSearchBtn = document.getElementById('sidebarSearchBtn'); DOM.sidebarCloseBtn = document.getElementById('sidebarCloseBtn');
+          DOM.sidebarFilterInput = document.getElementById('sidebarFilterInput'); DOM.sidebarBrand = document.getElementById('sidebarBrand');
           this._bind();
         },
         _bind: function() {
@@ -961,7 +899,20 @@
           nav.querySelectorAll('li').forEach(function(li) { var cu = li.querySelector('ul'); if (!cu) return; li.classList.add('folder-item'); var label = li.querySelector(':scope > .folder-label'); if (!label) { var link = li.querySelector(':scope > a'); if (link) { label = link; label.classList.add('folder-label'); label.setAttribute('href', 'javascript:void(0)'); label.removeAttribute('target'); } else { var fn = '', tr = []; for (var i = 0; i < li.childNodes.length; i++) { var cn = li.childNodes[i]; if (cn.nodeType === 3 && cn.textContent.trim()) { fn += cn.textContent.trim(); tr.push(cn); } } tr.forEach(function(n) { li.removeChild(n); }); label = document.createElement('span'); label.className = 'folder-label'; label.textContent = fn || 'Folder'; li.insertBefore(label, li.firstChild); } } var arrow = label.querySelector('.folder-arrow'); if (!arrow) { arrow = document.createElement('span'); arrow.className = 'folder-arrow'; arrow.innerHTML = '<svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>'; label.appendChild(arrow); } label.onclick = function(e) { e.preventDefault(); e.stopPropagation(); if (cu.classList.contains('expanded')) { Sidebar._collapse(li, cu); } else { Sidebar._expand(li, cu); } }; });
           this._autoExpand();
         },
-        _sort: function(uls) { var sf = function(a, b) { var aD = !!a.querySelector('ul'), bD = !!b.querySelector('ul'); if (aD && !bD) return -1; if (!aD && bD) return 1; return (a.textContent || '').trim().localeCompare((b.textContent || '').trim(), 'en'); }; uls.forEach(function(ul) { var its = Array.from(ul.children).filter(function(c) { return c.tagName === 'LI'; }); its.sort(sf); its.forEach(function(li) { ul.appendChild(li); }); }); },
+        _sort: function(uls) {
+          // ★ "首页" always first, then folders, then alphabetical
+          var pinned = '首页';
+          var sf = function(a, b) {
+            var aT = (a.textContent || '').trim(), bT = (b.textContent || '').trim();
+            if (aT === pinned) return -1;
+            if (bT === pinned) return 1;
+            var aD = !!a.querySelector('ul'), bD = !!b.querySelector('ul');
+            if (aD && !bD) return -1;
+            if (!aD && bD) return 1;
+            return aT.localeCompare(bT, 'en');
+          };
+          uls.forEach(function(ul) { var its = Array.from(ul.children).filter(function(c) { return c.tagName === 'LI'; }); its.sort(sf); its.forEach(function(li) { ul.appendChild(li); }); });
+        },
         _expand: function(li, cu) { if (state.currentOpenFolderUl && state.currentOpenFolderUl !== cu) { state.currentOpenFolderUl.classList.remove('expanded'); var pl = state.currentOpenFolderUl.parentNode; if (pl) pl.classList.remove('expanded'); } cu.classList.add('expanded'); li.classList.add('expanded'); state.currentOpenFolderUl = cu; },
         _collapse: function(li, cu) { cu.classList.remove('expanded'); li.classList.remove('expanded'); if (state.currentOpenFolderUl === cu) state.currentOpenFolderUl = null; },
         _autoExpand: function() { var al = document.querySelector('.sidebar-nav .active > a'); if (!al) return; var p = al.closest('.folder-item'); if (!p) { var pu = al.closest('ul.sidebar-sub'); if (pu) p = pu.closest('.folder-item'); } if (p) { var cu = p.querySelector(':scope > ul'); if (cu) this._expand(p, cu); } },
@@ -981,40 +932,23 @@
       /* ==========================================================
          Scroll Handler
          ========================================================== */
-      function onScroll() {
-        ProgressBar.update();
-        BackToTop.update();
-        clearTimeout(state.scrollTimer);
-        state.scrollTimer = setTimeout(function() { ReadingPosition.save(); }, CFG.SCROLL_SAVE_DEBOUNCE);
-        TOC.highlight();
-      }
+      function onScroll() { ProgressBar.update(); BackToTop.update(); clearTimeout(state.scrollTimer); state.scrollTimer = setTimeout(function() { ReadingPosition.save(); }, CFG.SCROLL_SAVE_DEBOUNCE); TOC.highlight(); }
 
       /* ==========================================================
          Docsify Hooks
          ========================================================== */
       function onPageReady() {
-        cacheDOM();
-        DarkMode.restore();
-        Loader.init();
-        Loader.hide();
-        Sidebar.injectHeader();
-        _bindGlobalEvents();
-        Lightbox.init();
-        document.body.classList.remove('close');
-        DocTitle.update();
-        ReadingTime.update();
+        cacheDOM(); DarkMode.restore(); Loader.init(); Loader.hide(); Sidebar.injectHeader(); _bindGlobalEvents(); Lightbox.init();
+        document.body.classList.remove('close'); DocTitle.update(); ReadingTime.update();
         setTimeout(function() { Sidebar.initFolders(); TOC.generate(); ProgressBar.update(); HeadingAnchors.add(); ReadingPosition.restore(); CodeBlock.addLineNumbers(); }, 250);
         setTimeout(function() { Loader.showError(); }, CFG.LOADING_ERROR_DELAY);
       }
-
       function onPageSwitch() {
-        var nav = document.querySelector('.sidebar-nav');
-        var unfreeze = nav ? freezeTransitions(nav) : function() {};
+        var nav = document.querySelector('.sidebar-nav'); var unfreeze = nav ? freezeTransitions(nav) : function() {};
         ReadingPosition.save(); DocTitle.update(); ReadingTime.update(); Search.close(); CodeBlock.enhance(); TOC.clear(); Sidebar.reset();
         setTimeout(function() { Sidebar.initFolders(); TOC.generate(); ProgressBar.update(); HeadingAnchors.add(); CodeBlock.addLineNumbers(); Lightbox.bindImages(); unfreeze(); setTimeout(function() { ReadingPosition.restore(); }, CFG.DOM_RESTORE_DELAY); }, 150);
         if (window.MathJax && typeof window.MathJax.typesetPromise === 'function') window.MathJax.typesetPromise();
       }
-
       function _bindGlobalEvents() {
         if (DOM.capsuleSidebarBtn) DOM.capsuleSidebarBtn.addEventListener('click', function() { document.body.classList.remove('close'); });
         if (DOM.capsuleSearchBtn) DOM.capsuleSearchBtn.addEventListener('click', Search.open);
@@ -1026,29 +960,14 @@
         if (DOM.searchOverlay) DOM.searchOverlay.addEventListener('click', function(e) { if (e.target === DOM.searchOverlay) Search.close(); });
         if (DOM.searchInput) { DOM.searchInput.addEventListener('input', function() { Search.highlightInDocument(this.value); Search.generateResults(this.value); state.searchSelectedIdx = -1; }); DOM.searchInput.addEventListener('keydown', function(e) { Search.handleKeyboard(e); }); }
         Keyboard.init();
-        // ★ 窗口 resize 时更新波浪画布尺寸（如果正在动画中）
-        window.addEventListener('resize', function() {
-          if (state.waveAnimId && DOM.waveCanvas) {
-            DOM.waveCanvas.width = window.innerWidth;
-            DOM.waveCanvas.height = window.innerHeight;
-          }
-        });
+        window.addEventListener('resize', function() { if (state.waveAnimId && DOM.waveCanvas) { DOM.waveCanvas.width = window.innerWidth; DOM.waveCanvas.height = window.innerHeight; } });
       }
 
       /* ==========================================================
          Docsify Config
          ========================================================== */
-      window.$docsify = {
-        name: 'Soren的知识库', loadSidebar: '_sidebar.md', subMaxLevel: 0,
-        basePath: CFG.BASE_PATH, homepage: 'README.md', notFoundPage: true,
-        plugins: [function(hook) { hook.ready(onPageReady); hook.doneEach(onPageSwitch); }]
-      };
-
-      window.MathJax = {
-        tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']], processEscapes: true },
-        options: { skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'], ignoreHtmlClass: 'tex2jax_ignore', processHtmlClass: 'tex2jax_process' }
-      };
-
+      window.$docsify = { name: 'Soren的知识库', loadSidebar: '_sidebar.md', subMaxLevel: 0, basePath: CFG.BASE_PATH, homepage: 'README.md', notFoundPage: true, plugins: [function(hook) { hook.ready(onPageReady); hook.doneEach(onPageSwitch); }] };
+      window.MathJax = { tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [['$$','$$'],['\\[','\\]']], processEscapes: true }, options: { skipHtmlTags: ['script','noscript','style','textarea','pre','code'], ignoreHtmlClass: 'tex2jax_ignore', processHtmlClass: 'tex2jax_process' } };
     })();
   </script>
 
