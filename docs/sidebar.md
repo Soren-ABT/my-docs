@@ -1,14 +1,11 @@
 <!-- _sidebar.md -->
 
 - [首页](README.md)
-- 复变函数与积分变换
-  - [第二章](files/复变函数与积分变换/第二章/U2.complex-analysis-review.md)
-- 科研
-  - 深度学习和信号处理
-    - [0-1的AMC深度学习](files/科研/From-0-to-1-Deep-Learning-Based-AMC.md)
-- 论文资料
-  - 科研论文PDF
-    - [AMC-PDF1](files/论文资料/sample.pdf)
-- 其他
-  - 读书笔记
-    - [笔记1](files/其他/读书笔记.md)
+- Complex Analysis
+  - [Chapter 2](files/complex-analysis/chapter2/U2.complex-analysis-review.md)
+- Research
+  - [From 0 to 1: DL-Based AMC](files/research/From-0-to-1-Deep-Learning-Based-AMC.md)
+- Papers
+  - [AMC Paper 1](files/papers/sample.pdf)
+- Notes
+  - [Reading Notes](files/notes/reading-notes.md)
