@@ -6,7 +6,7 @@
   - [Chapter 5](files/complex-analysis/chapter5/U5.complex-analysis-review.md)
   - [Chapter 7](files/complex-analysis/chapter7/U7.complex-analysis-review.md)
 - General Physics A1
-  - [Mechanics](files/general-physics-a1/Mechanics/general-physics-a1-mechanics-review.md)
+  - [Mechanics](files/general-physics-a1/mechanics/general-physics-a1-mechanics-review.md)
 - Research
   - [From 0 to 1 DL-Based AMC](files/research/From-0-to-1-Deep-Learning-Based-AMC.md)
 - Papers
