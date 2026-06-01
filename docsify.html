@@ -28,7 +28,7 @@
       --accent: #c9a962;
       --accent-light: rgba(201,169,98,0.15);
       --code-bg: #f8f9fa;
-      --code-border: rgba(0,0,0,0.05);
+      --code-border: rgba(0,0,0,0.06);
       --header-bg: rgba(255,255,255,0.85);
       --sidebar-bg: #f5f5f5;
       --sidebar-active: rgba(0,0,0,0.08);
@@ -38,6 +38,8 @@
       --search-highlight: #b9f6ca;
       --btn-hover: rgba(0,0,0,0.06);
       --toc-bg: rgba(255,255,255,0.95);
+      --scrollbar-thumb: #c0c0c0;
+      --scrollbar-track: transparent;
     }
 
     body.dark {
@@ -55,7 +57,7 @@
       --accent-light: rgba(241,196,15,0.15);
       --code-bg: #0d1b2a;
       --code-border: #1b2838;
-      --header-bg: rgba(26,26,46,0.85);
+      --header-bg: rgba(26,26,46,0.88);
       --sidebar-bg: #16213e;
       --sidebar-active: rgba(255,255,255,0.08);
       --progress-bg: #f1c40f;
@@ -64,17 +66,25 @@
       --search-highlight: #3d5a1e;
       --btn-hover: rgba(255,255,255,0.08);
       --toc-bg: rgba(26,26,46,0.95);
+      --scrollbar-thumb: #3a3a5a;
+      --scrollbar-track: #1a1a2e;
     }
 
     /* ============================================================
-       全局过渡
+       全局
        ============================================================ */
     * { box-sizing: border-box; }
     body {
       background: var(--bg);
       color: var(--text);
       transition: background 0.3s, color 0.3s;
+      scroll-behavior: smooth;
     }
+
+    /* 自定义滚动条 */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--scrollbar-track); }
+    ::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 3px; }
 
     /* ============================================================
        毛玻璃加载遮罩
@@ -119,7 +129,7 @@
       position: fixed; top: 0; left: 0; height: 3px;
       background: linear-gradient(90deg, var(--accent), var(--progress-bg));
       z-index: 10000; transition: width 0.15s linear;
-      border-radius: 0 2px 2px 0;
+      border-radius: 0 2px 2px 0; pointer-events: none;
     }
 
     /* ============================================================
@@ -137,29 +147,30 @@
 
     /* 侧边栏头部 */
     .sidebar-header {
-      display: flex; align-items: center; padding: 14px 12px;
-      border-bottom: 1px solid var(--border); gap: 8px;
+      display: flex; align-items: center; padding: 12px 12px;
+      border-bottom: 1px solid var(--border); gap: 6px;
       background: var(--sidebar-bg);
     }
     .sidebar-brand {
-      font-size: 1.1rem; font-weight: 600; color: var(--text);
+      font-size: 1.05rem; font-weight: 600; color: var(--text);
       white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1;
+      min-width: 0;
     }
     .sidebar-brand.hidden { display: none; }
     .sidebar-filter-input {
-      flex: 1; padding: 6px 10px; border: 1px solid var(--border); border-radius: 6px;
-      background: var(--bg); color: var(--text); font-size: 0.85rem; outline: none; display: none;
-      transition: border 0.2s;
+      flex: 1; padding: 5px 8px; border: 1px solid var(--border); border-radius: 6px;
+      background: var(--bg); color: var(--text); font-size: 0.82rem; outline: none; display: none;
+      transition: border 0.2s; min-width: 0;
     }
     .sidebar-filter-input:focus { border-color: var(--accent); }
     .sidebar-filter-input.show { display: block; }
-    .sidebar-actions { display: flex; align-items: center; gap: 2px; margin-left: auto; }
+    .sidebar-actions { display: flex; align-items: center; gap: 2px; flex-shrink: 0; }
 
     /* 图标按钮 */
     .icon-btn {
       background: none; border: none; cursor: pointer;
       width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;
-      border-radius: 6px; transition: background 0.2s; color: var(--text-secondary);
+      border-radius: 6px; transition: background 0.2s, color 0.2s; color: var(--text-secondary);
       flex-shrink: 0;
     }
     .icon-btn:hover { background: var(--btn-hover); color: var(--text); }
@@ -177,33 +188,41 @@
     .sidebar-nav .active > a { background: var(--sidebar-active); font-weight: 500; color: var(--accent); }
     .sidebar-nav li.filtered-out { display: none !important; }
 
-    /* 文件夹 */
+    /* 文件夹条目 —— + 号紧挨文字右侧 */
     .folder-item {
-      display: flex !important; flex-wrap: wrap;
-      justify-content: space-between; align-items: center;
+      display: flex !important;
+      flex-wrap: wrap;
+      align-items: center;
     }
-    .folder-item > a, .folder-item > .folder-label {
-      flex: 1 1 auto; max-width: calc(100% - 28px);
-      display: block; padding: 7px 14px; border-radius: 8px;
+    .folder-item > a,
+    .folder-item > .folder-label {
+      flex: 0 1 auto;
+      max-width: calc(100% - 26px);
+      display: block; padding: 7px 0 7px 14px; border-radius: 8px;
       color: var(--text); cursor: pointer; font-size: 0.9rem;
-      text-decoration: none;
+      text-decoration: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
-    .folder-item > a:hover, .folder-item > .folder-label:hover { background: var(--btn-hover); }
+    .folder-item > a:hover,
+    .folder-item > .folder-label:hover { background: var(--btn-hover); }
     .folder-item > ul { flex-basis: 100%; width: 100%; }
     .folder-toggle {
-      font-size: 13px; font-weight: bold; color: var(--text-muted);
-      user-select: none; min-width: 18px; text-align: center;
-      flex-shrink: 0; cursor: pointer; line-height: 1;
+      font-size: 13px; font-weight: 600; color: var(--text-muted);
+      user-select: none; min-width: 20px; height: 20px; text-align: center;
+      flex-shrink: 0; cursor: pointer; line-height: 20px;
+      border-radius: 4px; transition: background 0.15s, color 0.15s;
+      display: inline-flex; align-items: center; justify-content: center;
     }
+    .folder-toggle:hover { background: var(--btn-hover); color: var(--accent); }
     .sidebar-nav ul.sidebar-sub {
-      padding-left: 1.5rem; max-height: 0; overflow: hidden;
+      padding-left: 1.5rem;
+      max-height: 0; overflow: hidden;
       transition: max-height 0.3s ease;
     }
     .sidebar-nav ul.sidebar-sub.expanded { max-height: 600px; }
     .sidebar-nav ul.sidebar-sub li a { font-size: 0.85rem; }
 
     /* ============================================================
-       文档抬头 & 阅读时间
+       文档固定抬头
        ============================================================ */
     .doc-header {
       position: fixed; top: 0; left: 260px; right: 0; height: 56px;
@@ -220,25 +239,39 @@
       white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
     .doc-reading-time {
-      font-size: 0.75rem; color: var(--text-muted);
-      white-space: nowrap; margin-left: 8px;
+      font-size: 0.72rem; color: var(--text-muted); white-space: nowrap; margin-left: 6px;
     }
-    .doc-header-actions { display: flex; align-items: center; gap: 2px; }
+    .doc-header-actions { display: flex; align-items: center; gap: 2px; flex-shrink: 0; }
 
     .capsule {
       display: none; align-items: center; background: var(--header-bg);
       backdrop-filter: blur(10px); border: 1px solid var(--border); border-radius: 24px;
-      padding: 4px 8px; gap: 2px; position: absolute; left: 14px; top: 50%;
+      padding: 4px 6px; gap: 2px; position: absolute; left: 14px; top: 50%;
       transform: translateY(-50%); z-index: 1000; box-shadow: 0 2px 8px var(--shadow);
     }
     body.close .capsule { display: flex; }
-    body.close .doc-header-left { padding-left: 70px; }
+    body.close .doc-header-left { padding-left: 68px; }
     .capsule .icon-btn { width: 28px; height: 28px; border-radius: 50%; }
 
-    /* 暗色模式切换按钮 */
+    /* 暗色图标切换 */
     #darkModeBtn .sun-icon, #darkModeBtn .moon-icon { transition: transform 0.4s; }
     body:not(.dark) #darkModeBtn .moon-icon { display: none; }
     body.dark #darkModeBtn .sun-icon { display: none; }
+
+    /* ============================================================
+       Markdown 文档区域 —— 居中浏览
+       ============================================================ */
+    .markdown-section {
+      padding-top: 56px !important;
+      padding-left: 24px !important;
+      padding-right: 24px !important;
+      max-width: 860px;
+      margin: 0 auto;
+    }
+    /* 代码块内边距不叠加 */
+    .markdown-section .code-block-wrapper pre {
+      padding: 1.2rem 1.5rem;
+    }
 
     /* ============================================================
        回到顶部按钮
@@ -274,19 +307,19 @@
     #toc-panel.visible { opacity: 1; transform: translateX(0); pointer-events: auto; }
     #toc-panel .toc-title {
       font-weight: 600; color: var(--text); margin-bottom: 8px;
-      font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px;
+      font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.5px;
     }
     #toc-panel a {
       display: block; padding: 4px 0; color: var(--text-secondary);
       text-decoration: none; border-left: 2px solid transparent;
-      padding-left: 8px; transition: all 0.2s;
+      padding-left: 8px; transition: all 0.2s; white-space: nowrap;
+      overflow: hidden; text-overflow: ellipsis;
     }
     #toc-panel a:hover, #toc-panel a.active { color: var(--accent); border-left-color: var(--accent); }
     #toc-panel a.toc-h2 { padding-left: 8px; font-weight: 500; }
-    #toc-panel a.toc-h3 { padding-left: 18px; font-size: 0.75rem; }
-    #toc-panel a.toc-h4 { padding-left: 28px; font-size: 0.72rem; }
+    #toc-panel a.toc-h3 { padding-left: 18px; font-size: 0.76rem; }
+    #toc-panel a.toc-h4 { padding-left: 28px; font-size: 0.73rem; }
 
-    /* TOC 切换按钮 */
     #tocToggleBtn { position: relative; }
     #tocToggleBtn.active { color: var(--accent); }
 
@@ -359,17 +392,8 @@
     }
 
     /* ============================================================
-       Markdown 区域
+       代码块卡片 + 语法高亮
        ============================================================ */
-    .markdown-section {
-      padding-top: 56px !important;
-      max-width: 860px; margin: 0 auto;
-      padding-right: 260px; /* 给 TOC 面板留空间 */
-    }
-    @media (max-width: 1200px) { .markdown-section { padding-right: 0; } }
-    body.close .markdown-section { padding-right: 0; }
-
-    /* 代码块卡片 */
     .code-block-wrapper {
       margin: 1.6rem 0; border-radius: 10px; overflow: hidden;
       box-shadow: 0 2px 12px var(--shadow); background: var(--code-bg);
@@ -392,14 +416,89 @@
     .code-copy-btn:hover { background: var(--btn-hover); border-color: var(--accent); color: var(--accent); }
     .code-copy-btn.copied { background: #27ae60; border-color: #27ae60; color: #fff; }
     .code-block-wrapper pre {
-      margin: 0; padding: 1.2rem 1.5rem; overflow-x: auto; background: transparent;
+      margin: 0; padding: 1.2rem 1.5rem; overflow-x: auto; background: transparent !important;
     }
     .code-block-wrapper pre code {
       font-family: 'JetBrains Mono', 'Fira Code', Consolas, monospace;
-      font-size: 0.88rem; line-height: 1.7; color: var(--text);
+      font-size: 0.88rem; line-height: 1.7;
     }
 
-    /* 覆盖 Docsify 默认链接颜色 */
+    /* ============================================================
+       Prism 语法高亮 —— 亮色主题
+       ============================================================ */
+    .markdown-section .token.comment,
+    .markdown-section .token.prolog,
+    .markdown-section .token.doctype,
+    .markdown-section .token.cdata { color: #6a737d; font-style: italic; }
+    .markdown-section .token.namespace { opacity: 0.7; }
+    .markdown-section .token.punctuation { color: #393a34; }
+    .markdown-section .token.property,
+    .markdown-section .token.tag,
+    .markdown-section .token.boolean,
+    .markdown-section .token.number,
+    .markdown-section .token.constant,
+    .markdown-section .token.symbol,
+    .markdown-section .token.deleted { color: #005cc5; }
+    .markdown-section .token.selector,
+    .markdown-section .token.attr-name,
+    .markdown-section .token.string,
+    .markdown-section .token.char,
+    .markdown-section .token.builtin,
+    .markdown-section .token.inserted { color: #032f62; }
+    .markdown-section .token.operator,
+    .markdown-section .token.entity,
+    .markdown-section .token.url { color: #d73a49; }
+    .markdown-section .token.atrule,
+    .markdown-section .token.attr-value,
+    .markdown-section .token.keyword { color: #d73a49; }
+    .markdown-section .token.function,
+    .markdown-section .token.class-name { color: #6f42c1; }
+    .markdown-section .token.regex,
+    .markdown-section .token.important,
+    .markdown-section .token.variable { color: #e36209; }
+    .markdown-section .token.important,
+    .markdown-section .token.bold { font-weight: 600; }
+    .markdown-section .token.italic { font-style: italic; }
+
+    /* ============================================================
+       Prism 语法高亮 —— 暗色主题
+       ============================================================ */
+    body.dark .markdown-section .token.comment,
+    body.dark .markdown-section .token.prolog,
+    body.dark .markdown-section .token.doctype,
+    body.dark .markdown-section .token.cdata { color: #6a9955; font-style: italic; }
+    body.dark .markdown-section .token.punctuation { color: #d4d4d4; }
+    body.dark .markdown-section .token.property,
+    body.dark .markdown-section .token.tag,
+    body.dark .markdown-section .token.boolean,
+    body.dark .markdown-section .token.number,
+    body.dark .markdown-section .token.constant,
+    body.dark .markdown-section .token.symbol,
+    body.dark .markdown-section .token.deleted { color: #b5cea8; }
+    body.dark .markdown-section .token.selector,
+    body.dark .markdown-section .token.attr-name,
+    body.dark .markdown-section .token.string,
+    body.dark .markdown-section .token.char,
+    body.dark .markdown-section .token.builtin,
+    body.dark .markdown-section .token.inserted { color: #ce9178; }
+    body.dark .markdown-section .token.operator,
+    body.dark .markdown-section .token.entity,
+    body.dark .markdown-section .token.url { color: #569cd6; }
+    body.dark .markdown-section .token.atrule,
+    body.dark .markdown-section .token.attr-value,
+    body.dark .markdown-section .token.keyword { color: #569cd6; }
+    body.dark .markdown-section .token.function,
+    body.dark .markdown-section .token.class-name { color: #dcdcaa; }
+    body.dark .markdown-section .token.regex,
+    body.dark .markdown-section .token.important,
+    body.dark .markdown-section .token.variable { color: #e36209; }
+
+    /* 暗色下代码块文字颜色 */
+    body.dark .code-block-wrapper pre code { color: #d4d4d4; }
+
+    /* ============================================================
+       链接颜色
+       ============================================================ */
     .markdown-section a { color: var(--accent); }
     body.dark .markdown-section a { color: #f1c40f; }
 
@@ -409,7 +508,7 @@
     @media (max-width: 768px) {
       .sidebar { width: 100% !important; }
       .doc-header { left: 0 !important; }
-      .markdown-section { padding-right: 0; padding-top: 56px !important; }
+      .markdown-section { padding-left: 16px !important; padding-right: 16px !important; }
       #toc-panel { display: none !important; }
       #backToTop { bottom: 16px; right: 16px; }
       .search-modal { max-height: 85vh; border-radius: 16px; }
@@ -440,10 +539,10 @@
   <!-- ========== 文档固定抬头 ========== -->
   <div class="doc-header" id="docHeader">
     <div class="capsule" id="capsuleGroup">
-      <button class="icon-btn" id="capsuleSidebarBtn" title="打开侧边栏">
+      <button class="icon-btn" id="capsuleSidebarBtn" title="打开侧边栏 (Ctrl+B)">
         <svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
       </button>
-      <button class="icon-btn" id="capsuleSearchBtn" title="搜索 (Ctrl+K)">
+      <button class="icon-btn" id="capsuleSearchBtn" title="全局搜索 (Ctrl+K)">
         <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg>
       </button>
     </div>
@@ -452,10 +551,10 @@
       <span class="doc-reading-time" id="readingTime"></span>
     </div>
     <div class="doc-header-actions">
-      <button class="icon-btn" id="tocToggleBtn" title="页面目录">
+      <button class="icon-btn" id="tocToggleBtn" title="本页目录">
         <svg viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
       </button>
-      <button class="icon-btn" id="darkModeBtn" title="切换暗色模式">
+      <button class="icon-btn" id="darkModeBtn" title="暗色模式 (Ctrl+D)">
         <svg class="sun-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
         <svg class="moon-icon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
       </button>
@@ -469,7 +568,7 @@
   </div>
 
   <!-- ========== 回到顶部 ========== -->
-  <button id="backToTop" title="回到顶部">
+  <button id="backToTop" title="回到顶部 (Ctrl+↑)">
     <svg viewBox="0 0 24 24"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
   </button>
 
@@ -491,7 +590,7 @@
   <div id="shortcuts-panel">
     <div class="shortcuts-modal">
       <h3>⌨ 键盘快捷键</h3>
-      <div class="kbd-row"><span>打开搜索</span><span><kbd>Ctrl</kbd> + <kbd>K</kbd></span></div>
+      <div class="kbd-row"><span>全局搜索</span><span><kbd>Ctrl</kbd> + <kbd>K</kbd></span></div>
       <div class="kbd-row"><span>切换侧边栏</span><span><kbd>Ctrl</kbd> + <kbd>B</kbd></span></div>
       <div class="kbd-row"><span>暗色模式</span><span><kbd>Ctrl</kbd> + <kbd>D</kbd></span></div>
       <div class="kbd-row"><span>回到顶部</span><span><kbd>Ctrl</kbd> + <kbd>↑</kbd></span></div>
@@ -503,7 +602,7 @@
   <div id="app"></div>
 
   <!-- ============================================================
-       localStorage 容错（Edge 严格模式）
+       localStorage 容错（Edge 严格跟踪防护）
        ============================================================ -->
   <script>
     (function() {
@@ -513,7 +612,8 @@
         catch (e) { return true; }
       }
       if (!blocked()) return;
-      var _s = Storage.prototype.setItem, _g = Storage.prototype.getItem, _r = Storage.prototype.removeItem, _c = Storage.prototype.clear;
+      var _s = Storage.prototype.setItem, _g = Storage.prototype.getItem;
+      var _r = Storage.prototype.removeItem, _c = Storage.prototype.clear;
       Storage.prototype.setItem = function(k, v) { try { _s.call(this, k, v); } catch (e) { mem[k] = String(v); } };
       Storage.prototype.getItem = function(k) { try { return _g.call(this, k); } catch (e) { return k in mem ? mem[k] : null; } };
       Storage.prototype.removeItem = function(k) { try { _r.call(this, k); } catch (e) { delete mem[k]; } };
@@ -522,22 +622,21 @@
   </script>
 
   <!-- ============================================================
-       Docsify 配置 & 全部功能
+       Docsify 配置 & 全部插件
        ============================================================ -->
   <script>
-    // ★ 部署配置
+    // ★ 部署路径（项目站点）
     var DOCSIFY_BASE_PATH = '/my-docs/';
 
     window.$docsify = {
       name: 'Soren的知识库',
       loadSidebar: '_sidebar.md',
-      subMaxLevel: 3,
+      subMaxLevel: 0,            // ★ 侧边栏不展开页面内标题层级
       basePath: DOCSIFY_BASE_PATH,
       homepage: 'README.md',
       notFoundPage: true,
       plugins: [
         function(hook, vm) {
-          // ========== 首次加载完成 ==========
           hook.ready(function() {
             hideLoading();
             injectSidebarHeader();
@@ -552,7 +651,6 @@
             }, 250);
           });
 
-          // ========== 每次页面切换 ==========
           hook.doneEach(function() {
             updateDocTitle();
             updateReadingTime();
@@ -585,14 +683,13 @@
       if (dh) dh.style.display = 'flex';
       if (window._loaderMouse) { document.removeEventListener('mousemove', window._loaderMouse); window._loaderMouse = null; }
     }
-
     // 5 秒后显示排查提示（不强制关闭遮罩）
     setTimeout(function() {
       if (!_loaded) { var err = document.getElementById('loadingError'); if (err) err.classList.add('show'); }
     }, 5000);
 
     // ============================================================
-    // 侧边栏头部注入
+    // 侧边栏头部（仅两个按钮：搜索=过滤切换，关闭）
     // ============================================================
     function injectSidebarHeader() {
       var sidebar = document.querySelector('.sidebar');
@@ -605,8 +702,7 @@
         '<span class="sidebar-brand" id="sidebarBrand">📚 知识库总览</span>' +
         '<input type="text" class="sidebar-filter-input" id="sidebarFilterInput" placeholder="过滤…">' +
         '<div class="sidebar-actions">' +
-          '<button class="icon-btn" id="sidebarSearchBtn" title="搜索"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg></button>' +
-          '<button class="icon-btn" id="sidebarFilterToggleBtn" title="过滤"><svg viewBox="0 0 24 24"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="20" y2="12"/><line x1="12" y1="18" x2="20" y2="18"/></svg></button>' +
+          '<button class="icon-btn" id="sidebarSearchBtn" title="过滤侧边栏"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg></button>' +
           '<button class="icon-btn" id="sidebarCloseBtn" title="关闭侧边栏"><svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>' +
         '</div>';
       sidebar.insertBefore(h, nav);
@@ -616,15 +712,14 @@
     function bindSidebarButtons() {
       var closeBtn = document.getElementById('sidebarCloseBtn');
       var searchBtn = document.getElementById('sidebarSearchBtn');
-      var filterToggle = document.getElementById('sidebarFilterToggleBtn');
       var filterInput = document.getElementById('sidebarFilterInput');
       var brand = document.getElementById('sidebarBrand');
 
       if (closeBtn) closeBtn.addEventListener('click', function() { document.body.classList.add('close'); });
-      if (searchBtn) searchBtn.addEventListener('click', openSearchModal);
 
-      if (filterToggle && filterInput && brand) {
-        filterToggle.addEventListener('click', function() {
+      // ★ 搜索按钮 → 切换过滤输入框（不再是全局搜索）
+      if (searchBtn && filterInput && brand) {
+        searchBtn.addEventListener('click', function() {
           if (filterInput.classList.contains('show')) {
             filterInput.classList.remove('show'); brand.classList.remove('hidden');
             filterInput.value = ''; filterSidebarItems('');
@@ -637,7 +732,10 @@
       if (filterInput) {
         filterInput.addEventListener('input', function() { filterSidebarItems(this.value); });
         filterInput.addEventListener('keydown', function(e) {
-          if (e.key === 'Escape') { this.value = ''; filterSidebarItems(''); this.classList.remove('show'); if (brand) brand.classList.remove('hidden'); }
+          if (e.key === 'Escape') {
+            this.value = ''; filterSidebarItems(''); this.classList.remove('show');
+            if (brand) brand.classList.remove('hidden');
+          }
         });
       }
     }
@@ -650,13 +748,12 @@
       var cb1 = document.getElementById('capsuleSidebarBtn');
       var cb2 = document.getElementById('capsuleSearchBtn');
       if (cb1) cb1.addEventListener('click', function() { document.body.classList.remove('close'); });
-      if (cb2) cb2.addEventListener('click', openSearchModal);
+      if (cb2) cb2.addEventListener('click', openSearchModal);  // ★ 全局搜索仅通过胶囊按钮或快捷键
 
       // 暗色模式
       var dmBtn = document.getElementById('darkModeBtn');
       if (dmBtn) {
         dmBtn.addEventListener('click', toggleDarkMode);
-        // 读取本地存储
         if (localStorage.getItem('darkMode') === 'true') document.body.classList.add('dark');
       }
 
@@ -674,7 +771,7 @@
       var btt = document.getElementById('backToTop');
       if (btt) btt.addEventListener('click', function() { window.scrollTo({ top: 0, behavior: 'smooth' }); });
 
-      // 滚动监听：进度条 & 回到顶部 & TOC 高亮
+      // 滚动监听
       window.addEventListener('scroll', function() {
         updateProgressBar();
         if (btt) btt.classList.toggle('visible', window.scrollY > 400);
@@ -697,7 +794,7 @@
       // 键盘快捷键
       document.addEventListener('keydown', handleKeyboardShortcuts);
 
-      // 加载动画 3D 鼠标交互
+      // 加载动画 3D 交互
       initLoaderMouse();
     }
 
@@ -713,44 +810,25 @@
     // 键盘快捷键
     // ============================================================
     function handleKeyboardShortcuts(e) {
-      // 如果焦点在输入框内，跳过（但 Ctrl+K 和 ? 始终生效）
       var tag = (e.target.tagName || '').toLowerCase();
       var isInput = tag === 'input' || tag === 'textarea' || e.target.isContentEditable;
 
-      // Esc
       if (e.key === 'Escape') {
         closeSearchModal();
         closeShortcutsPanel();
-        var tocPanel = document.getElementById('toc-panel');
-        if (tocPanel) tocPanel.classList.remove('visible');
-        var tocBtn = document.getElementById('tocToggleBtn');
-        if (tocBtn) tocBtn.classList.remove('active');
+        var tp = document.getElementById('toc-panel'); if (tp) tp.classList.remove('visible');
+        var tb = document.getElementById('tocToggleBtn'); if (tb) tb.classList.remove('active');
       }
 
-      // Ctrl+K → 搜索
       if ((e.ctrlKey || e.metaKey) && e.key === 'k') { e.preventDefault(); openSearchModal(); return; }
-
-      // Ctrl+B → 切换侧边栏
       if ((e.ctrlKey || e.metaKey) && e.key === 'b') { e.preventDefault(); document.body.classList.toggle('close'); return; }
-
-      // Ctrl+D → 暗色模式
       if ((e.ctrlKey || e.metaKey) && e.key === 'd') { e.preventDefault(); toggleDarkMode(); return; }
-
-      // Ctrl+↑ → 回到顶部
       if ((e.ctrlKey || e.metaKey) && e.key === 'ArrowUp') { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); return; }
-
-      // ? → 快捷键帮助（不在输入框内时）
       if (e.key === '?' && !isInput) { e.preventDefault(); openShortcutsPanel(); return; }
     }
 
-    function openShortcutsPanel() {
-      var panel = document.getElementById('shortcuts-panel');
-      if (panel) panel.classList.add('active');
-    }
-    function closeShortcutsPanel() {
-      var panel = document.getElementById('shortcuts-panel');
-      if (panel) panel.classList.remove('active');
-    }
+    function openShortcutsPanel() { var p = document.getElementById('shortcuts-panel'); if (p) p.classList.add('active'); }
+    function closeShortcutsPanel() { var p = document.getElementById('shortcuts-panel'); if (p) p.classList.remove('active'); }
 
     // ============================================================
     // 阅读进度条
@@ -758,11 +836,9 @@
     function updateProgressBar() {
       var bar = document.getElementById('reading-progress');
       if (!bar) return;
-      var scrollTop = window.scrollY;
-      var docHeight = document.documentElement.scrollHeight - window.innerHeight;
-      if (docHeight <= 0) { bar.style.width = '0%'; return; }
-      var progress = Math.min(100, Math.max(0, (scrollTop / docHeight) * 100));
-      bar.style.width = progress + '%';
+      var dh = document.documentElement.scrollHeight - window.innerHeight;
+      if (dh <= 0) { bar.style.width = '0%'; return; }
+      bar.style.width = Math.min(100, Math.max(0, (window.scrollY / dh) * 100)) + '%';
     }
 
     // ============================================================
@@ -775,9 +851,8 @@
       if (!container) { el.textContent = ''; return; }
       var text = container.textContent || '';
       var words = text.replace(/\s+/g, ' ').trim().split(/\s+/).length;
-      // 中文按字符数估算：~400 字/分钟
-      var chineseChars = (text.match(/[\u4e00-\u9fff]/g) || []).length;
-      var minutes = Math.max(1, Math.ceil((words / 200) + (chineseChars / 400)));
+      var chinese = (text.match(/[\u4e00-\u9fff]/g) || []).length;
+      var minutes = Math.max(1, Math.ceil((words / 200) + (chinese / 400)));
       el.textContent = '⏱ ~' + minutes + ' min';
     }
 
@@ -787,32 +862,26 @@
     function generateTOC() {
       var container = document.querySelector('.markdown-section');
       var tocContent = document.getElementById('toc-content');
+      var tocPanel = document.getElementById('toc-panel');
+      var tocBtn = document.getElementById('tocToggleBtn');
       if (!container || !tocContent) return;
 
       var headings = container.querySelectorAll('h1, h2, h3, h4');
       if (headings.length < 2) {
-        // 少于 2 个标题，隐藏 TOC 按钮和面板
-        var tocPanel = document.getElementById('toc-panel');
-        var tocBtn = document.getElementById('tocToggleBtn');
         if (tocPanel) tocPanel.classList.remove('visible');
         if (tocBtn) { tocBtn.classList.remove('active'); tocBtn.style.display = 'none'; }
         return;
       }
-
-      // 显示 TOC 按钮
-      var tocBtn = document.getElementById('tocToggleBtn');
       if (tocBtn) tocBtn.style.display = '';
 
       var html = '';
       headings.forEach(function(h, i) {
-        // 给每个标题加 id（如果没有的话）
-        if (!h.id) h.id = 'heading-' + i;
+        if (!h.id) h.id = 'toc-' + i;
         var level = h.tagName.toLowerCase();
         html += '<a href="#' + h.id + '" class="toc-' + level + '" data-target="' + h.id + '">' + h.textContent.trim() + '</a>';
       });
       tocContent.innerHTML = html;
 
-      // 点击 TOC 链接平滑滚动
       tocContent.querySelectorAll('a').forEach(function(a) {
         a.addEventListener('click', function(e) {
           e.preventDefault();
@@ -820,30 +889,24 @@
           if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
         });
       });
-
       updateTOCHighlight();
     }
 
     function updateTOCHighlight() {
       var links = document.querySelectorAll('#toc-content a');
       if (!links.length) return;
-      var scrollTop = window.scrollY + 80;
-      var activeId = null;
+      var scrollTop = window.scrollY + 80, activeId = null;
       links.forEach(function(a) {
         var id = a.getAttribute('data-target');
         var el = document.getElementById(id);
         if (el && el.offsetTop <= scrollTop) activeId = id;
       });
-      links.forEach(function(a) {
-        a.classList.toggle('active', a.getAttribute('data-target') === activeId);
-      });
+      links.forEach(function(a) { a.classList.toggle('active', a.getAttribute('data-target') === activeId); });
     }
 
     function clearTOC() {
-      var tocContent = document.getElementById('toc-content');
-      if (tocContent) tocContent.innerHTML = '';
-      var tocPanel = document.getElementById('toc-panel');
-      if (tocPanel) tocPanel.classList.remove('visible');
+      var tc = document.getElementById('toc-content'); if (tc) tc.innerHTML = '';
+      var tp = document.getElementById('toc-panel'); if (tp) tp.classList.remove('visible');
     }
 
     // ============================================================
@@ -889,7 +952,7 @@
     }
 
     // ============================================================
-    // 文件夹树
+    // 文件夹树（默认折叠，+ 号紧挨文字右侧，点击文字或 + 号展开）
     // ============================================================
     function initSidebarFolders() {
       var nav = document.querySelector('.sidebar-nav');
@@ -918,29 +981,35 @@
       nav.querySelectorAll('li').forEach(function(li) {
         var childUl = li.querySelector('ul');
         if (!childUl) return;
-        if (li.querySelector('.folder-toggle')) return; // 已处理
+        if (li.querySelector('.folder-toggle')) return;
 
         li.classList.add('folder-item');
 
-        // 保留原始 <a> 作为可点击标签
         var link = li.querySelector(':scope > a');
         var label;
         if (link) {
-          link.classList.add('folder-label');
           label = link;
+          label.classList.add('folder-label');
         } else {
           label = document.createElement('span');
           label.className = 'folder-label';
-          label.textContent = li.childNodes[0] ? li.childNodes[0].textContent.trim() : 'Folder';
+          var firstText = '';
+          for (var i = 0; i < li.childNodes.length; i++) {
+            if (li.childNodes[i].nodeType === 3 && li.childNodes[i].textContent.trim()) {
+              firstText = li.childNodes[i].textContent.trim(); break;
+            }
+          }
+          label.textContent = firstText || 'Folder';
         }
 
         var icon = document.createElement('span');
         icon.className = 'folder-toggle';
-        icon.textContent = '+';
+        icon.textContent = '+';  // ★ 默认折叠
         li.appendChild(icon);
 
+        // ★ 点击文字或 + 号都能展开/折叠
         function toggle(e) {
-          if (e.target.tagName === 'A' && e.target !== label) return;
+          if (e.target.tagName === 'A' && e.target !== label && e.target.closest('ul') === childUl) return;
           e.preventDefault(); e.stopPropagation();
           var expanded = childUl.classList.contains('expanded');
           if (expanded) { childUl.classList.remove('expanded'); icon.textContent = '+'; }
@@ -952,7 +1021,7 @@
     }
 
     // ============================================================
-    // 代码块增强
+    // 代码块增强（卡片 + 复制 + 语法高亮保持）
     // ============================================================
     function enhanceCodeBlocks() {
       document.querySelectorAll('.markdown-section pre').forEach(function(pre) {
@@ -969,20 +1038,30 @@
 
         btn.addEventListener('click', function() {
           var text = pre.textContent || '';
-          var done = function() { btn.classList.add('copied'); btn.innerHTML = '✓ Copied'; setTimeout(function() { btn.classList.remove('copied'); btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy'; }, 2000); };
+          var done = function() {
+            btn.classList.add('copied'); btn.innerHTML = '✓ Copied';
+            setTimeout(function() {
+              btn.classList.remove('copied');
+              btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy';
+            }, 2000);
+          };
           if (navigator.clipboard && navigator.clipboard.writeText) {
-            navigator.clipboard.writeText(text).then(done).catch(function() {
-              // fallback
-              var ta = document.createElement('textarea'); ta.value = text; ta.style.cssText = 'position:fixed;left:-9999px'; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); done();
-            });
-          } else {
-            var ta = document.createElement('textarea'); ta.value = text; ta.style.cssText = 'position:fixed;left:-9999px'; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); done();
-          }
+            navigator.clipboard.writeText(text).then(done).catch(function() { fallbackCopy(text, done); });
+          } else { fallbackCopy(text, done); }
         });
 
         toolbar.appendChild(btn); wrapper.appendChild(toolbar);
         pre.parentNode.insertBefore(wrapper, pre); wrapper.appendChild(pre);
       });
+
+      function fallbackCopy(text, cb) {
+        var ta = document.createElement('textarea'); ta.value = text;
+        ta.style.cssText = 'position:fixed;left:-9999px;top:-9999px';
+        document.body.appendChild(ta); ta.select();
+        try { document.execCommand('copy'); } catch (e) {}
+        document.body.removeChild(ta);
+        if (cb) cb();
+      }
     }
 
     // ============================================================
@@ -1033,7 +1112,6 @@
           return NodeFilter.FILTER_ACCEPT;
         }
       });
-
       var nodes = [], n;
       while ((n = walker.nextNode())) nodes.push(n);
       if (!nodes.length) return;
@@ -1078,28 +1156,21 @@
         var excerpt = (start > 0 ? '…' : '') + text.substring(start, end) + (end < text.length ? '…' : '');
 
         var div = document.createElement('div'); div.className = 'search-result-item';
-
-        // 提取附近标题作为上下文
         var heading = block.closest('h1, h2, h3, h4, h5, h6') || findPreviousHeading(block);
         if (heading && heading !== block) {
           div.innerHTML = '<div class="search-result-title">' + heading.textContent.trim() + '</div>' + excerpt.replace(new RegExp(esc, 'gi'), '<mark>$&</mark>');
         } else {
           div.innerHTML = excerpt.replace(new RegExp(esc, 'gi'), '<mark>$&</mark>');
         }
-
         div.addEventListener('click', function() { closeSearchModal(); block.scrollIntoView({ behavior: 'smooth', block: 'center' }); });
         results.appendChild(div);
       });
-
       if (count === 0) results.innerHTML = '<div class="search-no-results">未找到匹配内容</div>';
     }
 
     function findPreviousHeading(el) {
       var prev = el.previousElementSibling;
-      while (prev) {
-        if (/^H[1-6]$/.test(prev.tagName)) return prev;
-        prev = prev.previousElementSibling;
-      }
+      while (prev) { if (/^H[1-6]$/.test(prev.tagName)) return prev; prev = prev.previousElementSibling; }
       return null;
     }
 
@@ -1129,9 +1200,6 @@
       options: { skipHtmlTags: ['script','noscript','style','textarea','pre','code'], ignoreHtmlClass: 'tex2jax_ignore', processHtmlClass: 'tex2jax_process' }
     };
   </script>
-
-  <!-- PDF 内嵌 (可选，如果不用可删除) -->
-  <!-- <script src="//cdn.jsdelivr.net/npm/docsify-pdf-embed-plugin/dist/docsify-pdf-embed-plugin.min.js"></script> -->
 
   <!-- Docsify 核心 -->
   <script src="//cdn.jsdelivr.net/npm/docsify@4"></script>
