@@ -8,8 +8,8 @@
 - General Physics A1
   - [Mechanics](files/general-physics-a1/mechanics/general-physics-a1-mechanics-review.md)
 - Mathematical Modeling
-  - [Writting Methods](files/mathematical-modeling/how-to-write-a-better-mathematical-modeling-papper.md)
-  - [Methods GA-1](files/mathematical-modeling/Research-on-Genetic-Algorithm-Based-on-Double‑Helix-Chromosome-and-Hierarchical-Structure.pdf)
+  - [Writing Methods](files/mathematical-modeling/how-to-write-a-better-mathematical-modeling-papper.md)
+  - [Methods GA-1](files/mathematical-modeling/Research-on-Genetic-Algorithm-Based-on-Double-Helix-Chromosome-and-Hierarchical-Structure.pdf)
   - [Methods GA-2](files/mathematical-modeling/Hybrid-Genetic-Algorithm-Based-on-Simulated-Annealing.pdf)
 - Notes
   - [Reading Notes](files/notes/reading-notes.md)

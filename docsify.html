@@ -266,9 +266,6 @@
     .markdown-section img{cursor:zoom-in;border-radius:6px;transition:transform .15s}
     .markdown-section img:hover{transform:scale(1.02)}
 
-    /* ============================================================
-       ★ 文档查看器 (PDF / DOCX / TXT)
-       ============================================================ */
     .docviewer-container{width:100%;max-width:860px;margin:0 auto;padding:72px 28px 40px}
     .docviewer-toolbar{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:var(--docviewer-toolbar-bg);border:1px solid var(--border);border-radius:10px 10px 0 0;gap:10px;flex-wrap:wrap}
     .docviewer-toolbar .dv-info{font-size:.78rem;color:var(--text-secondary);display:flex;align-items:center;gap:12px;flex:1;min-width:0}
@@ -280,12 +277,9 @@
     .docviewer-content{background:var(--bg);border:1px solid var(--border);border-top:none;border-radius:0 0 10px 10px;min-height:300px;overflow:auto}
     .docviewer-content .dv-placeholder{display:flex;align-items:center;justify-content:center;flex-direction:column;padding:60px 20px;color:var(--text-muted);gap:12px}
     .docviewer-content .dv-placeholder svg{opacity:.35}
-    /* PDF 页面 */
     .docviewer-pdf-page{display:flex;justify-content:center;padding:16px;background:var(--bg-secondary)}
     .docviewer-pdf-page canvas{max-width:100%;height:auto!important;box-shadow:0 2px 16px var(--shadow);border-radius:4px}
-    /* TXT 内容 */
     .docviewer-txt{font-family:'JetBrains Mono',monospace;font-size:.84rem;line-height:1.7;padding:20px 24px;white-space:pre-wrap;word-break:break-word;color:var(--text)}
-    /* DOCX 渲染 */
     .docviewer-docx{padding:20px 28px;line-height:1.7;color:var(--text)}
     .docviewer-docx h1,.docviewer-docx h2,.docviewer-docx h3{color:var(--heading-color);margin:1.2rem 0 .5rem}
     .docviewer-docx table{border-collapse:collapse;width:100%;margin:1rem 0}
@@ -377,9 +371,6 @@
     (function() {
       'use strict';
 
-      /* ==========================================================
-         Configuration
-         ========================================================== */
       var CFG = {
         BASE_PATH: '/my-docs/',
         LOADER_MAX_ANGLE: 9,
@@ -401,7 +392,6 @@
         PREVIEW_CACHE_MAX: 25,
         PREVIEW_DEBOUNCE: 350,
         PREVIEW_HIDE_DELAY: 180,
-        // ★ 文档查看器 CDN
         PDFJS_CDN: 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js',
         PDFJS_WORKER: 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js',
         MAMMOTH_CDN: 'https://cdn.jsdelivr.net/npm/mammoth@1.6.0/mammoth.browser.min.js'
@@ -414,6 +404,7 @@
       };
 
       var DOM = {};
+      function el(id){return document.getElementById(id);}
       function cacheDOM() {
         DOM.loading=el('loading');DOM.docHeader=el('docHeader');DOM.loaderWrapper=el('loaderWrapper');
         DOM.loaderTriangle=el('loaderTriangle');DOM.loadingError=el('loadingError');
@@ -430,11 +421,17 @@
         DOM.previewCard=el('linkPreviewCard');
         DOM.sidebarSearchBtn=null;DOM.sidebarCloseBtn=null;DOM.sidebarFilterInput=null;DOM.sidebarBrand=null;
       }
-      function el(id){return document.getElementById(id);}
 
-      /* ==========================================================
-         Utility Functions
-         ========================================================== */
+      /* ★ 路径编码工具：对 URL 路径中非 ASCII 字符逐段 encodeURIComponent */
+      function encodePath(path) {
+        if (!path || path.startsWith('http')) return path;
+        var hi = path.indexOf('#');
+        var p = hi === -1 ? path : path.substring(0, hi);
+        var h = hi === -1 ? '' : path.substring(hi);
+        var encoded = p.split('/').map(function(seg) { return encodeURIComponent(seg); }).join('/');
+        return encoded + h;
+      }
+
       function toast(msg,type){type=type||'info';if(!DOM.toastContainer)return;var e=document.createElement('div');e.className='toast '+type;e.textContent=msg;DOM.toastContainer.appendChild(e);setTimeout(function(){if(e.parentNode)e.remove();},CFG.TOAST_DURATION);}
       function freezeTransitions(el){el.classList.add('no-transition');return function(){requestAnimationFrame(function(){requestAnimationFrame(function(){el.classList.remove('no-transition');});});};}
       function copyToClipboard(text,cb){var done=function(){if(cb)cb();};if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(text).then(done).catch(function(){fallbackCopy(text,done);});}else{fallbackCopy(text,done);}}
@@ -443,48 +440,30 @@
       function randomId(){return Math.random().toString(36).substr(2,8);}
       function countText(text){var w=(text||'').replace(/\s+/g,' ').trim().split(/\s+/).filter(Boolean).length;var c=((text||'').match(/[\u4e00-\u9fff]/g)||[]).length;return{words:w,chinese:c,total:w+c};}
 
-      /* ==========================================================
-         Module: Loader
-         ========================================================== */
       var Loader={_mouseHandler:null,init:function(){if(!DOM.loaderWrapper||!DOM.loaderTriangle)return;var self=this,ma=CFG.LOADER_MAX_ANGLE,bs=CFG.LOADER_BASE_SHADOW;this._mouseHandler=function(e){if(state.loading)return;var dx=(e.clientX-window.innerWidth/2)/(window.innerWidth/2),dy=(e.clientY-window.innerHeight/2)/(window.innerHeight/2);DOM.loaderWrapper.style.transform='rotateX('+(-dy*ma)+'deg) rotateY('+(dx*ma)+'deg) translateZ(14px)';DOM.loaderTriangle.style.filter=bs+' drop-shadow('+(dx*10)+'px '+(dy*10)+'px 12px rgba(0,0,0,0.35))';};document.addEventListener('mousemove',this._mouseHandler);},hide:function(){if(state.loading)return;state.loading=true;if(DOM.loading){DOM.loading.classList.add('fade-out');setTimeout(function(){if(DOM.loading)DOM.loading.style.display='none';},450);}if(DOM.docHeader)DOM.docHeader.style.display='flex';if(this._mouseHandler){document.removeEventListener('mousemove',this._mouseHandler);this._mouseHandler=null;}},showError:function(){if(!state.loading&&DOM.loadingError)DOM.loadingError.classList.add('show');}};
 
-      /* ==========================================================
-         Module: ThemeWave
-         ========================================================== */
       var ThemeWave={_ctx:null,_ensureContext:function(){if(!this._ctx&&DOM.waveCanvas)this._ctx=DOM.waveCanvas.getContext('2d');return this._ctx;},animate:function(fillColor){var canvas=DOM.waveCanvas,ctx=this._ensureContext();if(!canvas||!ctx)return;if(state.waveAnimId){cancelAnimationFrame(state.waveAnimId);state.waveAnimId=null;}canvas.width=window.innerWidth;canvas.height=window.innerHeight;canvas.style.display='block';var w=canvas.width,h=canvas.height,freq=CFG.WAVE_FREQ,maxAmp=CFG.WAVE_MAX_AMP,harmonics=CFG.WAVE_HARMONICS,dur=CFG.WAVE_DURATION,st=performance.now();function frame(now){var raw=Math.min((now-st)/dur,1),eased=1-Math.pow(1-raw,4),waveY=-maxAmp+eased*(h+maxAmp*2),ampEnvelope=Math.sin(eased*Math.PI),amp=maxAmp*ampEnvelope,steps=Math.max(2,Math.floor(w/1.5)),ps=eased*Math.PI*1.8;ctx.clearRect(0,0,w,h);ctx.beginPath();ctx.moveTo(0,0);for(var i=0;i<=steps;i++){var x=(i/steps)*w,phase=(i/steps)*Math.PI*2*freq+ps,yOff=0;for(var j=0;j<harmonics.length;j++)yOff+=Math.sin(phase*harmonics[j].mult)*amp*harmonics[j].amp;ctx.lineTo(x,waveY+yOff);}ctx.lineTo(w,h);ctx.lineTo(0,h);ctx.closePath();ctx.fillStyle=fillColor;ctx.fill();ctx.save();ctx.clip();var gT=waveY-amp-10,gB=waveY+amp+80,grd=ctx.createLinearGradient(0,gT,0,gB);grd.addColorStop(0,'rgba(0,0,0,0)');grd.addColorStop(.3,'rgba(0,0,0,0)');grd.addColorStop(.6,'rgba(0,0,0,0.10)');grd.addColorStop(1,'rgba(0,0,0,0)');ctx.fillStyle=grd;ctx.fillRect(0,gT,w,gB-gT);ctx.restore();ctx.beginPath();for(var i=0;i<=steps;i++){var x=(i/steps)*w,phase=(i/steps)*Math.PI*2*freq+ps,yOff=0;for(var j=0;j<harmonics.length;j++)yOff+=Math.sin(phase*harmonics[j].mult)*amp*harmonics[j].amp;if(i===0)ctx.moveTo(x,waveY+yOff);else ctx.lineTo(x,waveY+yOff);}ctx.strokeStyle='rgba(255,255,255,0.20)';ctx.lineWidth=1.4;ctx.stroke();ctx.beginPath();for(var i=0;i<=steps;i++){var x=(i/steps)*w,phase=(i/steps)*Math.PI*2*freq+ps,yOff=0;for(var j=0;j<harmonics.length;j++)yOff+=Math.sin(phase*harmonics[j].mult)*amp*harmonics[j].amp;if(i===0)ctx.moveTo(x,waveY+yOff-1.0);else ctx.lineTo(x,waveY+yOff-1.0);}ctx.strokeStyle='rgba(255,255,255,0.38)';ctx.lineWidth=.5;ctx.stroke();if(raw<1)state.waveAnimId=requestAnimationFrame(frame);else{ctx.clearRect(0,0,w,h);canvas.style.display='none';state.waveAnimId=null;}}state.waveAnimId=requestAnimationFrame(frame);}};
 
-      /* ==========================================================
-         Module: DarkMode
-         ========================================================== */
       var DarkMode={toggle:function(){var oldBg=getComputedStyle(document.body).getPropertyValue('--bg').trim()||(document.body.classList.contains('dark')?'#0d1117':'#fff');document.body.classList.toggle('dark');try{localStorage.setItem(CFG.DARK_MODE_KEY,String(document.body.classList.contains('dark')));}catch(e){}ThemeWave.animate(oldBg);},restore:function(){try{if(localStorage.getItem(CFG.DARK_MODE_KEY)==='true')document.body.classList.add('dark');}catch(e){}}};
 
-      /* ==========================================================
-         Modules: ProgressBar, BackToTop, ReadingStats, DocTitle
-         ========================================================== */
       var ProgressBar={update:function(){if(!DOM.readingProgress)return;var dh=document.documentElement.scrollHeight-window.innerHeight;DOM.readingProgress.style.width=dh<=0?'0%':Math.min(100,Math.max(0,(window.scrollY/dh)*100))+'%';}};
       var BackToTop={update:function(){if(!DOM.backToTop)return;var v=window.scrollY>CFG.BACK_TO_TOP_THRESHOLD;DOM.backToTop.classList.toggle('visible',v);if(v){var dh=document.documentElement.scrollHeight-window.innerHeight;DOM.backToTop.style.setProperty('--scroll-pct',dh>0?Math.min(100,Math.round((window.scrollY/dh)*100))+'%':'0%');}}};
       var ReadingStats={update:function(){if(!DOM.readingStats)return;var c=document.querySelector('.markdown-section');if(!c){DOM.readingStats.innerHTML='';return;}var text=c.textContent||'',ct=countText(text),mins=Math.max(1,Math.ceil((ct.words/200)+(ct.chinese/400))),wcFmt=ct.total>=1000?(ct.total/1000).toFixed(1)+'k':ct.total;DOM.readingStats.innerHTML='<span>'+wcFmt+' 字</span><span>⏱ ~'+mins+' min</span>';}};
       var DocTitle={update:function(){if(!DOM.docTitle)return;var a=document.querySelector('.sidebar-nav .active'),t='';if(a){var l=a.querySelector(':scope > a');t=(l||a).textContent.trim();}if(!t){var h1=document.querySelector('.markdown-section h1');if(h1)t=h1.textContent.trim();}if(!t&&window.location.hash)t=decodeURIComponent(window.location.hash.substring(1)).replace(/\?.*$/,'').replace(/-/g,' ');DOM.docTitle.textContent=t||'文档';}};
 
-      /* ==========================================================
-         Module: HeadingAnchors, TOC, ReadingPosition, Lightbox, CodeBlock
-         ========================================================== */
       var HeadingAnchors={add:function(){var c=document.querySelector('.markdown-section');if(!c)return;c.querySelectorAll('h1,h2,h3,h4').forEach(function(h){if(h.querySelector('.heading-anchor'))return;if(!h.id)h.id='h-'+randomId();var a=document.createElement('a');a.className='heading-anchor';a.innerHTML='#';a.title='复制链接';a.href='javascript:void(0)';a.addEventListener('click',function(e){e.preventDefault();e.stopPropagation();copyToClipboard(window.location.origin+window.location.pathname+'?id='+h.id+'#'+h.id,function(){toast('✓ 链接已复制','success');});});h.appendChild(a);});}};
       var TOC={generate:function(){var c=document.querySelector('.markdown-section');if(!c||!DOM.tocContent)return;var hs=c.querySelectorAll('h1,h2,h3,h4');if(hs.length<CFG.TOC_MIN_HEADINGS){if(DOM.tocPanel)DOM.tocPanel.classList.remove('visible');if(DOM.tocToggleBtn){DOM.tocToggleBtn.classList.remove('active');DOM.tocToggleBtn.style.display='none';}return;}if(DOM.tocToggleBtn)DOM.tocToggleBtn.style.display='';var html='';hs.forEach(function(h,i){if(!h.id)h.id='toc-'+i;html+='<a href="#'+h.id+'" class="toc-'+h.tagName.toLowerCase()+'" data-target="'+h.id+'">'+h.textContent.trim()+'</a>';});DOM.tocContent.innerHTML=html;DOM.tocContent.querySelectorAll('a').forEach(function(a){a.addEventListener('click',function(e){e.preventDefault();var t=document.getElementById(a.getAttribute('data-target'));if(t)t.scrollIntoView({behavior:'smooth',block:'start'});});});this.highlight();},highlight:function(){var ls=document.querySelectorAll('#toc-content a');if(!ls.length)return;var st=window.scrollY+CFG.TOC_SCROLL_OFFSET,aid=null;ls.forEach(function(a){var el=document.getElementById(a.getAttribute('data-target'));if(el&&el.offsetTop<=st)aid=a.getAttribute('data-target');});ls.forEach(function(a){a.classList.toggle('active',a.getAttribute('data-target')===aid);});},clear:function(){if(DOM.tocContent)DOM.tocContent.innerHTML='';if(DOM.tocPanel)DOM.tocPanel.classList.remove('visible');},toggle:function(){if(DOM.tocPanel)DOM.tocPanel.classList.toggle('visible');if(DOM.tocToggleBtn)DOM.tocToggleBtn.classList.toggle('active');}};
       var ReadingPosition={_pk:function(){return window.location.pathname+window.location.hash;},save:function(){try{localStorage.setItem(CFG.READING_POSITION_KEY,JSON.stringify({scrollY:window.scrollY,pageKey:this._pk(),timestamp:Date.now()}));}catch(e){}},restore:function(){try{var r=localStorage.getItem(CFG.READING_POSITION_KEY);if(!r)return;var d=JSON.parse(r);if(d.pageKey===this._pk()&&typeof d.scrollY==='number')setTimeout(function(){window.scrollTo({top:d.scrollY,behavior:'instant'});},150);}catch(e){}}};
       var Lightbox={init:function(){if(!DOM.lightbox||!DOM.lightboxImg)return;var s=this,lc=DOM.lightbox.querySelector('.lb-close');DOM.lightbox.addEventListener('click',function(e){if(e.target===DOM.lightbox||e.target===lc)s.close();});if(lc)lc.addEventListener('click',function(){s.close();});document.addEventListener('keydown',function(e){if(e.key==='Escape'&&DOM.lightbox.classList.contains('active'))s.close();});},open:function(src,alt){if(!DOM.lightbox||!DOM.lightboxImg)return;DOM.lightboxImg.src=src;DOM.lightboxImg.alt=alt||'';DOM.lightbox.classList.add('active');document.body.style.overflow='hidden';},close:function(){if(!DOM.lightbox)return;DOM.lightbox.classList.remove('active');document.body.style.overflow='';},bindImages:function(){var s=this;document.querySelectorAll('.markdown-section img').forEach(function(img){if(img.hasAttribute('data-lb'))return;img.setAttribute('data-lb','1');img.addEventListener('click',function(e){e.preventDefault();s.open(img.src,img.alt||'');});});}};
       var CodeBlock={enhance:function(){document.querySelectorAll('.markdown-section pre').forEach(function(pre){if(pre.parentNode.classList.contains('code-block-wrapper'))return;var code=pre.querySelector('code'),lang='';if(code&&code.className){var m=code.className.match(/lang(?:uage)?-(\w+)/);if(m)lang=m[1];}var w=document.createElement('div');w.className='code-block-wrapper';var tb=document.createElement('div');tb.className='code-toolbar';tb.innerHTML='<span class="code-lang">'+(lang||'code')+'</span>';var btn=document.createElement('button');btn.className='code-copy-btn';btn.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy';btn.addEventListener('click',function(){var text=pre.textContent||'';var done=function(){btn.classList.add('copied');btn.innerHTML='✓ Copied';toast('✓ 代码已复制','success');setTimeout(function(){btn.classList.remove('copied');btn.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy';},CFG.CODE_COPIED_DURATION);};copyToClipboard(text,done);});tb.appendChild(btn);w.appendChild(tb);pre.parentNode.insertBefore(w,pre);w.appendChild(pre);});},addLineNumbers:function(){document.querySelectorAll('.code-block-wrapper pre').forEach(function(pre){if(pre.querySelector('.code-line-numbers'))return;var code=pre.querySelector('code');if(!code)return;var lines=(code.textContent||'').split('\n');if(lines.length>1&&lines[lines.length-1].trim()==='')lines.pop();var h='';for(var i=0;i<lines.length;i++)h+='<span>'+(i+1)+'</span>';var ln=document.createElement('div');ln.className='code-line-numbers';ln.innerHTML=h;pre.insertBefore(ln,pre.firstChild);});}};
 
-      /* ==========================================================
-         Module: LinkPreview
-         ========================================================== */
       var LinkPreview={
         _cache:null,_activeHref:null,_hoverTimer:null,_hideTimer:null,init:function(){this._cache=new Map();this._bind();},
         _bind:function(){var s=this;document.addEventListener('mouseover',function(e){var a=e.target.closest('a');if(!a){s._scheduleHide();return;}var href=a.getAttribute('href')||'';if(!href||href.startsWith('http://')||href.startsWith('https://')||href.startsWith('#')||href==='javascript:void(0)'){s._scheduleHide();return;}if(!s._isDoc(href)){s._scheduleHide();return;}s._activeHref=href;clearTimeout(s._hoverTimer);clearTimeout(s._hideTimer);s._hoverTimer=setTimeout(function(){s._show(a,href);},CFG.PREVIEW_DEBOUNCE);},{passive:true});document.addEventListener('mouseout',function(e){var a=e.target.closest('a');if(!a){s._scheduleHide();return;}if((a.getAttribute('href')||'')===s._activeHref)s._scheduleHide();},{passive:true});},
         _isDoc:function(h){return /\.(md|markdown|html?|pdf|txt|docx?)$/i.test(h)||(h.indexOf('.')===-1&&h.indexOf('#')!==0);},
         _scheduleHide:function(){var s=this;clearTimeout(this._hoverTimer);clearTimeout(this._hideTimer);this._activeHref=null;this._hideTimer=setTimeout(function(){s._hide();},CFG.PREVIEW_HIDE_DELAY);},
-        _resolveUrl:function(h){return new URL(h,window.location.href).href;},
-        _show:function(anchor,href){var s=this;if(this._cache.has(href)){this._render(anchor,this._cache.get(href));return;}this._showLoader(anchor);fetch(this._resolveUrl(href)).then(function(r){if(!r.ok)throw new Error('404');return r.text();}).then(function(text){var p=s._parse(text);s._cache.set(href,p);if(s._cache.size>CFG.PREVIEW_CACHE_MAX)s._cache.delete(s._cache.keys().next().value);if(s._activeHref===href)s._render(anchor,p);}).catch(function(){if(s._activeHref===href)s._hide();});},
+        _resolveUrl:function(h){return new URL(encodePath(h),window.location.href).href;},
+        _show:function(anchor,href){var s=this;if(this._cache.has(href)){this._render(anchor,this._cache.get(href));return;}this._showLoader(anchor);fetch(encodePath(this._resolveUrl(href))).then(function(r){if(!r.ok)throw new Error('404');return r.text();}).then(function(text){var p=s._parse(text);s._cache.set(href,p);if(s._cache.size>CFG.PREVIEW_CACHE_MAX)s._cache.delete(s._cache.keys().next().value);if(s._activeHref===href)s._render(anchor,p);}).catch(function(){if(s._activeHref===href)s._hide();});},
         _parse:function(md){var lines=md.split('\n'),title='',excerpt='',inC=false,el=0,MAX=200;for(var i=0;i<lines.length;i++){var line=lines[i].trim();if(!title&&/^#\s/.test(line)){title=line.replace(/^#\s+/,'');inC=true;continue;}if(inC&&line&&!/^#/.test(line)&&!/^```/.test(line)&&!/^\|/.test(line)&&!/^[-*]\s/.test(line)){var add=line+' ';excerpt+=add;el+=add.length;if(el>=MAX)break;}}return{title:title||'Untitled',excerpt:(excerpt.trim()||'No preview').substring(0,MAX),words:countText(title+' '+excerpt).total};},
         _showLoader:function(a){if(!DOM.previewCard)return;DOM.previewCard.innerHTML='<div class="lp-loader">Loading preview…</div>';this._pos(DOM.previewCard,a);DOM.previewCard.style.display='block';},
         _render:function(a,p){if(!DOM.previewCard)return;DOM.previewCard.innerHTML='<div class="lp-title">'+this._esc(p.title)+'</div><div class="lp-excerpt">'+this._esc(p.excerpt)+'</div><div class="lp-meta"><span>⏱ ~'+Math.max(1,Math.ceil(p.words/400))+' min</span></div>';this._pos(DOM.previewCard,a);DOM.previewCard.style.display='block';},
@@ -494,30 +473,19 @@
         dispose:function(){clearTimeout(this._hoverTimer);clearTimeout(this._hideTimer);this._cache.clear();this._hide();}
       };
 
-      /* ==========================================================
-         ★ Module: DocViewer — multi-format document reader
-         ========================================================== */
       var DocViewer = {
-        _pdfLib: null,
-        _mammothLib: null,
-        _loadingLibs: {},
-
-        /** Detect if current route is a supported document file */
+        _pdfLib: null, _mammothLib: null, _loadingLibs: {},
         isDocFile: function() {
           var hash = window.location.hash || '';
           var path = hash.replace(/^#/,'').replace(/\?.*$/,'');
           return /\.(pdf|docx?|txt)$/i.test(path);
         },
-
-        /** Get file path and type from current route */
         _getFileInfo: function() {
           var hash = window.location.hash || '';
           var path = hash.replace(/^#/,'').replace(/\?.*$/,'');
           var ext = (path.match(/\.(\w+)$/i)||[])[1]||'';
           return { path: path, ext: ext.toLowerCase() };
         },
-
-        /** Main entry: render the document into .markdown-section */
         render: function() {
           var info = this._getFileInfo();
           if (!info.ext) return;
@@ -532,8 +500,6 @@
             default: break;
           }
         },
-
-        /** Build the shell HTML for the document viewer */
         _buildHTML: function(info) {
           var label = ({pdf:'PDF Document',docx:'Word Document',doc:'Word Document',txt:'Plain Text'})[info.ext]||'Document';
           return '<div class="docviewer-container">' +
@@ -546,8 +512,6 @@
             '</div>' +
           '</div>';
         },
-
-        /** ----- PDF Renderer (PDF.js) ----- */
         _renderPDF: function(path, section) {
           var self = this;
           this._loadLib('pdf', function() {
@@ -562,7 +526,6 @@
             });
           });
         },
-
         _buildPDFUI: function(pdf, section) {
           var self = this;
           var content = section.querySelector('#dvContent');
@@ -611,49 +574,35 @@
           section.querySelector('#dvZoomIn').onclick = function() { zoomLevel = Math.min(2.5, zoomLevel+0.15); applyZoom(); };
           function updateInfo() { var el = section.querySelector('#dvPageInfo'); if (el) el.textContent = currentPage+' / '+totalPages; }
 
-          // Keyboard navigation
           var keyHandler = function(e) {
             if (!state.docViewerActive) { document.removeEventListener('keydown', keyHandler); return; }
             if (e.key === 'ArrowLeft') { if (currentPage>1) { currentPage--; renderPage(currentPage); updateInfo(); } }
             if (e.key === 'ArrowRight') { if (currentPage<totalPages) { currentPage++; renderPage(currentPage); updateInfo(); } }
           };
           document.addEventListener('keydown', keyHandler);
-          // Store for cleanup
           section._dvKeyHandler = keyHandler;
-
           renderPage(1);
         },
-
-        _showPage: function(canvas, content, num, total) {
-          content.innerHTML = '<div class="docviewer-pdf-page"></div>';
-          content.querySelector('.docviewer-pdf-page').appendChild(canvas);
-        },
-
-        /** ----- DOCX Renderer (mammoth.js) ----- */
+        _showPage: function(canvas, content) { content.innerHTML = '<div class="docviewer-pdf-page"></div>'; content.querySelector('.docviewer-pdf-page').appendChild(canvas); },
         _renderDOCX: function(path, section) {
           var self = this;
           this._loadLib('mammoth', function() {
             var mammoth = self._mammothLib;
             if (!mammoth) { self._showError(section, 'Failed to load mammoth.js'); return; }
-            var url = self._resolvePath(path);
-            fetch(url).then(function(r) { if (!r.ok) throw new Error('HTTP '+r.status); return r.arrayBuffer(); })
+            fetch(self._resolvePath(path)).then(function(r) { if (!r.ok) throw new Error('HTTP '+r.status); return r.arrayBuffer(); })
               .then(function(buf) { return mammoth.convertToHtml({arrayBuffer: buf}); })
               .then(function(result) {
                 var content = section.querySelector('#dvContent');
                 content.innerHTML = '<div class="docviewer-docx">'+result.value+'</div>';
                 var buttons = section.querySelector('#dvButtons');
                 if (buttons) buttons.innerHTML = '<span style="font-size:.7rem;color:var(--text-muted)">Rendered by mammoth.js</span>';
-                if (result.messages.length) console.warn('Mammoth warnings:', result.messages);
               })
               .catch(function(err) { self._showError(section, 'Failed to render DOCX: '+err.message); });
           });
         },
-
-        /** ----- TXT Renderer (native fetch) ----- */
         _renderTXT: function(path, section) {
           var self = this;
-          var url = this._resolvePath(path);
-          fetch(url).then(function(r) { if (!r.ok) throw new Error('HTTP '+r.status); return r.text(); })
+          fetch(this._resolvePath(path)).then(function(r) { if (!r.ok) throw new Error('HTTP '+r.status); return r.text(); })
             .then(function(text) {
               var content = section.querySelector('#dvContent');
               content.innerHTML = '<pre class="docviewer-txt">'+self._esc(text)+'</pre>';
@@ -662,22 +611,16 @@
             })
             .catch(function(err) { self._showError(section, 'Failed to load TXT: '+err.message); });
         },
-
-        /** ----- Helpers ----- */
         _resolvePath: function(path) {
           if (path.startsWith('http')) return path;
-          return CFG.BASE_PATH.replace(/\/$/,'') + '/' + path.replace(/^\//,'');
+          return CFG.BASE_PATH.replace(/\/$/,'') + '/' + encodePath(path).replace(/^\//,'');
         },
-
         _showError: function(section, msg) {
           var content = section.querySelector('#dvContent');
           if (content) content.innerHTML = '<div class="dv-placeholder" style="color:#c0392b">⚠ '+this._esc(msg)+'</div>';
           toast(msg, 'info');
         },
-
         _esc: function(s) { var d = document.createElement('div'); d.textContent = s; return d.innerHTML; },
-
-        /** Lazy-load external library (PDF.js or mammoth) */
         _loadLib: function(name, cb) {
           var self = this;
           if (name === 'pdf' && this._pdfLib) { cb(); return; }
@@ -687,30 +630,17 @@
           var url = name === 'pdf' ? CFG.PDFJS_CDN : CFG.MAMMOTH_CDN;
           var s = document.createElement('script');
           s.src = url;
-          s.onload = function() {
-            self._loadingLibs[name] = false;
-            if (name === 'pdf') self._pdfLib = window.pdfjsLib;
-            if (name === 'mammoth') self._mammothLib = window.mammoth;
-            cb();
-          };
+          s.onload = function() { self._loadingLibs[name] = false; if (name === 'pdf') self._pdfLib = window.pdfjsLib; if (name === 'mammoth') self._mammothLib = window.mammoth; cb(); };
           s.onerror = function() { self._loadingLibs[name] = false; cb(); };
           document.head.appendChild(s);
         },
-
-        /** Cleanup when navigating away */
         dispose: function() {
           state.docViewerActive = false;
           var section = document.querySelector('.markdown-section');
-          if (section && section._dvKeyHandler) {
-            document.removeEventListener('keydown', section._dvKeyHandler);
-            section._dvKeyHandler = null;
-          }
+          if (section && section._dvKeyHandler) { document.removeEventListener('keydown', section._dvKeyHandler); section._dvKeyHandler = null; }
         }
       };
 
-      /* ==========================================================
-         Module: Search
-         ========================================================== */
       var Search={
         open:function(){if(!DOM.searchOverlay)return;DOM.searchOverlay.classList.add('active');if(DOM.searchInput){DOM.searchInput.value='';DOM.searchInput.focus();}if(DOM.searchResults)DOM.searchResults.innerHTML='';Search._clr();state.searchSelectedIdx=-1;},
         close:function(){if(DOM.searchOverlay)DOM.searchOverlay.classList.remove('active');if(DOM.searchResults)DOM.searchResults.innerHTML='';Search._clr();state.searchSelectedIdx=-1;},
@@ -723,9 +653,6 @@
         _sel:function(items){for(var i=0;i<items.length;i++){items[i].classList.toggle('selected',i===state.searchSelectedIdx);if(i===state.searchSelectedIdx)items[i].scrollIntoView({block:'nearest'});}}
       };
 
-      /* ==========================================================
-         Module: Sidebar
-         ========================================================== */
       var Sidebar={
         injectHeader:function(){var sb=document.querySelector('.sidebar');if(!sb||sb.querySelector('.sidebar-header'))return;var nav=sb.querySelector('.sidebar-nav');if(!nav)return;var h=document.createElement('div');h.className='sidebar-header';h.innerHTML='<span class="sidebar-brand" id="sidebarBrand">📚 知识库总览</span><input type="text" class="sidebar-filter-input" id="sidebarFilterInput" placeholder="过滤…"><div class="sidebar-actions"><button class="icon-btn" id="sidebarSearchBtn" title="过滤"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg></button><button class="icon-btn" id="sidebarCloseBtn" title="关闭"><svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button></div>';sb.insertBefore(h,nav);DOM.sidebarSearchBtn=el('sidebarSearchBtn');DOM.sidebarCloseBtn=el('sidebarCloseBtn');DOM.sidebarFilterInput=el('sidebarFilterInput');DOM.sidebarBrand=el('sidebarBrand');Sidebar._bind();},
         _bind:function(){if(DOM.sidebarCloseBtn)DOM.sidebarCloseBtn.addEventListener('click',function(){document.body.classList.add('close');});if(DOM.sidebarSearchBtn&&DOM.sidebarFilterInput&&DOM.sidebarBrand){DOM.sidebarSearchBtn.addEventListener('click',function(){if(DOM.sidebarFilterInput.classList.contains('show')){DOM.sidebarFilterInput.classList.remove('show');DOM.sidebarBrand.classList.remove('hidden');DOM.sidebarFilterInput.value='';Sidebar.filter('');}else{DOM.sidebarFilterInput.classList.add('show');DOM.sidebarBrand.classList.add('hidden');DOM.sidebarFilterInput.focus();}});}if(DOM.sidebarFilterInput){DOM.sidebarFilterInput.addEventListener('input',function(){Sidebar.filter(this.value);});DOM.sidebarFilterInput.addEventListener('keydown',function(e){if(e.key==='Escape'){this.value='';Sidebar.filter('');this.classList.remove('show');if(DOM.sidebarBrand)DOM.sidebarBrand.classList.remove('hidden');}});}},
@@ -738,9 +665,6 @@
         filter:function(kw){var all=document.querySelectorAll('.sidebar-nav li');if(!kw||!kw.trim()){for(var i=0;i<all.length;i++)all[i].classList.remove('filtered-out');return;}var kwl=kw.trim().toLowerCase();for(var i=0;i<all.length;i++){var li=all[i],el=li.querySelector(':scope > a')||li.querySelector(':scope > .folder-label'),text=(el?el.textContent:li.textContent)||'',cu=li.querySelector('ul'),cm=false;if(cu){var clis=cu.querySelectorAll('li');for(var j=0;j<clis.length;j++){if((clis[j].textContent||'').toLowerCase().indexOf(kwl)!==-1){cm=true;break;}}}if(text.toLowerCase().indexOf(kwl)!==-1||cm){li.classList.remove('filtered-out');if(cm&&cu&&!cu.classList.contains('expanded'))Sidebar._expand(li,cu);}else{li.classList.add('filtered-out');}}}
       };
 
-      /* ==========================================================
-         Module: Keyboard
-         ========================================================== */
       var Keyboard={
         init:function(){document.addEventListener('keydown',Keyboard._h);},
         _h:function(e){var tag=(e.target.tagName||'').toLowerCase(),isInput=tag==='input'||tag==='textarea'||e.target.isContentEditable;if(e.key==='Escape'){Search.close();Keyboard._cS();if(DOM.tocPanel)DOM.tocPanel.classList.remove('visible');if(DOM.tocToggleBtn)DOM.tocToggleBtn.classList.remove('active');}if((e.ctrlKey||e.metaKey)&&e.key==='k'){e.preventDefault();Search.open();return;}if((e.ctrlKey||e.metaKey)&&e.key==='b'){e.preventDefault();document.body.classList.toggle('close');return;}if((e.ctrlKey||e.metaKey)&&e.key==='d'){e.preventDefault();DarkMode.toggle();return;}if((e.ctrlKey||e.metaKey)&&e.key==='ArrowUp'){e.preventDefault();window.scrollTo({top:0,behavior:'smooth'});return;}if(e.key==='/'&&!isInput){e.preventDefault();Search.open();return;}if(e.key==='?'&&!isInput){e.preventDefault();Keyboard._oS();return;}},
@@ -748,9 +672,6 @@
         _cS:function(){if(DOM.shortcutsPanel)DOM.shortcutsPanel.classList.remove('active');}
       };
 
-      /* ==========================================================
-         Scroll Handler (RAF throttled)
-         ========================================================== */
       var scrollRAF=null;
       function onScroll(){
         if(scrollRAF)return;
@@ -775,9 +696,6 @@
         section.appendChild(footer);
       }
 
-      /* ==========================================================
-         Docsify Hooks
-         ========================================================== */
       function onPageReady(){
         cacheDOM();DarkMode.restore();Loader.init();Loader.hide();Sidebar.injectHeader();LinkPreview.init();_bindGlobalEvents();Lightbox.init();
         document.body.classList.remove('close');DocTitle.update();ReadingStats.update();
@@ -793,16 +711,9 @@
         DocViewer.dispose();
         ReadingPosition.save();DocTitle.update();ReadingStats.update();Search.close();CodeBlock.enhance();TOC.clear();Sidebar.reset();
         setTimeout(function(){
-          // ★ 检测是否为文档文件
-          if (DocViewer.isDocFile()) {
-            DocViewer.render();
-            // 隐藏 markdown-section 的 TOC 引用
-            TOC.clear();
-          } else {
-            Sidebar.initFolders();TOC.generate();HeadingAnchors.add();CodeBlock.addLineNumbers();Lightbox.bindImages();injectFooter();
-          }
-          ProgressBar.update();
-          unfreeze();
+          if (DocViewer.isDocFile()) { DocViewer.render(); TOC.clear(); }
+          else { Sidebar.initFolders();TOC.generate();HeadingAnchors.add();CodeBlock.addLineNumbers();Lightbox.bindImages();injectFooter(); }
+          ProgressBar.update(); unfreeze();
           setTimeout(function(){ReadingPosition.restore();},CFG.DOM_RESTORE_DELAY);
         },150);
         if(window.MathJax&&typeof window.MathJax.typesetPromise==='function')window.MathJax.typesetPromise();
