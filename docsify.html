@@ -733,12 +733,35 @@
         window.addEventListener('resize',function(){if(state.waveAnimId&&DOM.waveCanvas){DOM.waveCanvas.width=window.innerWidth;DOM.waveCanvas.height=window.innerHeight;}});
       }
 
-      window.$docsify={
-        name:'Soren的知识库',loadSidebar:'_sidebar.md',subMaxLevel:0,
-        basePath:CFG.BASE_PATH,homepage:'README.md',notFoundPage:true,
-        externalLinkTarget:'_blank',topMargin:60,maxLevel:6,
-        plugins:[function(hook){hook.ready(onPageReady);hook.doneEach(onPageSwitch);}]
-      };
+      window.$docsify = {
+  name: 'Soren的知识库',
+  loadSidebar: '_sidebar.md',
+  subMaxLevel: 0,
+  basePath: CFG.BASE_PATH,
+  homepage: 'README.md',
+  notFoundPage: true,
+  externalLinkTarget: '_blank',
+  topMargin: 60,
+  maxLevel: 6,
+  plugins: [
+    // ★ 插件 1：拦截 PDF/DOCX/TXT，防止 Docsify 404
+    function(hook) {
+      hook.beforeEach(function(content) {
+        if (DocViewer.isDocFile()) {
+          // 在下一帧渲染 DocViewer（此时 DOM 已就绪）
+          setTimeout(function() { DocViewer.render(); }, 30);
+          return ''; // 返回空内容，跳过 Docsify 默认加载
+        }
+        return content;
+      });
+    },
+    // 插件 2：主体功能
+    function(hook) {
+      hook.ready(onPageReady);
+      hook.doneEach(onPageSwitch);
+    }
+  ]
+};
       window.MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']],displayMath:[['$$','$$'],['\\[','\\]']],processEscapes:true},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code'],ignoreHtmlClass:'tex2jax_ignore',processHtmlClass:'tex2jax_process'}};
     })();
   </script>
