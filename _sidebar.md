@@ -9,7 +9,7 @@
   - [Mechanics](files/general-physics-a1/mechanics/general-physics-a1-mechanics-review.md)
 - Mathematical Modeling
   - [Writing Methods](files/mathematical-modeling/how-to-write-a-better-mathematical-modeling-papper.md)
-  - [Methods GA-1](files/mathematical-modeling/Research-Genetic-Algorithm-Double-Helix-Chromosome.pdf)
+  - [Methods GA-1](files/mathematical-modeling/Research-Genetic-Algorithm-Double-Helix-Chromosome.pdf)  <!-- 保持相对链接 -->
   - [Methods GA-2](files/mathematical-modeling/Hybrid-Genetic-Algorithm-Simulated-Annealing.pdf)
 - Notes
   - [Reading Notes](files/notes/reading-notes.md)

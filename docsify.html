@@ -718,8 +718,6 @@
   TOC.clear();
   Sidebar.reset();
   setTimeout(function() {
-    // ★ 不再在这里判断 DocViewer.isDocFile()
-    // 由 beforeEach hook 统一处理
     Sidebar.initFolders();
     TOC.generate();
     HeadingAnchors.add();
@@ -760,23 +758,45 @@
   topMargin: 60,
   maxLevel: 6,
   plugins: [
-    // ★ 插件 1：拦截 PDF/DOCX/TXT，防止 Docsify 404
-    function(hook) {
-      hook.beforeEach(function(content) {
-        if (DocViewer.isDocFile()) {
-          // 在下一帧渲染 DocViewer（此时 DOM 已就绪）
-          setTimeout(function() { DocViewer.render(); }, 30);
-          return ''; // 返回空内容，跳过 Docsify 默认加载
-        }
-        return content;
-      });
-    },
-    // 插件 2：主体功能
-    function(hook) {
-      hook.ready(onPageReady);
-      hook.doneEach(onPageSwitch);
-    }
-  ]
+  // ★ 插件 1：阻止 Docsify Router 给非 Markdown 文件追加 .md
+  function(hook, vm) {
+    hook.init(function() {
+      // Monkey-patch 内部路径解析：保留 PDF/DOCX/TXT 原始扩展名
+      if (vm && vm._getFile) {
+        var origGetFile = vm._getFile;
+        vm._getFile = function(path) {
+          if (/\.(pdf|docx?|txt|png|jpe?g|gif|svg|webp|ico)$/i.test(path)) {
+            return path; // 不追加 .md
+          }
+          return origGetFile.call(vm, path);
+        };
+      }
+      // 备用：同时 patch router 的 normalize 方法
+      if (vm && vm.router && vm.router.normalize) {
+        var origNormalize = vm.router.normalize;
+        vm.router.normalize = function(path) {
+          if (/\.(pdf|docx?|txt)$/i.test(path)) {
+            return path;
+          }
+          return origNormalize.call(vm.router, path);
+        };
+      }
+    });
+
+    hook.beforeEach(function(content) {
+      if (DocViewer.isDocFile()) {
+        setTimeout(function() { DocViewer.render(); }, 30);
+        return '';
+      }
+      return content;
+    });
+  },
+  // 插件 2：主体功能
+  function(hook) {
+    hook.ready(onPageReady);
+    hook.doneEach(onPageSwitch);
+  }
+]
 };
       window.MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']],displayMath:[['$$','$$'],['\\[','\\]']],processEscapes:true},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code'],ignoreHtmlClass:'tex2jax_ignore',processHtmlClass:'tex2jax_process'}};
     })();
