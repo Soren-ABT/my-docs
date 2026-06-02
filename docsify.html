@@ -706,18 +706,34 @@
         setTimeout(function(){Loader.showError();},CFG.LOADING_ERROR_DELAY);
       }
 
-      function onPageSwitch(){
-        var nav=document.querySelector('.sidebar-nav');var unfreeze=nav?freezeTransitions(nav):function(){};
-        DocViewer.dispose();
-        ReadingPosition.save();DocTitle.update();ReadingStats.update();Search.close();CodeBlock.enhance();TOC.clear();Sidebar.reset();
-        setTimeout(function(){
-          if (DocViewer.isDocFile()) { DocViewer.render(); TOC.clear(); }
-          else { Sidebar.initFolders();TOC.generate();HeadingAnchors.add();CodeBlock.addLineNumbers();Lightbox.bindImages();injectFooter(); }
-          ProgressBar.update(); unfreeze();
-          setTimeout(function(){ReadingPosition.restore();},CFG.DOM_RESTORE_DELAY);
-        },150);
-        if(window.MathJax&&typeof window.MathJax.typesetPromise==='function')window.MathJax.typesetPromise();
-      }
+      function onPageSwitch() {
+  var nav = document.querySelector('.sidebar-nav');
+  var unfreeze = nav ? freezeTransitions(nav) : function() {};
+  DocViewer.dispose();
+  ReadingPosition.save();
+  DocTitle.update();
+  ReadingStats.update();
+  Search.close();
+  CodeBlock.enhance();
+  TOC.clear();
+  Sidebar.reset();
+  setTimeout(function() {
+    // ★ 不再在这里判断 DocViewer.isDocFile()
+    // 由 beforeEach hook 统一处理
+    Sidebar.initFolders();
+    TOC.generate();
+    HeadingAnchors.add();
+    CodeBlock.addLineNumbers();
+    Lightbox.bindImages();
+    injectFooter();
+    ProgressBar.update();
+    unfreeze();
+    setTimeout(function() { ReadingPosition.restore(); }, CFG.DOM_RESTORE_DELAY);
+  }, 150);
+  if (window.MathJax && typeof window.MathJax.typesetPromise === 'function') {
+    window.MathJax.typesetPromise();
+  }
+}
 
       function _bindGlobalEvents(){
         if(DOM.capsuleSidebarBtn)DOM.capsuleSidebarBtn.addEventListener('click',function(){document.body.classList.remove('close');});
